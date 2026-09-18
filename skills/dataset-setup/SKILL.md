@@ -27,7 +27,10 @@ Record every rule that can change examples or labels:
 ```yaml
 id: dataset-setup-<stable-id>
 dataset_revision: dataset-revision-<id>
-setup_revision: <git commit, digest, or path@revision>
+setup_revision:
+  repository: <Git remote or repository identifier>
+  commit: <40-character SHA>
+  paths: [<split, preprocessing, and setup record paths>]
 inputs:
   - name: train
     source_selection: <selection or generation rule>

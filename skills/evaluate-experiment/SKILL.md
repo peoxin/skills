@@ -9,6 +9,8 @@ This entry owns the `evaluate` phase and its report bundle. It can be called dir
 
 Read the Experiment spec, Dataset setup, checkpoint record, metric identity, and execution context. Never treat a missing, failed, cancelled, or partial phase as zero or success. When called by `$run-experiment`, use the supplied run ID, assigned devices, cancellation state, and output locations without allocating a second GPU reservation.
 
+Before direct evaluation, require the confirmed Experiment spec commit and the Git component preflight: clean source paths, complete component SHAs, existing commits, and current checkout paths matching each declared commit. When delegated, use the orchestrator's verified context and re-check it at evaluation start.
+
 ## Compatibility and metrics
 
 Before formal evaluation, check model architecture/revision, checkpoint digest and format, input shape and dtype, preprocessing, label mapping, device constraints, source/license, and the selected Dataset input. Record each check as pass, mismatch, or unknown.
@@ -23,7 +25,10 @@ inputs: [<prediction/target fields>]
 masking: <rule>
 reduction: <rule>
 output_semantics: <meaning>
-implementation_revision: git:<commit> | locator@revision
+implementation_revision:
+  repository: <Git remote or repository identifier>
+  commit: <40-character SHA>
+  paths: [<metric implementation paths>]
 ```
 
 ## Canonical report data
@@ -37,6 +42,13 @@ inputs:
   experiment: <id>
   execution_context: <id>
   dataset_setup: <id>
+experiment_spec_commit: <40-character SHA>
+component_commits:
+  model: {repository: <id>, commit: <40-character SHA>, paths: [<paths>]}
+  dataset_setup: {repository: <id>, commit: <40-character SHA>, paths: [<paths>]}
+  benchmark: {repository: <id>, commit: <40-character SHA>, paths: [<paths>]}
+  evaluation_config: {repository: <id>, commit: <40-character SHA>, paths: [<paths>]}
+  dependencies: {repository: <id>, commit: <40-character SHA>, paths: [<paths>]}
 phases:
   - name: train
     status: completed | failed | cancelled | blocked | partial

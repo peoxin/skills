@@ -24,7 +24,7 @@ Write one falsifiable proposal at a time:
 <metric, direction, expected effect, and uncertainty>
 
 ## Implementation sketch
-<model/training/evaluation changes and fixed component revisions>
+<model/training/evaluation changes and the repository, full 40-character commit SHA, and paths that would fix each component for a formal experiment>
 
 ## Required comparison and ablations
 <baseline, controls, seeds, Dataset setup, metric, and stopping condition>

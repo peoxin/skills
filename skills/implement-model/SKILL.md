@@ -24,6 +24,8 @@ Present:
 6. Tests, smoke test, expected outputs, and known deviations.
 7. Components that must receive fixed revisions for a formal experiment.
 
+After editing, show `git diff`, the exact files to commit, and a proposed commit message. A formal run may consume the change only after the user has created a commit with a complete SHA; this skill does not silently commit changes. Record the model commit and paths in the Experiment spec.
+
 For reproduction, maintain a deviation table:
 
 ```markdown

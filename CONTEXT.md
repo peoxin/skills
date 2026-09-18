@@ -59,11 +59,15 @@ The functional view of one experiment as `Result = f_eval(f_train(Model, Data_tr
 _Avoid_: Training job, benchmark number
 
 **Experiment component revision**:
-The fixed identity of an intentional, reusable input or implementation such as a model, Dataset setup, training function, evaluation function, metric, configuration, or dependency lockfile.
-_Avoid_: Latest code, file version
+The Git identity of an intentional, reusable input or implementation. It records a repository, a complete commit SHA, and the paths whose contents belong to the component, such as a model, Dataset setup, Benchmark, training configuration, evaluation configuration, or dependency lockfile.
+_Avoid_: Latest code, branch-only reference, file version without a commit
+
+**Component commit**:
+The commit that defines the exact contents of one component's declared paths. Different components in one repository may use different commits; a formal run verifies that the current checkout still matches each component commit at its paths.
+_Avoid_: Unverified version label, execution snapshot
 
 **Execution context record**:
-The immutable record of facts about one actual execution, including code commit, Python/PyTorch/CUDA and dependency identities, hardware and assigned devices, timestamps, resource observations, and phase status. It describes where and how an experiment ran rather than defining a reusable component.
+The immutable record of facts about one actual execution, including the observed Git HEAD, component commits, Python/PyTorch/CUDA and dependency identities, hardware and assigned devices, timestamps, resource observations, and phase status. The observed HEAD is audit evidence; component commits define the reproducible input paths.
 _Avoid_: Component revision, environment default
 
 **Experiment phase**:
@@ -87,12 +91,24 @@ An experiment whose declared phases or outputs are incomplete, failed, cancelled
 _Avoid_: Successful experiment, missing run
 
 **Runnable revision**:
-A committed and locatable revision of every code, configuration, Dataset setup, and environment input required for a deliverable run. Draft or dirty-worktree material may support exploration but is not eligible for a formal run.
+A formal runnable revision is identified by a Git repository, a complete 40-character commit SHA, and paths for every code, configuration, Dataset setup, and environment input required for a deliverable run. An external repository is acceptable when its URL or identifier and use are recorded and its commit can be independently verified. Draft or dirty-worktree material may support exploration but is not eligible for a formal run.
 _Avoid_: Latest version, working copy
 
 **Git-tracked experiment**:
-An experiment whose specs, code, configuration, reports, and provenance references are committed or otherwise identified in Git. Large outputs may remain external and be referenced by stable metadata.
-_Avoid_: Git commit, tracker run
+An experiment whose model, Dataset setup, Benchmark, training/evaluation configuration, confirmed Experiment spec, and result records are identified by Git commits. Large outputs may remain external only when their source, digest, and producing commits are recorded.
+_Avoid_: One undifferentiated commit, tracker run
+
+**Experiment control commit**:
+The Git commit containing the confirmed Experiment spec used to start a formal run. It binds the selected component commits, phase declarations, seed, resources, commands, and output locations.
+_Avoid_: Component commit, result commit
+
+**Result commit**:
+A user-confirmed Git commit containing canonical phase manifests, execution context, metrics, report data, rendered reports, and figure metadata for a completed or partial run. It links back to the Experiment control commit and all component commits.
+_Avoid_: Checkpoint file alone, mutable dashboard
+
+**Component verification**:
+The preflight and phase-boundary check that the worktree is clean for source paths, HEAD is unchanged, and every declared component path matches the contents of its recorded Git commit. A failed check blocks formal execution or the next phase.
+_Avoid_: Trusting a branch name, checking only the commit message
 
 **Local multi-GPU execution**:
 The documented procedure for one researcher-controlled multi-GPU machine: observe devices, select and reserve resources, run approved commands, record assignments and context, and release resources without claiming cloud-provider support. The skill collection does not ship a scheduler or runtime.

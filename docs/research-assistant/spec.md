@@ -99,7 +99,7 @@ Result = f_eval(
 )
 ```
 
-Every component is locatable. A component revision is an intentional reusable input or implementation. An execution context record captures what actually happened in one run: commits, Python/PyTorch/CUDA and dependency identities, hardware, assigned GPUs, timestamps, resources, and phase status. Environment facts may change between runs; each run gets its own context record.
+Every formal component is Git-addressed. A component revision records a repository, a complete 40-character commit SHA, and the paths that belong to it. An execution context records the observed HEAD and all component commits used in one run; it does not replace them with a separate execution snapshot. Environment facts may change between runs; each run gets its own context record.
 
 ### Phases and partial work
 
@@ -109,7 +109,15 @@ An external checkpoint is registered with an External checkpoint record and eval
 
 ### Formal and exploratory work
 
-All code, configurations, Dataset setups, metrics, evaluation implementations, and dependency/environment inputs for a deliverable run must be committed or otherwise locatable as Runnable revisions. Dirty or draft work may support exploratory runs and smoke tests, but it is not eligible for a formal benchmark or report claim.
+Formal version contract:
+
+- Model, Dataset setup, Benchmark, training configuration, evaluation configuration, dependency lockfiles, and the confirmed Experiment spec must be identified by Git repository, complete commit SHA, and paths. For an external repository, also record its URL or identifier and how the component is used; verify it from a checkout or other immutable source before execution.
+- Before a formal run, each source checkout must be clean for its declared source paths. For every component, compare the checkout paths with `git show <component.commit>:<path>`; a mismatch blocks the run.
+- Record the Experiment control commit containing the confirmed Experiment spec. Record the observed `git rev-parse HEAD` in the execution context for audit, but use component commits as the reproducibility binding.
+- Check HEAD, source-path cleanliness, and component-path equality before each phase and after each child phase returns. A change blocks the next phase and is written to the manifest.
+- After a complete or partial run, commit canonical manifests, execution context, metrics, report data, rendered reports, and figure metadata as a user-confirmed Result commit. Skills propose the files and commit message but do not commit automatically.
+
+Draft or dirty work may support exploratory runs and smoke tests, but it is not eligible for a formal benchmark or report claim.
 
 Formal execution requires a user-confirmed Experiment spec and resource plan. The assistant may prepare code, validate records, and run low-cost smoke tests before confirmation. It may not silently change a component, resource request, Dataset setup, or benchmark scope.
 
@@ -117,7 +125,7 @@ Formal execution requires a user-confirmed Experiment spec and resource plan. Th
 
 The first execution target is one researcher-controlled multi-GPU machine. `run-experiment` observes local device availability, accepts explicit GPU count and device constraints, explains queue or reservation steps, creates the shared execution context, delegates phase work, records assignments, supports cancellation, and releases resources after success or failure. Child phase skills do not create a second reservation when called by the orchestrator. There is no cloud implementation or bundled scheduler in v1.
 
-Large checkpoints, datasets, logs, and image collections need not be committed to Git. Their manifests record path or external reference, size, digest, generation time, and the component revisions that produced them. Specs, code, configs, reports, and small provenance records are Git-tracked.
+Large checkpoints, datasets, logs, and image collections need not be committed to Git. Their manifests record path or external reference, size, SHA256, generation/download time, and the component commits that produced or consumed them. Dataset processing code, Dataset setup records, checkpoint registration records, specs, code, configs, reports, and small provenance records are Git-tracked.
 
 ## Literature and knowledge
 

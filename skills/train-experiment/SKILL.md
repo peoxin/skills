@@ -11,6 +11,8 @@ This entry owns the `train` phase only. It can be called directly for a standalo
 
 Read the confirmed Experiment spec, the referenced Dataset setup, model/training component revisions, hyperparameter configuration, dependency identity, resource assignment, and execution context. Verify that the declared training input is available and that the output checkpoint path or locator is writable.
 
+Before direct execution, require the confirmed Experiment spec commit and the Git preflight described by `$run-experiment`: clean source paths, complete component SHAs, existing commits, and current checkout paths matching each component commit. When delegated, consume the orchestrator's verified context rather than repeating or weakening it.
+
 When called by `$run-experiment`, use the parent run ID, assigned devices, cancellation state, working directory, and execution context supplied by the orchestrator. Do not allocate a second set of GPUs or silently change the request. For a direct invocation, show and confirm the resource plan before starting.
 
 ## Training procedure
@@ -31,7 +33,13 @@ status: completed | failed | cancelled | partial
 started_at: <timestamp>
 finished_at: <timestamp>
 command: <exact command or immutable command record>
-component_revisions: {model: <revision>, training: <revision>, dependencies: <revision>}
+component_commits:
+  model: {repository: <id>, commit: <40-character SHA>, paths: [<paths>]}
+  dataset_setup: {repository: <id>, commit: <40-character SHA>, paths: [<paths>]}
+  benchmark: {repository: <id>, commit: <40-character SHA>, paths: [<paths>]}
+  training_config: {repository: <id>, commit: <40-character SHA>, paths: [<paths>]}
+  dependencies: {repository: <id>, commit: <40-character SHA>, paths: [<paths>]}
+experiment_spec_commit: <40-character SHA>
 dataset_setup: <id>
 dataset_input: train
 seed: <integer>
