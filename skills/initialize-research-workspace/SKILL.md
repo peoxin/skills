@@ -9,37 +9,53 @@ Prepare the user's target project; do not treat this skill repository as the res
 
 ## Inspect first
 
-Read the target project's Git status, root instructions, `AGENTS.md` or `CLAUDE.md`, existing domain docs, and any existing `.research/` content. Identify conflicts and conventions without writing files.
+Read the target project's Git status, root instructions, `AGENTS.md` or `CLAUDE.md`, existing domain docs, and any existing root-level research directories. Identify conflicts and conventions without writing files.
 
 Inspect Git as a source of provenance, but do not create commits during initialization. The formal workflow requires the user to commit component records and the confirmed Experiment spec before execution; the user also creates the Result commit after a run. The initializer may document the repository identifier and expected paths in starter Markdown, but must not claim a component is fixed until a full commit SHA is available.
 
-Propose only the directories the project needs:
+Create the complete set of root-level research directories after confirmation. Do not create component subdirectories; the component-specific skills create those lazily after the user names or confirms a component:
 
 ```text
-.research/
-  library/       # confirmed source records and analyses
-  datasets/      # Dataset revisions and Dataset setups
-  benchmarks/    # reusable Benchmark specs
-  experiments/   # concrete Experiment specs
-  runs/          # phase manifests and artifact references
-  reports/       # canonical report data and rendered reports
+sources/         # papers, preprints, repositories, documentation, and analyses
+data/            # logical Datasets and their Dataset setups
+models/          # self-contained model components
+benchmarks/      # self-contained data-and-metric protocols
+experiments/     # concrete Experiment specs, including optional training settings
+results/         # execution results, manifests, reports, figures, and artifacts
 ```
+
+Directory conventions:
+
+```text
+data/<dataset-id>/setups/<setup-id>/
+models/<model-id>/
+benchmarks/<benchmark-id>/metrics/
+benchmarks/<benchmark-id>/visualizations/
+experiments/<experiment-id>/experiment.yaml
+results/<experiment-id>/<result-id>/
+```
+
+Do not create top-level `training/`, `evaluation/`, `metrics/`, `runs/`, `reports/`, `common/`, or `_shared/` directories. Training and evaluation are Experiment phases; training settings live in `experiment.yaml`; metric implementations belong to their Benchmark; each model is self-contained.
 
 Show the exact files to create, existing files to preserve, and any optional registration text for the target project's agent instructions. Wait for confirmation. Create missing files only; overwrite a file only when the user names it explicitly.
 
 ## Starter document
 
-When useful, create `.research/README.md` with this minimum content:
+Create `README.md` files in the root-level directories when useful. A root `README.md` may contain this minimum content:
 
 ```markdown
 # Research workspace
 
-This directory stores explicit handoffs between research skills.
+This project uses component-oriented research directories.
 
-- Markdown: plans, source analyses, proposals, and human-readable reports.
-- YAML/JSON: Dataset setups, Benchmark specs, Experiment specs, run manifests, metric records, and report data.
-- Large datasets, checkpoints, logs, and figures may live elsewhere; records identify them by stable path or locator and digest.
-- Formal results require confirmed specs and fixed Git component records. Exploratory work is labeled and cannot silently become benchmark evidence. Large datasets, checkpoints, logs, and figures may remain outside Git only with source/version or producing commits, path or URL, size, SHA256, and relevant timestamps recorded.
+- `sources/`: literature and resource records; it is not an experiment component.
+- `data/`: logical Datasets, Dataset setups, processing code, and setup records.
+- `models/`: self-contained model implementations, configurations, and tests.
+- `benchmarks/`: self-contained data-and-metric protocols, metric implementations, and optional visualizations.
+- `experiments/`: concrete Experiment specs with optional training settings and train/evaluate phases.
+- `results/`: one directory per execution result, including manifests, reports, figures, and artifact references.
+- Large datasets, checkpoints, logs, and figures may live outside Git; records identify them by stable path or locator, source, size, SHA256, and relevant component commits.
+- Formal results require confirmed specs and fixed Git component records. Exploratory work is labeled and cannot silently become benchmark evidence.
 ```
 
 Do not generate model code, training scripts, cloud configuration, or a generic experiment runtime during initialization. Finish by listing created and preserved files and the next relevant skill.

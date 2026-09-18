@@ -7,13 +7,15 @@ description: Execute or analyze an experiment evaluation phase and produce trace
 
 This entry owns the `evaluate` phase and its report bundle. It can be called directly for an existing checkpoint or delegated to by `$run-experiment`. It does not schedule a train phase or decide the parent experiment's phase order.
 
-Read the Experiment spec, Dataset setup, checkpoint record, metric identity, and execution context. Never treat a missing, failed, cancelled, or partial phase as zero or success. When called by `$run-experiment`, use the supplied run ID, assigned devices, cancellation state, and output locations without allocating a second GPU reservation.
+Unless the Experiment spec declares another location, write the evaluation report bundle under `results/<experiment-id>/<result-id>/`.
+
+Read the Experiment spec, the Benchmark's selected Dataset setup inputs, checkpoint record, Benchmark-owned metric identities and implementations, and execution context. Never treat a missing, failed, cancelled, or partial phase as zero or success. When called by `$run-experiment`, use the supplied run ID, assigned devices, cancellation state, and output locations without allocating a second GPU reservation.
 
 Before direct evaluation, require the confirmed Experiment spec commit and the Git component preflight: clean source paths, complete component SHAs, existing commits, and current checkout paths matching each declared commit. When delegated, use the orchestrator's verified context and re-check it at evaluation start.
 
 ## Compatibility and metrics
 
-Before formal evaluation, check model architecture/revision, checkpoint digest and format, input shape and dtype, preprocessing, label mapping, device constraints, source/license, and the selected Dataset input. Record each check as pass, mismatch, or unknown.
+Before formal evaluation, check model architecture/revision, checkpoint digest and format, input shape and dtype, preprocessing, label mapping, device constraints, source/license, and every selected Benchmark input. Record each check as pass, mismatch, or unknown.
 
 Keep metric identity separate from a metric value:
 
@@ -25,10 +27,7 @@ inputs: [<prediction/target fields>]
 masking: <rule>
 reduction: <rule>
 output_semantics: <meaning>
-implementation_revision:
-  repository: <Git remote or repository identifier>
-  commit: <40-character SHA>
-  paths: [<metric implementation paths>]
+implementation_paths: [benchmarks/<benchmark-id>/metrics/<metric implementation paths>]
 ```
 
 ## Canonical report data
@@ -41,13 +40,17 @@ title: <report title>
 inputs:
   experiment: <id>
   execution_context: <id>
-  dataset_setup: <id>
+  dataset_setups: [<dataset-setup-id>]
+  benchmark_inputs: [<named Benchmark inputs>]
 experiment_spec_commit: <40-character SHA>
 component_commits:
   model: {repository: <id>, commit: <40-character SHA>, paths: [<paths>]}
-  dataset_setup: {repository: <id>, commit: <40-character SHA>, paths: [<paths>]}
+  dataset_setups:
+    - id: <dataset-setup-id>
+      repository: <id>
+      commit: <40-character SHA>
+      paths: [<paths>]
   benchmark: {repository: <id>, commit: <40-character SHA>, paths: [<paths>]}
-  evaluation_config: {repository: <id>, commit: <40-character SHA>, paths: [<paths>]}
   dependencies: {repository: <id>, commit: <40-character SHA>, paths: [<paths>]}
 phases:
   - name: train
@@ -67,4 +70,4 @@ missing: [<missing input, failed phase, or unresolved interpretation>]
 
 Render a Markdown or HTML view from this data. Include phase status, inputs, aggregation/statistics, metrics, figure links, compatibility results, failures, and missingness. Optional project-provided visualization hooks may add qualitative examples and error cases; they must record their input and revision and may not rewrite canonical metrics.
 
-Return an evaluation phase manifest linking the checkpoint, Dataset input, metric records, report data, rendered report, figures, execution context, assigned GPUs, and final status. `$run-experiment` uses this manifest when writing the parent run manifest.
+Return an evaluation phase manifest linking the checkpoint, Benchmark inputs, metric records, report data, rendered report, figures, execution context, assigned GPUs, and final status. `$run-experiment` uses this manifest when writing the parent Result manifest.

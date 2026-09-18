@@ -16,11 +16,11 @@ _Avoid_: Pipeline stage, internal utility
 A thin entry that recommends or sequences existing skills while preserving their separate files, rules, outputs, and confirmation points.
 _Avoid_: Central orchestrator, hidden workflow engine
 
-**Research library**:
-A file-based local collection of literature records, source links or snapshots, analysis notes, resource indexes, and project terminology that skills can search and update alongside on-demand web research.
-_Avoid_: Knowledge service, vector database
+**Source collection**:
+A file-based local collection of literature and resource records, source links or snapshots, analysis notes, resource indexes, and project terminology that skills can search and update alongside on-demand web research. It is stored under the target project's root-level `sources/` directory and is not an experiment component.
+_Avoid_: Research library, knowledge service, vector database
 
-**Research library write policy**:
+**Source collection write policy**:
 Search and synthesis results become durable local records only after an explicit user request or confirmation; machine-generated indexes may refresh without promoting unverified claims to facts.
 _Avoid_: Automatic web archive, conversation memory
 
@@ -38,28 +38,32 @@ _Avoid_: Dataset name, data path, processed split
 A versioned declaration that derives usable inputs from a raw dataset revision through split selection or generation, filtering, sampling, preprocessing, augmentation, label mapping, and other data-use rules. Standard inputs are train, validation, and test; custom inputs may be named explicitly and unavailable inputs are recorded.
 _Avoid_: Dataset view, data folder, eval split
 
+**Logical component directory**:
+A stable root-level directory for one reusable research component or family, such as `data/<dataset-id>`, `models/<model-id>`, or `benchmarks/<benchmark-id>`. Its name identifies the logical component, not a version; formal reproducibility comes from the recorded Git commit and paths.
+_Avoid_: Version directory, dated snapshot, commit-named folder
+
 **Dataset setup skill**:
 A user-facing capability that inspects or creates a Dataset setup independently of model implementation and experiment execution, validates its derived inputs, and records the source dataset and transformation choices for reuse.
 _Avoid_: Dataset loader, hidden preprocessing
 
 **Benchmark spec**:
-A reusable comparison contract for a task and research question, defining eligible Dataset setups, metrics, baselines, seed and aggregation rules, selection constraints, resource expectations, and required report outputs across multiple experiment specs.
-_Avoid_: One run config, score table
+A reusable data-and-metric evaluation contract that may combine multiple Dataset setups, names the train, validation, test, or custom inputs derived from them, defines composition and input mapping, and fixes metric identities, aggregation, and optional qualitative outputs. It does not choose a model, baseline, seed, resource request, or concrete checkpoint.
+_Avoid_: Baseline suite, one run config, score table
 
 **Experiment plan**:
 The research design for a set of experiments, including questions, comparisons, intended benchmark coverage, evaluation approach, and resource envelope. It is not directly executable.
 _Avoid_: Experiment config, run config
 
 **Experiment spec**:
-A fully resolved, executable declaration for one concrete experiment or phase, binding component revisions, Dataset setup, phase inputs, seed, resources, commands, and output locations. It may reference a Benchmark spec but never replaces it.
+A fully resolved, executable declaration for one concrete experiment, binding model, one or more Dataset setups through a Benchmark, the optional training configuration, seed, resources, commands, phases, and output locations. Training configuration may be absent or not applicable for evaluation-only work; the Experiment control commit fixes the complete declaration.
 _Avoid_: Experiment plan, benchmark protocol, training config
 
 **Experiment composition**:
-The functional view of one experiment as `Result = f_eval(f_train(Model, Data_train, Hyperparameter_config), Data_test, Eval_metric)`, where train and test inputs are derived from a Dataset setup and every input, transformation, and function implementation has a fixed revision.
+The functional view of one experiment as `Result = f_eval(f_train(Model, Data_train, Hyperparameter_config), Data_test, Eval_metric)`, where named train and test inputs are selected by a Benchmark and may be composed from multiple Dataset setups; every input, transformation, and function implementation has a fixed revision.
 _Avoid_: Training job, benchmark number
 
 **Experiment component revision**:
-The Git identity of an intentional, reusable input or implementation. It records a repository, a complete commit SHA, and the paths whose contents belong to the component, such as a model, Dataset setup, Benchmark, training configuration, evaluation configuration, or dependency lockfile.
+The Git identity of an intentional, reusable input or implementation. It records a repository, a complete commit SHA, and the paths whose contents belong to the component, such as a model, Dataset setup, Benchmark, benchmark-owned metric implementation, or dependency lockfile. The concrete training and evaluation settings belong to the Experiment control commit.
 _Avoid_: Latest code, branch-only reference, file version without a commit
 
 **Component commit**:
@@ -95,11 +99,11 @@ A formal runnable revision is identified by a Git repository, a complete 40-char
 _Avoid_: Latest version, working copy
 
 **Git-tracked experiment**:
-An experiment whose model, Dataset setup, Benchmark, training/evaluation configuration, confirmed Experiment spec, and result records are identified by Git commits. Large outputs may remain external only when their source, digest, and producing commits are recorded.
+An experiment whose model, Dataset setup(s), Benchmark, confirmed Experiment spec including applicable training settings, and result records are identified by Git commits. Large outputs may remain external only when their source, digest, and producing commits are recorded.
 _Avoid_: One undifferentiated commit, tracker run
 
 **Experiment control commit**:
-The Git commit containing the confirmed Experiment spec used to start a formal run. It binds the selected component commits, phase declarations, seed, resources, commands, and output locations.
+The Git commit containing the confirmed Experiment spec used to start a formal run. It binds the selected model, Dataset setup references, Benchmark, optional training settings, phase declarations, seed, resources, commands, and output locations.
 _Avoid_: Component commit, result commit
 
 **Result commit**:
@@ -119,7 +123,7 @@ A provenance record for a checkpoint obtained outside the current training phase
 _Avoid_: Downloaded file, pretrained model name
 
 **Evaluation-only experiment**:
-An experiment composition with no local train phase that evaluates an external or previously produced checkpoint against a declared model implementation, Dataset setup, evaluation implementation, and metric.
+An experiment composition with no local train phase that evaluates an external or previously produced checkpoint against a declared model implementation, one or more Dataset setups selected by a Benchmark, and the Benchmark's metric implementations.
 _Avoid_: Fake training run, ad hoc evaluation
 
 **Checkpoint compatibility check**:
@@ -145,12 +149,12 @@ Canonical metrics, tables, provenance, and source links are changed only in stru
 _Avoid_: Freeform result editing, manual override
 
 **Metric identity**:
-The versioned definition and implementation contract of a metric, including direction, units, inputs, masking, reduction, and output semantics.
+The versioned definition and implementation contract of a metric, including direction, units, inputs, masking, reduction, output semantics, and the Benchmark-owned implementation path.
 _Avoid_: Metric name, score
 
 **Evaluation protocol**:
-A versioned declaration of how experiment outputs become evidence, including selected Dataset setup inputs, metrics, comparisons, seed/statistics policy, tolerances, aggregation, and failure criteria.
-_Avoid_: Scoring script, ad hoc evaluation
+The input-mapping and metric-evaluation portion of a Benchmark spec, including how one or more Dataset setups become named inputs and how metric values are aggregated.
+_Avoid_: Baseline suite, scoring script, ad hoc evaluation
 
 **Source record**:
 A literature or resource entry containing source type, title/author or owner, URL or locator, access date, version/commit when available, citation data, and verification status.

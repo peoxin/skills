@@ -27,7 +27,7 @@ The entries may be invoked independently. Do not force a fixed pipeline or maint
 
 Use project files as the handoff between skills. Prefer Markdown for plans, analyses, and human reports; use YAML or JSON for records that commands or later skills must consume.
 
-For formal experiment evidence, identify the model, Dataset setup, Benchmark, training configuration, evaluation configuration, and dependency inputs by a Git repository, a complete 40-character commit SHA, and the paths that define each component. The confirmed Experiment spec is committed as the Experiment control commit, and manifests, report data, and rendered outputs are committed as a user-confirmed Result commit. An external repository is allowed only when its URL or repository identifier, full SHA, paths, and use in the experiment are recorded and independently verifiable. Do not substitute a branch, tag, short SHA, `latest`, dirty-worktree marker, or `locator@revision`. Draft or dirty work is allowed for exploration and smoke tests, but label it accordingly.
+For formal experiment evidence, identify the model, every Dataset setup selected by the Benchmark, the self-contained Benchmark and its metric implementations, and dependency inputs by a Git repository, a complete 40-character commit SHA, and the paths that define each component. The confirmed Experiment spec, including applicable training settings and phase configuration, is committed as the Experiment control commit, and manifests, report data, and rendered outputs are committed as a user-confirmed Result commit. An external repository is allowed only when its URL or repository identifier, full SHA, paths, and use in the experiment are recorded and independently verifiable. Do not substitute a branch, tag, short SHA, `latest`, dirty-worktree marker, or `locator@revision`. Draft or dirty work is allowed for exploration and smoke tests, but label it accordingly.
 
 Model one complete experiment as:
 
@@ -42,7 +42,7 @@ Result = f_eval(
 Keep these distinctions explicit:
 
 - A raw Dataset revision identifies source content; a Dataset setup defines how it becomes usable named inputs.
-- A Benchmark spec defines a reusable comparison contract; an Experiment spec defines one concrete model/configuration/seed and its phases.
+- A Benchmark spec defines a reusable data-and-metric protocol that may compose multiple Dataset setups; an Experiment spec defines one concrete model/configuration/seed and its phases.
 - Train and evaluate are independent phases with separate status and outputs.
 - A component revision defines an intended reusable input; an execution context records what actually happened in one run. The component commit is the reproducibility binding; the observed HEAD is audit evidence.
 - Machine-readable results are authoritative; Markdown reports render and interpret them without silently changing values.

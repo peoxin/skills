@@ -12,6 +12,20 @@ Use one of two intents:
 
 If intent is unclear, ask. Inspect the target project's instructions, architecture, data interfaces, training entry points, tests, and dependency conventions before proposing edits.
 
+## Default directory
+
+Place each logical model in a self-contained root-level directory:
+
+```text
+models/
+  <model-id>/
+    model.py
+    config.yaml
+    tests/
+```
+
+The directory name is not a version; formal runs record its repository, full commit, and paths. Do not create or require `common/`, `lib/`, `_shared/`, or another shared model-code directory. If two models need similar code, copy the relevant implementation into each model directory and maintain each copy independently.
+
 ## Plan before edits
 
 Present:
@@ -24,7 +38,7 @@ Present:
 6. Tests, smoke test, expected outputs, and known deviations.
 7. Components that must receive fixed revisions for a formal experiment.
 
-After editing, show `git diff`, the exact files to commit, and a proposed commit message. A formal run may consume the change only after the user has created a commit with a complete SHA; this skill does not silently commit changes. Record the model commit and paths in the Experiment spec.
+After editing, show `git diff`, the exact files to commit, and a proposed commit message. A formal run may consume the change only after the user has created a commit with a complete SHA; this skill does not silently commit changes. Record the `models/<model-id>/` commit and paths in the Experiment spec.
 
 For reproduction, maintain a deviation table:
 

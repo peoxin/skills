@@ -7,9 +7,11 @@ description: Execute or document the training phase of a confirmed deep-learning
 
 This entry owns the `train` phase only. It can be called directly for a standalone training phase or delegated to by `$run-experiment`. It does not evaluate a checkpoint, compare metrics across runs, or write the final report bundle.
 
+Unless the Experiment spec declares another location, write training manifests and artifact references under `results/<experiment-id>/<result-id>/`.
+
 ## Inputs
 
-Read the confirmed Experiment spec, the referenced Dataset setup, model/training component revisions, hyperparameter configuration, dependency identity, resource assignment, and execution context. Verify that the declared training input is available and that the output checkpoint path or locator is writable.
+Read the confirmed Experiment spec, the Benchmark's selected Dataset setup inputs, model and Benchmark component revisions, optional training settings, dependency identity, resource assignment, and execution context. Verify that the declared training inputs are available and that the output checkpoint path or locator is writable.
 
 Before direct execution, require the confirmed Experiment spec commit and the Git preflight described by `$run-experiment`: clean source paths, complete component SHAs, existing commits, and current checkout paths matching each component commit. When delegated, consume the orchestrator's verified context rather than repeating or weakening it.
 
@@ -17,7 +19,7 @@ When called by `$run-experiment`, use the parent run ID, assigned devices, cance
 
 ## Training procedure
 
-1. Record the exact training command, configuration, seed, Dataset setup/input, component revisions, assigned physical GPU indices, and output locations.
+1. Record the exact training command, Experiment training settings, seed, Benchmark input mapping, component revisions, assigned physical GPU indices, and output locations.
 2. Run the target project's own training launcher and environment. The skill may provide PyTorch code or command snippets in Markdown, but it does not install a generic runner.
 3. Preserve stdout/stderr, checkpoints, training curves, and intermediate artifacts by stable path or locator and digest where practical.
 4. Verify that the declared checkpoint exists and can be identified by the model revision, configuration, and training run that produced it.
@@ -35,13 +37,15 @@ finished_at: <timestamp>
 command: <exact command or immutable command record>
 component_commits:
   model: {repository: <id>, commit: <40-character SHA>, paths: [<paths>]}
-  dataset_setup: {repository: <id>, commit: <40-character SHA>, paths: [<paths>]}
+  dataset_setups:
+    - id: <dataset-setup-id>
+      repository: <id>
+      commit: <40-character SHA>
+      paths: [<paths>]
   benchmark: {repository: <id>, commit: <40-character SHA>, paths: [<paths>]}
-  training_config: {repository: <id>, commit: <40-character SHA>, paths: [<paths>]}
   dependencies: {repository: <id>, commit: <40-character SHA>, paths: [<paths>]}
 experiment_spec_commit: <40-character SHA>
-dataset_setup: <id>
-dataset_input: train
+benchmark_inputs: [<named Benchmark inputs>]
 seed: <integer>
 assigned_gpus: [<physical indices>]
 checkpoint: {path_or_locator: <value>, digest: <value>, model_revision: <value>}
@@ -50,4 +54,4 @@ log: <path or locator>
 reason: <required for failed, cancelled, or partial status>
 ```
 
-Return the manifest and artifact locators. A failed or partial training phase is not a successful experiment; `$run-experiment` decides whether an evaluation phase may continue under `allow_partial_train`.
+Return the manifest and artifact locators. A failed or partial training phase is not a successful experiment; `$run-experiment` decides whether an evaluation phase may continue under `allow_partial_train`. The manifest belongs under the parent Result directory.

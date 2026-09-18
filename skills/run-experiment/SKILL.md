@@ -5,7 +5,7 @@ description: Orchestrate confirmed deep-learning experiment phases on a research
 
 # Run Experiment
 
-This is the orchestration entry. Run only a `confirmed` Experiment spec. Before starting, verify that code, Dataset setup, configuration, training/evaluation commands, metric, and dependencies are fixed revisions. A draft or dirty run must be labeled exploratory and cannot silently produce formal evidence.
+This is the orchestration entry. Run only a `confirmed` Experiment spec. Before starting, verify that the model, every Dataset setup selected by the Benchmark, self-contained Benchmark and metric implementation, Experiment configuration, and dependencies are fixed revisions. A draft or dirty run must be labeled exploratory and cannot silently produce formal evidence.
 
 Delegate phase work instead of reimplementing it:
 
@@ -13,6 +13,8 @@ Delegate phase work instead of reimplementing it:
 - `evaluate` phase: call `$evaluate-experiment`.
 
 Both child skills remain independently callable. The orchestrator passes them the parent run ID, phase inputs, execution context, assigned devices, cancellation state, and output locations.
+
+Unless the confirmed Experiment spec declares another location, use `results/<experiment-id>/<result-id>/` for the Result directory. Keep manifests, report data, rendered reports, figures, and artifact references under that Result directory.
 
 ## Git preflight
 
@@ -55,10 +57,12 @@ git_commit: <observed HEAD full SHA or null for exploratory work>
 experiment_spec_commit: <40-character SHA>
 component_commits:
   model: {repository: <id>, commit: <40-character SHA>, paths: [<paths>]}
-  dataset_setup: {repository: <id>, commit: <40-character SHA>, paths: [<paths>]}
+  dataset_setups:
+    - id: <dataset-setup-id>
+      repository: <id>
+      commit: <40-character SHA>
+      paths: [<paths>]
   benchmark: {repository: <id>, commit: <40-character SHA>, paths: [<paths>]}
-  training_config: {repository: <id>, commit: <40-character SHA>, paths: [<paths>]}
-  evaluation_config: {repository: <id>, commit: <40-character SHA>, paths: [<paths>]}
   dependencies: {repository: <id>, commit: <40-character SHA>, paths: [<lockfile paths>]}
 python: <runtime identity>
 pytorch: <runtime identity>

@@ -11,6 +11,18 @@ Prefer primary sources. Treat search snippets and assistant summaries as discove
 
 Present a shortlist before writing durable records. Save selected sources only after the user asks or confirms.
 
+Use the target project's root-level `sources/` directory for durable records:
+
+```text
+sources/
+  papers/
+  repositories/
+  documentation/
+  analyses/
+```
+
+Place each selected record under the matching source-class directory. Do not store downloaded model code, datasets, or checkpoints in `sources/`; record their locator, version, and provenance instead.
+
 ## Source record
 
 Use this shape in Markdown, YAML, or JSON:

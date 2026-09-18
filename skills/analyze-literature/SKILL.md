@@ -7,6 +7,8 @@ description: Analyze selected papers and resources with source locators, impleme
 
 Analyze selected, inspectable sources. Separate reported facts, derivations, your inference, conflicts, and missing details. Bind every material claim to a page, section, table, figure, equation, code path, commit, or URL anchor.
 
+Write confirmed source analyses under the target project's `sources/analyses/` directory. Keep the source record and its analysis separate so a paper, repository, or documentation source can have multiple analysis notes without changing its identity.
+
 ## Per-source analysis
 
 Use this Markdown structure:

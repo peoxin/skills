@@ -9,6 +9,32 @@ This repository develops a user-directed research assistant, not an autonomous r
 
 The assistant may search, summarize, generate plans and code, run static checks, run smoke tests, queue confirmed experiments, and assemble reports. The researcher owns the research question, hypotheses, benchmark acceptance, interpretation, and final written claims.
 
+## Target project layout
+
+The initialized target project uses visible root-level directories organized by research component:
+
+```text
+sources/       # papers, preprints, repositories, documentation, and analyses
+data/          # logical Datasets and Dataset setups
+models/        # self-contained model implementations and tests
+benchmarks/    # self-contained data-and-metric protocols
+experiments/   # concrete Experiment specs, including optional training settings
+results/       # execution results, manifests, reports, figures, and artifacts
+```
+
+The initializer creates these six root directories after confirmation. Component skills create subdirectories lazily:
+
+```text
+data/<dataset-id>/setups/<setup-id>/
+models/<model-id>/
+benchmarks/<benchmark-id>/metrics/
+benchmarks/<benchmark-id>/visualizations/
+experiments/<experiment-id>/experiment.yaml
+results/<experiment-id>/<result-id>/
+```
+
+Do not create top-level `training/`, `evaluation/`, `metrics/`, `runs/`, `reports/`, `common/`, or `_shared/` directories. Training and evaluation are Experiment phases; training settings belong in `experiment.yaml`; metric implementations belong to their Benchmark; and each model is self-contained.
+
 ## Scope
 
 In scope:
@@ -18,7 +44,7 @@ In scope:
 - source analysis, literature reviews, and evidence-linked notes;
 - reproducing an existing model or implementing a model from a user idea through one shared model-implementation entry;
 - explicit raw dataset records and reusable Dataset setups;
-- reusable Benchmark specs and concrete Experiment specs;
+- reusable data-and-metric Benchmark specs and concrete Experiment specs;
 - local multi-GPU execution with a queue, device assignment, and phase-level manifests;
 - train and evaluate phases that may complete independently;
 - external-checkpoint evaluation-only experiments;
@@ -51,7 +77,7 @@ Each entry is independently callable. They exchange explicit files, not hidden c
 5. `dataset-setup`
    Register a raw Dataset revision and create or validate a Dataset setup describing splits, preprocessing, sampling, label mapping, and derived input digests.
 6. `define-experiment`
-   Create or revise Benchmark specs and concrete Experiment specs. Bind component revisions, Dataset setup, phases, seeds, metrics, resources, commands, and outputs without starting formal execution.
+   Create or revise data-and-metric Benchmark specs and concrete Experiment specs. Bind model, one or more Dataset setups, Benchmark, optional training settings, phases, seed, resources, commands, and outputs without starting formal execution.
 7. `run-experiment`
    Orchestrate confirmed Experiment phases through the local multi-GPU procedure. Allocate resources, call the training and evaluation entries, preserve shared execution context, handle cancellation and partial states, and write the parent manifest.
 8. `train-experiment`
@@ -59,7 +85,7 @@ Each entry is independently callable. They exchange explicit files, not hidden c
 9. `evaluate-experiment`
    Execute or collect an evaluation phase, check checkpoint compatibility, and generate canonical metric/report records plus rendered reports, tables, plots, and optional visualization-hook outputs. It can be called directly or by `run-experiment`.
 10. `propose-improvements`
-   Combine Source analyses, Research library records, and experiment reports into evidence-linked improvement proposals with hypotheses, mechanisms, risks, and ablations.
+   Combine Source analyses, Source collection records, and experiment reports into evidence-linked improvement proposals with hypotheses, mechanisms, risks, and ablations.
 11. `write-report`
     Produce an editable paper or technical-report draft from confirmed sources, reports, and claims. It does not submit or review the document.
 12. `research-assistant` (optional convenience entry)
@@ -81,13 +107,15 @@ raw Dataset revision
 
 The raw Dataset revision identifies the source content, provenance, licensing/access conditions, and retention. It is not directly consumed by training or evaluation. A Dataset setup records how usable inputs are derived, including custom splits or processing that differs from an original dataset definition. `eval` is not a default split name; evaluation is a phase that selects a declared input such as validation, test, or a custom input.
 
-The reusable comparison layer and one concrete run are different:
+The reusable data-and-metric evaluation layer and one concrete run are different:
 
 ```text
-Benchmark spec
-  -> Experiment spec (one model/seed/config/phase instance)
-  -> Experiment spec (another seed, baseline, or ablation)
+Benchmark spec (one or more Dataset setups, inputs, metrics, aggregation)
+  -> Experiment spec (one model/seed/configuration/phase instance)
+  -> Result (one execution, possibly partial)
 ```
+
+Benchmark does not own baselines or model comparisons. An Experiment may compare models by referencing the same Benchmark from multiple Experiment specs.
 
 The functional model of a complete experiment is:
 
@@ -99,11 +127,13 @@ Result = f_eval(
 )
 ```
 
-Every formal component is Git-addressed. A component revision records a repository, a complete 40-character commit SHA, and the paths that belong to it. An execution context records the observed HEAD and all component commits used in one run; it does not replace them with a separate execution snapshot. Environment facts may change between runs; each run gets its own context record.
+`Data_train` and `Data_test` are named Benchmark inputs and may be composed from multiple Dataset setups.
+
+Every formal component is Git-addressed. A component revision records a repository, a complete 40-character commit SHA, and the paths that belong to it. A Benchmark directory is self-contained, including its metric implementations and optional visualizations; model directories are likewise self-contained and do not use a shared model directory. An execution context records the observed HEAD and all component commits used in one run; it does not replace them with a separate execution snapshot. Environment facts may change between runs; each run gets its own context record.
 
 ### Phases and partial work
 
-An Experiment spec may contain independent `train` and `evaluate` phases. `run-experiment` orchestrates only the phases declared in the spec by calling `train-experiment` and/or `evaluate-experiment`. Training produces checkpoints and training metrics; evaluation consumes a specifically identified checkpoint and Dataset setup. Evaluation may run against an incomplete training output when the spec permits it, but the report marks the training phase as partial, failed, cancelled, or incomplete. Missing phases are never silently treated as zero or success.
+An Experiment spec may contain independent `train` and `evaluate` phases. `run-experiment` orchestrates only the phases declared in the spec by calling `train-experiment` and/or `evaluate-experiment`. Training produces checkpoints and training metrics; evaluation consumes a specifically identified checkpoint and the Dataset inputs selected by the Benchmark. Training settings are part of the Experiment spec and may be absent or not applicable for evaluation-only work. Evaluation may run against an incomplete training output when the spec permits it, but the report marks the training phase as partial, failed, cancelled, or incomplete. Missing phases are never silently treated as zero or success.
 
 An external checkpoint is registered with an External checkpoint record and evaluated through an Evaluation-only experiment. The compatibility check validates architecture, format, weights digest, input/label semantics, preprocessing, shape, dtype/device constraints, and source/license information before formal evaluation.
 
@@ -111,7 +141,7 @@ An external checkpoint is registered with an External checkpoint record and eval
 
 Formal version contract:
 
-- Model, Dataset setup, Benchmark, training configuration, evaluation configuration, dependency lockfiles, and the confirmed Experiment spec must be identified by Git repository, complete commit SHA, and paths. For an external repository, also record its URL or identifier and how the component is used; verify it from a checkout or other immutable source before execution.
+- Model, every Dataset setup selected by the Benchmark, Benchmark (including its metric implementations), dependency lockfiles, and the confirmed Experiment spec must be identified by Git repository, complete commit SHA, and paths. The Experiment control commit fixes its training and evaluation phase settings. For an external repository, also record its URL or identifier and how the component is used; verify it from a checkout or other immutable source before execution.
 - Before a formal run, each source checkout must be clean for its declared source paths. For every component, compare the checkout paths with `git show <component.commit>:<path>`; a mismatch blocks the run.
 - Record the Experiment control commit containing the confirmed Experiment spec. Record the observed `git rev-parse HEAD` in the execution context for audit, but use component commits as the reproducibility binding.
 - Check HEAD, source-path cleanliness, and component-path equality before each phase and after each child phase returns. A change blocks the next phase and is written to the manifest.
@@ -129,7 +159,7 @@ Large checkpoints, datasets, logs, and image collections need not be committed t
 
 ## Literature and knowledge
 
-`search-research` creates candidate Source records. `analyze-literature` consumes selected records and creates locator-bound Source analyses. A literature review aggregates selected analyses; search snippets and unverified summaries are never silently promoted to facts. The local Research library is file-based and is updated only after explicit user request or confirmation.
+`search-research` creates candidate Source records. `analyze-literature` consumes selected records and creates locator-bound Source analyses. A literature review aggregates selected analyses; search snippets and unverified summaries are never silently promoted to facts. The local Source collection is file-based and is updated only after explicit user request or confirmation.
 
 ## Evidence and writing
 

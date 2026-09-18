@@ -7,6 +7,23 @@ description: Register a raw dataset revision and define a reproducible Dataset s
 
 Keep the source dataset and its use separate. A raw Dataset revision is not directly consumable by training or evaluation. A Dataset setup derives named usable inputs from that revision.
 
+## Default directory
+
+Use the target project's root-level `data/` directory. Keep one logical Dataset per directory and put each usable setup below it:
+
+```text
+data/
+  <dataset-id>/
+    dataset.yaml
+    setups/
+      <setup-id>/
+        setup.yaml
+        prepare.py
+        README.md
+```
+
+The directory names are logical identities, not versions. A setup directory may contain its processing code, configuration, and derived-input records. Raw and processed data files may live there or at an explicitly recorded external path, but large files are not required to be committed to Git.
+
 ## Dataset revision
 
 Record provenance, content identity, access conditions, and retention:
@@ -30,7 +47,7 @@ dataset_revision: dataset-revision-<id>
 setup_revision:
   repository: <Git remote or repository identifier>
   commit: <40-character SHA>
-  paths: [<split, preprocessing, and setup record paths>]
+  paths: [<data/<dataset-id>/setups/<setup-id> paths>]
 inputs:
   - name: train
     source_selection: <selection or generation rule>
