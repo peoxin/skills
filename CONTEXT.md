@@ -70,6 +70,18 @@ _Avoid_: Component revision, environment default
 An independently executable part of an experiment composition, such as training or evaluation, with its own inputs, status, outputs, and continuation conditions while retaining the parent experiment identity.
 _Avoid_: Pipeline stage, complete run
 
+**Experiment orchestrator**:
+The `run-experiment` entry that prepares one confirmed run, allocates shared resources, calls the declared training and/or evaluation phase skills, preserves execution context, and writes the parent manifest. It does not own phase-specific training, metrics, or report logic.
+_Avoid_: Training runner, evaluation implementation, hidden workflow engine
+
+**Training phase skill**:
+The `train-experiment` entry that executes or documents one training phase, produces checkpoints and training metrics, and writes a phase manifest. It can run directly or under the Experiment orchestrator.
+_Avoid_: Complete experiment, evaluation phase
+
+**Evaluation phase skill**:
+The `evaluate-experiment` entry that consumes a declared checkpoint and Dataset input, checks compatibility, computes metrics, creates visualizations, and writes a report bundle. It can run directly or under the Experiment orchestrator.
+_Avoid_: Training runner, parent experiment manifest
+
 **Partial experiment**:
 An experiment whose declared phases or outputs are incomplete, failed, cancelled, or not yet executed. Available artifacts may be inspected or used under explicit eligibility rules without being presented as a complete result.
 _Avoid_: Successful experiment, missing run

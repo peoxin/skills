@@ -1,11 +1,13 @@
 ---
 name: evaluate-experiment
-description: Evaluate experiment outputs and produce traceable machine-readable data plus human-readable quantitative and qualitative reports.
+description: Execute or analyze an experiment evaluation phase and produce traceable metrics, visualizations, and human-readable reports.
 ---
 
 # Evaluate Experiment
 
-Read the Experiment spec, Dataset setup, phase manifests, checkpoint record, metric identity, and execution context. Never treat a missing, failed, cancelled, or partial phase as zero or success.
+This entry owns the `evaluate` phase and its report bundle. It can be called directly for an existing checkpoint or delegated to by `$run-experiment`. It does not schedule a train phase or decide the parent experiment's phase order.
+
+Read the Experiment spec, Dataset setup, checkpoint record, metric identity, and execution context. Never treat a missing, failed, cancelled, or partial phase as zero or success. When called by `$run-experiment`, use the supplied run ID, assigned devices, cancellation state, and output locations without allocating a second GPU reservation.
 
 ## Compatibility and metrics
 
@@ -52,3 +54,5 @@ missing: [<missing input, failed phase, or unresolved interpretation>]
 ```
 
 Render a Markdown or HTML view from this data. Include phase status, inputs, aggregation/statistics, metrics, figure links, compatibility results, failures, and missingness. Optional project-provided visualization hooks may add qualitative examples and error cases; they must record their input and revision and may not rewrite canonical metrics.
+
+Return an evaluation phase manifest linking the checkpoint, Dataset input, metric records, report data, rendered report, figures, execution context, assigned GPUs, and final status. `$run-experiment` uses this manifest when writing the parent run manifest.

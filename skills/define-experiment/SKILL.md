@@ -65,4 +65,4 @@ phases:
 
 For `evaluation-only`, omit `train`, include an External checkpoint record and a non-empty compatibility declaration covering architecture/model revision, format, preprocessing, shape/dtype, labels, and source conditions.
 
-Do not start execution from this skill. Show component revisions, phase inputs, resource plan, and confirmation status; then hand a confirmed record to `$run-experiment`.
+Do not start execution from this skill. Show component revisions, phase inputs, resource plan, and confirmation status; then hand a confirmed record to `$run-experiment`, `$train-experiment`, or `$evaluate-experiment` when the user explicitly requests a single phase.

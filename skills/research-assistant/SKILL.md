@@ -14,8 +14,9 @@ Act as an assistant to the researcher, not as an autonomous research system. The
 - Reproduce a method or implement a new idea: `$implement-model`
 - Define raw data use, splits, or preprocessing: `$dataset-setup`
 - Define a reusable benchmark or one concrete experiment: `$define-experiment`
-- Run confirmed train/evaluate phases on the local machine: `$run-experiment`
-- Analyze results and create quantitative/qualitative reports: `$evaluate-experiment`
+- Orchestrate confirmed phases on the local machine: `$run-experiment`
+- Run the training phase directly: `$train-experiment`
+- Run the evaluation phase and create quantitative/qualitative reports: `$evaluate-experiment`
 - Generate evidence-linked model improvements: `$propose-improvements`
 - Draft a paper or technical report: `$write-report`
 - Prepare a target project for these workflows: `$initialize-research-workspace`

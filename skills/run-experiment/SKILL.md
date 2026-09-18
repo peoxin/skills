@@ -1,11 +1,18 @@
 ---
 name: run-experiment
-description: Execute a confirmed experiment on a researcher-controlled multi-GPU machine with phase-level provenance and no cloud runtime assumption.
+description: Orchestrate confirmed deep-learning experiment phases on a researcher-controlled multi-GPU machine with shared provenance and no cloud runtime assumption.
 ---
 
 # Run Experiment
 
-Run only a `confirmed` Experiment spec. Before starting, verify that code, Dataset setup, configuration, training/evaluation commands, metric, and dependencies are fixed revisions. A draft or dirty run must be labeled exploratory and cannot silently produce formal evidence.
+This is the orchestration entry. Run only a `confirmed` Experiment spec. Before starting, verify that code, Dataset setup, configuration, training/evaluation commands, metric, and dependencies are fixed revisions. A draft or dirty run must be labeled exploratory and cannot silently produce formal evidence.
+
+Delegate phase work instead of reimplementing it:
+
+- `train` phase: call `$train-experiment`.
+- `evaluate` phase: call `$evaluate-experiment`.
+
+Both child skills remain independently callable. The orchestrator passes them the parent run ID, phase inputs, execution context, assigned devices, cancellation state, and output locations.
 
 ## Resource plan
 
@@ -13,11 +20,17 @@ Show the requested GPU count, allowed indices, minimum free memory, queue timeou
 
 Do not add cloud allocation or silently change a request. If no local assignment satisfies the request, preserve a queued or blocked state and ask how to proceed.
 
-## Phase execution
+## Phase orchestration
 
-Treat `train` and `evaluate` independently. Before evaluation, verify that the declared checkpoint exists and that its compatibility and Dataset input match the spec. Evaluation may consume an explicitly permitted partial checkpoint; mark the training phase and final run as partial. A failed or cancelled train phase blocks evaluation unless the spec explicitly permits partial work.
+Read only the phases declared in the Experiment spec:
 
-Use the target project's own launcher and environment. Set `CUDA_VISIBLE_DEVICES` or the project's equivalent only after recording the assigned physical indices. Do not introduce a generic Python runner.
+- train only: allocate resources and delegate to `$train-experiment`;
+- evaluate only: allocate resources and delegate to `$evaluate-experiment` using the declared or external checkpoint;
+- train followed by evaluate: wait for the training manifest, then check checkpoint and `allow_partial_train` before delegating evaluation.
+
+A failed or cancelled train phase blocks evaluation unless the spec explicitly permits partial work. An evaluation-only experiment must not invent a train phase.
+
+Allocate or reserve physical GPUs once per phase, record the assignment, and pass it to the child skill. Use the target project's own launcher and environment. Set `CUDA_VISIBLE_DEVICES` or the project's equivalent only after recording the assigned physical indices. Do not introduce a generic Python runner or a second scheduler.
 
 ## Required records
 
@@ -37,4 +50,4 @@ resource_observations: {<phase>: <requested and observed resources>}
 phase_statuses: {train: completed | failed | cancelled | blocked, evaluate: <status>}
 ```
 
-For each phase, write a manifest with experiment ID, phase, start/end timestamps, command identity, component revisions, Dataset setup/input, checkpoint, assigned GPUs, log/artifact locators, return status, and a reason for any failure or block. Write a parent manifest that reports `completed` only when every declared phase completed; otherwise report `partial` and retain all phase states.
+Persist the execution context before delegating the first phase and after every child returns. Child skills write phase manifests; the orchestrator verifies their parent/run IDs, appends orchestration status and resource observations, and writes the parent manifest. The parent manifest reports `completed` only when every declared phase completed; otherwise report `partial` and retain all phase states. Do not duplicate child metrics or report prose in the parent manifest; link to the child manifest and `$evaluate-experiment` report bundle instead.

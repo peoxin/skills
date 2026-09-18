@@ -53,14 +53,16 @@ Each entry is independently callable. They exchange explicit files, not hidden c
 6. `define-experiment`
    Create or revise Benchmark specs and concrete Experiment specs. Bind component revisions, Dataset setup, phases, seeds, metrics, resources, commands, and outputs without starting formal execution.
 7. `run-experiment`
-   Execute confirmed Experiment specs through documented local multi-GPU procedures. Show resource assignment, record execution context, retain phase outputs, and release resources; the skill collection does not ship a scheduler.
-8. `evaluate-experiment`
-   Execute or collect evaluation phases and generate canonical metric/report records plus rendered reports, tables, plots, and optional visualization-hook outputs.
-9. `propose-improvements`
+   Orchestrate confirmed Experiment phases through the local multi-GPU procedure. Allocate resources, call the training and evaluation entries, preserve shared execution context, handle cancellation and partial states, and write the parent manifest.
+8. `train-experiment`
+   Execute or document the training phase, produce checkpoints and training metrics, and write a training phase manifest. It can be called directly or by `run-experiment`.
+9. `evaluate-experiment`
+   Execute or collect an evaluation phase, check checkpoint compatibility, and generate canonical metric/report records plus rendered reports, tables, plots, and optional visualization-hook outputs. It can be called directly or by `run-experiment`.
+10. `propose-improvements`
    Combine Source analyses, Research library records, and experiment reports into evidence-linked improvement proposals with hypotheses, mechanisms, risks, and ablations.
-10. `write-report`
+11. `write-report`
     Produce an editable paper or technical-report draft from confirmed sources, reports, and claims. It does not submit or review the document.
-11. `research-assistant` (optional convenience entry)
+12. `research-assistant` (optional convenience entry)
     Recommend or sequence the skills above while preserving each skill's files, rules, and confirmation points. It is not a second workflow engine.
 
 ## Shared records
@@ -101,7 +103,7 @@ Every component is locatable. A component revision is an intentional reusable in
 
 ### Phases and partial work
 
-An Experiment spec may contain independent `train` and `evaluate` phases. Training produces checkpoints and training metrics; evaluation consumes a specifically identified checkpoint and Dataset setup. Evaluation may run against an incomplete training output when the spec permits it, but the report marks the training phase as partial, failed, cancelled, or incomplete. Missing phases are never silently treated as zero or success.
+An Experiment spec may contain independent `train` and `evaluate` phases. `run-experiment` orchestrates only the phases declared in the spec by calling `train-experiment` and/or `evaluate-experiment`. Training produces checkpoints and training metrics; evaluation consumes a specifically identified checkpoint and Dataset setup. Evaluation may run against an incomplete training output when the spec permits it, but the report marks the training phase as partial, failed, cancelled, or incomplete. Missing phases are never silently treated as zero or success.
 
 An external checkpoint is registered with an External checkpoint record and evaluated through an Evaluation-only experiment. The compatibility check validates architecture, format, weights digest, input/label semantics, preprocessing, shape, dtype/device constraints, and source/license information before formal evaluation.
 
@@ -113,7 +115,7 @@ Formal execution requires a user-confirmed Experiment spec and resource plan. Th
 
 ## Local execution
 
-The first execution target is one researcher-controlled multi-GPU machine. The skill observes local device availability, accepts explicit GPU count and device constraints, explains queue or reservation steps, records assignments, supports cancellation, and releases resources after success or failure. It has no cloud implementation or bundled scheduler in v1.
+The first execution target is one researcher-controlled multi-GPU machine. `run-experiment` observes local device availability, accepts explicit GPU count and device constraints, explains queue or reservation steps, creates the shared execution context, delegates phase work, records assignments, supports cancellation, and releases resources after success or failure. Child phase skills do not create a second reservation when called by the orchestrator. There is no cloud implementation or bundled scheduler in v1.
 
 Large checkpoints, datasets, logs, and image collections need not be committed to Git. Their manifests record path or external reference, size, digest, generation time, and the component revisions that produced them. Specs, code, configs, reports, and small provenance records are Git-tracked.
 
