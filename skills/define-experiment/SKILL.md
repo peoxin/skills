@@ -1,61 +1,21 @@
 ---
 name: define-experiment
-description: Define reusable benchmark contracts and concrete PyTorch experiment specs without starting formal execution.
+description: Define one concrete PyTorch Experiment spec from a fixed model and a confirmed Benchmark without executing it. Use for model, seed, training, phase, resource, checkpoint, and output choices; use define-benchmark for evaluation protocols.
 ---
 
 # Define Experiment
 
-Read the confirmed Dataset setups and the target project's model, Benchmark, dependency, and phase interfaces. Keep the reusable data-and-metric protocol separate from one executable instance.
+Define one concrete Experiment at a time in `experiments/<experiment-id>/experiment.yaml`. Read the selected model, confirmed Benchmark, its Dataset setup references, dependency identity, and target-project phase interfaces. This skill consumes component definitions; it does not create or modify them.
 
-Default locations are `benchmarks/<benchmark-id>/benchmark.yaml` and `experiments/<experiment-id>/experiment.yaml`. Logical directory names are stable component identities, not version labels.
+## Preconditions
+
+Require a Benchmark whose `status` is `confirmed` and whose complete directory has a user-created component commit. Verify its repository, complete 40-character commit SHA, and paths, and verify that its Dataset setup references match their confirmed component commits. If the Benchmark is missing, incomplete, or needs different inputs, metrics, aggregation, or visualizations, stop and hand the work to `$define-benchmark`.
+
+Read the selected model as a committed component. If the model or a Dataset setup must change, hand the work to `$implement-model` or `$dataset-setup`. Modify only `experiments/<experiment-id>/experiment.yaml` from this skill.
 
 ## Git revision contract
 
 For formal work, replace every placeholder with a repository, a complete 40-character commit SHA, and the paths that define the component. An external repository is allowed when its URL or identifier and use are recorded and its commit is independently verifiable. Do not use a branch, tag, short SHA, `latest`, dirty-worktree marker, or `locator@revision` in place of a commit. Components in one repository may use different commits; the formal runner verifies that each source checkout matches each declared path at its commit.
-
-## Benchmark spec
-
-A Benchmark defines how one or more Dataset setups become named evaluation inputs and which metrics interpret those inputs. It does not define baselines, models, seeds, resource requests, or a concrete checkpoint. Keep the Benchmark self-contained, including its metric implementations and optional visualization code:
-
-```text
-benchmarks/
-  <benchmark-id>/
-    benchmark.yaml
-    metrics/
-    visualizations/
-```
-
-Use this template:
-
-```yaml
-id: benchmark-<stable-id>
-task: <task definition>
-dataset_setups:
-  - id: dataset-setup-<id>
-    role: train | validation | test | auxiliary
-  - id: dataset-setup-<another-id>
-    role: test | auxiliary
-inputs:
-  train: [<dataset setup input references>]
-  validation: [<dataset setup input references>]
-  test: [<dataset setup input references>]
-  custom-input: [<dataset setup input references>]
-composition:
-  train: {operation: concat | interleave | join, rule: <composition rule>}
-  test: {operation: <operation>, rule: <composition rule>}
-metric_inputs:
-  <metric-id>: [<named benchmark inputs>]
-metrics:
-  - id: <metric-id>
-    direction: higher | lower
-    units: <unit>
-    implementation_paths: [benchmarks/<benchmark-id>/metrics/<paths>]
-aggregation:
-  statistic: mean_and_std
-  confidence_or_uncertainty: <rule>
-qualitative_outputs: [<optional visualization requirements>]
-unavailable_inputs: [<input name and reason>]
-```
 
 ## Experiment spec
 
@@ -114,6 +74,6 @@ phases:
     allow_partial_train: false
 ```
 
-For `evaluation-only`, omit `train`, set `training.status` to `not_applicable`, include an External checkpoint record and a non-empty compatibility declaration covering architecture/model revision, format, preprocessing, shape/dtype, labels, and source conditions. The model, every Dataset setup selected by the Benchmark, the Benchmark (including its metric implementations), dependencies, and Experiment control commit still require Git commits.
+For `evaluation-only`, omit `train`, set `training.status` to `not_applicable`, include an External checkpoint record and a non-empty compatibility declaration covering architecture/model revision, format, preprocessing, shape/dtype, labels, and source conditions. The model, every Dataset setup selected by the Benchmark, the Benchmark including its metric implementations, dependencies, and Experiment control commit still require Git commits.
 
-Do not start execution from this skill. Show component revisions, Benchmark input mappings, optional training settings, phase inputs, resource plan, and confirmation status. Once the Experiment spec is confirmed, commit `experiments/<experiment-id>/experiment.yaml` and record its commit as the Experiment control commit before handing it to `$run-experiment`, `$train-experiment`, or `$evaluate-experiment` for a direct phase request.
+Do not start execution from this skill. Show the fixed component revisions, Benchmark input mappings, optional training settings, phases, resource plan, checkpoint, outputs, and target file before writing. Keep `status: draft` until the user explicitly confirms the complete Experiment spec. After that confirmation, write `status: confirmed` only in `experiments/<experiment-id>/experiment.yaml`, then show `git diff`, the exact file to commit, and a proposed commit message. Do not create the commit. The Experiment is eligible for formal execution only after the user commits the confirmed spec and records that complete SHA as the Experiment control commit. Hand it to `$run-experiment`, `$train-experiment`, or `$evaluate-experiment` only when the user requests execution.

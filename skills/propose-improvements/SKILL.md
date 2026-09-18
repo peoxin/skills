@@ -33,4 +33,4 @@ Write one falsifiable proposal at a time:
 <ways the hypothesis can be wrong, compute cost, leakage or confounds>
 ```
 
-Distinguish reported fact, inference, and new hypothesis visibly. Do not call a proposal an improvement until a confirmed Experiment spec tests it. Do not modify a formal Benchmark spec or launch a run from this entry; pass an approved proposal to `$implement-model` and `$define-experiment`.
+Distinguish reported fact, inference, and new hypothesis visibly. Do not call a proposal an improvement until a confirmed Experiment spec tests it. Do not modify a formal Benchmark spec or launch a run from this entry. Pass an approved model change to `$implement-model`, a protocol change to `$define-benchmark`, and a concrete test design to `$define-experiment` after its Benchmark is confirmed.

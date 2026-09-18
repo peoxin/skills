@@ -50,6 +50,10 @@ _Avoid_: Dataset loader, hidden preprocessing
 A reusable data-and-metric evaluation contract that may combine multiple Dataset setups, names the train, validation, test, or custom inputs derived from them, defines composition and input mapping, and fixes metric identities, aggregation, and optional qualitative outputs. It does not choose a model, baseline, seed, resource request, or concrete checkpoint.
 _Avoid_: Baseline suite, one run config, score table
 
+**Benchmark definition skill**:
+The `define-benchmark` entry that creates or revises one self-contained Benchmark from confirmed Dataset setups, including metric implementations and optional visualizations, without selecting a model or concrete run.
+_Avoid_: Experiment definition, evaluation run
+
 **Experiment plan**:
 The research design for a set of experiments, including questions, comparisons, intended benchmark coverage, evaluation approach, and resource envelope. It is not directly executable.
 _Avoid_: Experiment config, run config
@@ -57,6 +61,10 @@ _Avoid_: Experiment config, run config
 **Experiment spec**:
 A fully resolved, executable declaration for one concrete experiment, binding model, one or more Dataset setups through a Benchmark, the optional training configuration, seed, resources, commands, phases, and output locations. Training configuration may be absent or not applicable for evaluation-only work; the Experiment control commit fixes the complete declaration.
 _Avoid_: Experiment plan, benchmark protocol, training config
+
+**Experiment definition skill**:
+The `define-experiment` entry that consumes a confirmed Benchmark and committed components to create one concrete Experiment spec. It changes only the selected Experiment directory and never defines or revises the Benchmark it references.
+_Avoid_: Benchmark definition, experiment execution
 
 **Experiment composition**:
 The functional view of one experiment as `Result = f_eval(f_train(Model, Data_train, Hyperparameter_config), Data_test, Eval_metric)`, where named train and test inputs are selected by a Benchmark and may be composed from multiple Dataset setups; every input, transformation, and function implementation has a fixed revision.

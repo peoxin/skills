@@ -20,7 +20,7 @@ Unless the confirmed Experiment spec declares another location, use `results/<ex
 
 Formal execution is refused until all of these checks pass:
 
-1. The confirmed Experiment spec is itself committed. Record the full SHA as `experiment_spec_commit` in the run manifest.
+1. The confirmed Experiment spec is itself committed. Record the full SHA as `experiment_spec_commit` in the run manifest. Read the Benchmark at its declared component commit and require `status: confirmed`; a draft or mismatched Benchmark blocks formal execution.
 2. `git status --porcelain=v1` is empty for source paths in every declared repository and `git rev-parse HEAD` succeeds. Record each observed HEAD in the execution context.
 3. Every declared component revision has a repository identifier, a complete 40-character commit SHA, and one or more paths. Verify the commit exists with `git cat-file -e <commit>^{commit}`.
 4. For every declared path, compare the relevant checkout with the recorded commit (`git diff --quiet <commit> -- <path>` or an equivalent `git show <commit>:<path>` comparison). A mismatch, missing path, short SHA, branch, tag, or uncommitted source change blocks the run.

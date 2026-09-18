@@ -67,4 +67,4 @@ notes: <differences from the source dataset definition>
 
 Use `train`, `val`, and `test` when present. Evaluation selects one of the declared inputs. Support custom splits, filtering, sampling, preprocessing, augmentation, and label semantics without modifying the raw Dataset revision.
 
-Check leakage, class/label transformations, random seeds, derived digests, and whether the declared files actually exist. Ask before saving a formal setup. Hand the confirmed setup to `$define-experiment`.
+Check leakage, class/label transformations, random seeds, derived digests, and whether the declared files actually exist. Ask before saving a formal setup. Hand the confirmed and committed setup to `$define-benchmark` when the user wants to include it in an evaluation protocol.

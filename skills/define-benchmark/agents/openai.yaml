@@ -1,0 +1,4 @@
+interface:
+  display_name: "define-benchmark"
+  short_description: "Define reusable dataset and metric benchmarks"
+  default_prompt: "Use $define-benchmark to define a reusable data-and-metric Benchmark."

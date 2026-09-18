@@ -13,7 +13,8 @@ Act as an assistant to the researcher, not as an autonomous research system. The
 - Paper or resource analysis and literature review: `$analyze-literature`
 - Reproduce a method or implement a new idea: `$implement-model`
 - Define raw data use, splits, or preprocessing: `$dataset-setup`
-- Define a reusable benchmark or one concrete experiment: `$define-experiment`
+- Define or revise a reusable data-and-metric Benchmark: `$define-benchmark`
+- Define one concrete Experiment from a confirmed Benchmark: `$define-experiment`
 - Orchestrate confirmed phases on the local machine: `$run-experiment`
 - Run the training phase directly: `$train-experiment`
 - Run the evaluation phase and create quantitative/qualitative reports: `$evaluate-experiment`

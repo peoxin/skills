@@ -1,4 +1,4 @@
 interface:
   display_name: "define-experiment"
-  short_description: "Deep learning research assistant capability"
-  default_prompt: "Use $define-experiment to support a focused deep learning research task."
+  short_description: "Define one experiment from fixed components"
+  default_prompt: "Use $define-experiment to define one concrete experiment from a confirmed Benchmark."

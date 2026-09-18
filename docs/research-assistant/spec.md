@@ -76,19 +76,21 @@ Each entry is independently callable. They exchange explicit files, not hidden c
    Handle either `reproduce` or `new-method` intent. Produce an implementation plan, evidence or hypothesis separation, code proposal, tests, and a runnable integration plan before confirmed edits.
 5. `dataset-setup`
    Register a raw Dataset revision and create or validate a Dataset setup describing splits, preprocessing, sampling, label mapping, and derived input digests.
-6. `define-experiment`
-   Create or revise data-and-metric Benchmark specs and concrete Experiment specs. Bind model, one or more Dataset setups, Benchmark, optional training settings, phases, seed, resources, commands, and outputs without starting formal execution.
-7. `run-experiment`
+6. `define-benchmark`
+   Create or revise one self-contained data-and-metric Benchmark from confirmed Dataset setups. Own its input composition, metric implementations, aggregation, optional visualizations, validation, confirmation, and proposed component commit without selecting a model or run.
+7. `define-experiment`
+   Create one concrete Experiment spec from a committed model and confirmed Benchmark. Bind component commits, optional training settings, phases, seed, resources, checkpoint, and outputs without modifying its Model, Dataset setups, or Benchmark.
+8. `run-experiment`
    Orchestrate confirmed Experiment phases through the local multi-GPU procedure. Allocate resources, call the training and evaluation entries, preserve shared execution context, handle cancellation and partial states, and write the parent manifest.
-8. `train-experiment`
+9. `train-experiment`
    Execute or document the training phase, produce checkpoints and training metrics, and write a training phase manifest. It can be called directly or by `run-experiment`.
-9. `evaluate-experiment`
+10. `evaluate-experiment`
    Execute or collect an evaluation phase, check checkpoint compatibility, and generate canonical metric/report records plus rendered reports, tables, plots, and optional visualization-hook outputs. It can be called directly or by `run-experiment`.
-10. `propose-improvements`
+11. `propose-improvements`
    Combine Source analyses, Source collection records, and experiment reports into evidence-linked improvement proposals with hypotheses, mechanisms, risks, and ablations.
-11. `write-report`
+12. `write-report`
     Produce an editable paper or technical-report draft from confirmed sources, reports, and claims. It does not submit or review the document.
-12. `research-assistant` (optional convenience entry)
+13. `research-assistant` (optional convenience entry)
     Recommend or sequence the skills above while preserving each skill's files, rules, and confirmation points. It is not a second workflow engine.
 
 ## Shared records
@@ -116,6 +118,8 @@ Benchmark spec (one or more Dataset setups, inputs, metrics, aggregation)
 ```
 
 Benchmark does not own baselines or model comparisons. An Experiment may compare models by referencing the same Benchmark from multiple Experiment specs.
+
+`define-benchmark` is the only entry that creates or revises a Benchmark. It consumes confirmed Dataset setup commits, keeps metric and visualization implementations inside the Benchmark directory, verifies them, and proposes a user-created Benchmark component commit. `define-experiment` consumes that confirmed commit and writes only one concrete Experiment spec. If the Benchmark needs to change, Experiment definition stops until `define-benchmark` produces a newly confirmed commit.
 
 The functional model of a complete experiment is:
 
@@ -178,4 +182,4 @@ The portable `skills/` directory is developed here and can be copied or installe
 
 ## Implementation order
 
-The implementation plan intentionally builds all user-facing entries as self-contained Markdown workflows before reviewing the collection as a whole. Review covers initialization, Dataset setup, model registration or implementation, Benchmark/Experiment specs, local execution guidance, phase-level evaluation, structured record templates, and rendered reports. No Python package, CLI, or repository-specific runtime is part of v1.
+The implementation plan intentionally builds all user-facing entries as self-contained Markdown workflows before reviewing the collection as a whole. Review covers initialization, Dataset setup, model registration or implementation, separately defined Benchmark and Experiment specs, local execution guidance, phase-level evaluation, structured record templates, and rendered reports. No Python package, CLI, or repository-specific runtime is part of v1.
