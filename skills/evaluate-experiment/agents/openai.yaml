@@ -1,0 +1,4 @@
+interface:
+  display_name: "evaluate-experiment"
+  short_description: "Deep learning research assistant capability"
+  default_prompt: "Use $evaluate-experiment to support a focused deep learning research task."

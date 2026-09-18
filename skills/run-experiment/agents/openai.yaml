@@ -1,0 +1,4 @@
+interface:
+  display_name: "run-experiment"
+  short_description: "Deep learning research assistant capability"
+  default_prompt: "Use $run-experiment to support a focused deep learning research task."

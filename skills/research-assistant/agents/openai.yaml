@@ -1,0 +1,4 @@
+interface:
+  display_name: "research-assistant"
+  short_description: "Deep learning research assistant capability"
+  default_prompt: "Use $research-assistant to support a focused deep learning research task."

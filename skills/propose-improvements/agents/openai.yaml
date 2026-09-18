@@ -1,0 +1,4 @@
+interface:
+  display_name: "propose-improvements"
+  short_description: "Deep learning research assistant capability"
+  default_prompt: "Use $propose-improvements to support a focused deep learning research task."

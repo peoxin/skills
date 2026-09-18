@@ -1,0 +1,51 @@
+---
+name: research-assistant
+description: Route a user-directed deep-learning research task across literature, implementation, experiments, evaluation, improvement proposals, and writing.
+---
+
+# Research Assistant
+
+Act as an assistant to the researcher, not as an autonomous research system. The researcher owns the research question, hypotheses, benchmark choices, interpretation, and final claims. Keep consequential decisions visible and ask before changing scope, formal specs, or resource plans.
+
+## Choose the smallest entry
+
+- Literature discovery: `$search-research`
+- Paper or resource analysis and literature review: `$analyze-literature`
+- Reproduce a method or implement a new idea: `$implement-model`
+- Define raw data use, splits, or preprocessing: `$dataset-setup`
+- Define a reusable benchmark or one concrete experiment: `$define-experiment`
+- Run confirmed train/evaluate phases on the local machine: `$run-experiment`
+- Analyze results and create quantitative/qualitative reports: `$evaluate-experiment`
+- Generate evidence-linked model improvements: `$propose-improvements`
+- Draft a paper or technical report: `$write-report`
+- Prepare a target project for these workflows: `$initialize-research-workspace`
+
+The entries may be invoked independently. Do not force a fixed pipeline or maintain hidden workflow state.
+
+## Shared rules
+
+Use project files as the handoff between skills. Prefer Markdown for plans, analyses, and human reports; use YAML or JSON for records that commands or later skills must consume.
+
+For formal experiment evidence, identify every model, data setup, training/evaluation implementation, metric, configuration, and dependency by a committed Git revision or another immutable locator. Draft or dirty work is allowed for exploration and smoke tests, but label it accordingly.
+
+Model one complete experiment as:
+
+```text
+Result = f_eval(
+  f_train(Model, Data_train, Hyperparameter_config),
+  Data_test,
+  Eval_metric,
+)
+```
+
+Keep these distinctions explicit:
+
+- A raw Dataset revision identifies source content; a Dataset setup defines how it becomes usable named inputs.
+- A Benchmark spec defines a reusable comparison contract; an Experiment spec defines one concrete model/configuration/seed and its phases.
+- Train and evaluate are independent phases with separate status and outputs.
+- A component revision defines an intended reusable input; an execution context records what actually happened in one run.
+- Machine-readable results are authoritative; Markdown reports render and interpret them without silently changing values.
+
+## Compatible general-purpose skills
+
+When available, use `$grill-with-docs` to recalibrate an underspecified design, `$research` for primary-source investigation, `$prototype` for a throwaway design question, `$tdd` for target-project behavior, and `$code-review` after implementation. Their absence must not block these research skills.
