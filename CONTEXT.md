@@ -20,6 +20,22 @@ _Avoid_: Router skill, pipeline stage, installed skill identity
 A file-based local collection of records for papers, code, datasets, documentation, and other research materials plus their analyses and reviews. Skills preserve an established project location; a new collection defaults to `references/` and is not an experiment component.
 _Avoid_: Research library, knowledge service, vector database
 
+**Reference material**:
+The paper, document, code excerpt, or other source artifact obtained from a locator or local path and optionally retained alongside its Reference record. Complete third-party repositories, datasets, and model weights remain external unless a narrower user-requested artifact is selected; the license is recorded as provenance and does not itself block an explicit acquisition request.
+_Avoid_: Reference record, search result, automatic archive
+
+**Reference acquisition skill**:
+The `add-references` entry that obtains user-selected Reference material from a network locator or local source and creates its Reference record using only metadata available from that direct source.
+_Avoid_: Reference search, metadata research, Reference analysis
+
+**Direct source**:
+The network locator, local file or directory, or versioned checkout explicitly supplied by the user, together with metadata directly exposed by that source. Search results, citation chains, and unrelated secondary metadata services are not direct sources.
+_Avoid_: Discovery chain, metadata enrichment, secondary lookup
+
+**Reference artifact**:
+A retained file or externally located source entry listed by a Reference record, with its source, storage location, media type, digest, and acquisition provenance when available. Multiple artifacts may belong to one Reference version.
+_Avoid_: Reference record, untracked attachment, complete repository copy
+
 **Reference collection write policy**:
 Search and synthesis results become durable Reference records only after an explicit user request or confirmation; machine-generated indexes may refresh without promoting unverified claims to facts. Complete third-party code repositories remain external checkouts fixed by commit.
 _Avoid_: Automatic web archive, conversation memory
@@ -165,8 +181,8 @@ The input-mapping and metric-evaluation portion of a Benchmark spec, including h
 _Avoid_: Baseline suite, scoring script, ad hoc evaluation
 
 **Reference record**:
-A paper, code, dataset, documentation, or other research-material entry containing its type, title or owner, locator, access date, version or commit when available, license, citation data, and verification status. New records use `reference-*` identities; legacy `source-*` records remain readable.
-_Avoid_: Search snippet, unverified fact
+A paper, code, dataset, documentation, or other research-material entry containing its type, title or owner, external locator when available, access date, version or commit when available, license, citation data, and artifact provenance. New records use `reference-*` identities and do not carry lifecycle or verification status; this early collection does not promise compatibility with superseded record formats.
+_Avoid_: Search snippet, candidate status, legacy record contract, unverified fact
 
 **Reference analysis**:
 A structured and human-readable analysis or review of one or more Reference records, with claims, mechanisms, implementation details, experimental details, limitations, and exact locators or links.

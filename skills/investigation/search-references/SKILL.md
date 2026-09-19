@@ -1,56 +1,37 @@
 ---
 name: search-references
-description: Search papers, code, datasets, documentation, and other research materials and save user-selected results as traceable Reference records.
+description: Search papers, code, datasets, documentation, and other research materials, then hand selected sources to add-references.
 ---
 
 # Search References
 
-Clarify the research question, Reference classes, date or version constraints, and desired breadth. Search published papers, preprints, official project pages, GitHub, Hugging Face, official documentation, datasets, and high-quality technical writing as relevant.
+Clarify the research question, desired Reference types, date or version constraints, and breadth. Search published papers and preprints, official project pages, Git repositories, Hugging Face, official documentation, datasets, standards, and high-quality technical writing as relevant.
 
-Prefer primary sources. Treat search snippets and assistant summaries as discovery aids, not evidence. Verify that each candidate actually supports the stated relevance.
+Prefer primary sources. Treat search snippets and assistant summaries as discovery aids, not evidence. Verify that each candidate actually supports the stated relevance before presenting it.
 
-Present a shortlist before writing durable records. Save selected References only after the user asks or confirms.
+## Search and shortlist
 
-## Reference collection
+Read the target project's instructions, root `CONTEXT.md` or `CONTEXT-MAP.md`, applicable ADRs, and the existing Reference collection before searching. Continue using one clearly established `references/` or equivalent collection. If several collections are plausible, ask the user to choose.
 
-Read the target project's instructions and existing research-material directories before choosing a location. Continue using one clearly established `sources/`, `references/`, or equivalent collection without renaming or migrating it. If several directories could own the records, show the candidates and ask the user to choose.
+Present a shortlist before any durable write. For each candidate, show the available source identity, type, title or owner, locator, version or commit when directly available, and a concise explanation of why it appeared in the shortlist. Keep that relevance explanation in the conversation; it is not a field in the Reference record.
 
-When no relevant directory exists, use this default and create only the directories needed by the selected records:
+Candidates are not Reference records. Do not create candidate YAML, do not create Reference directories, and do not add lifecycle or verification status. `$search-references` is complete when it has presented the shortlist or handed selected inputs to `$add-references`.
 
-```text
-references/
-  papers/
-  code/
-  materials/
-  analysis/
-```
+## Explicit handoff
 
-- Put paper and preprint records in `papers/`.
-- Put repository, model implementation, and other code records in `code/`.
-- Put datasets, documentation, model pages, standards, blogs, and other records in `materials/`.
-- Leave `analysis/` to `$analyze-references`.
+The user may skip adding anything. If the user explicitly says to add selected candidates, download a named document, or import a listed path, hand those selected locators or paths to `$add-references` in the same conversation. Examples of explicit intent include "add the first and third candidates" and "save this PDF in references". A vague request to search or discuss does not authorize a write.
 
-For a new default collection, write one YAML file per Reference as `<class>/<reference-id>.yaml`. Preserve an established project's record format when it already has one. Existing `source-*` IDs remain readable; assign `reference-*` IDs to new records.
+Show the shortlist before handing off, even when the original request combines searching and adding. Ask which candidates to add when the selection is ambiguous. `$add-references` independently performs direct-source acquisition, creates the new per-Reference directories, and reports the resulting artifacts.
 
-Record complete code repositories by locator and immutable commit and keep their checkouts outside the Reference collection. Small excerpts needed for analysis may be stored with their origin, commit, path, and license. Do not copy a complete third-party repository into `references/code/`. Save a PDF or other material snapshot only when the user explicitly requests it and its access and license permit retention. Keep model weights and datasets external and record their stable locators and provenance.
+## Type vocabulary
 
-## Reference record
+Use these simple semantic types in the shortlist and handoff:
 
-Use this shape for new records:
+- `paper`: papers, preprints, and technical reports;
+- `code`: repositories and implementations;
+- `dataset`: datasets and their data descriptions;
+- `model`: model pages, model revisions, and checkpoint provenance;
+- `document`: official documentation, standards, blogs, tutorials, and web materials;
+- `other`: anything that cannot reasonably use the above, with an optional `type_detail`.
 
-```yaml
-id: reference-<stable-id>
-type: paper | preprint | repository | model | dataset | documentation | blog
-title: <title>
-authors_or_owner: [<name>]
-locator: <URL, DOI, arXiv ID, repository path, or model ID>
-version: <publication version, tag, or commit; null if unavailable>
-accessed_at: <ISO date>
-license: <license or unknown>
-verification: verified | partially-verified | candidate
-match_rationale: <why it matters to the user's question>
-citation: <citation data when applicable>
-unresolved: [<missing field or verification question>]
-```
-
-Keep published and preprint versions distinguishable. Record repository commits and model revisions when available. Do not turn a candidate list into a review; pass selected records to `$analyze-references`.
+Do not turn a candidate list into an analysis. Pass selected inputs to `$add-references`, then pass created records to `$analyze-references` when the user asks for evidence-linked reading.

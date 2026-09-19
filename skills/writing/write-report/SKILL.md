@@ -5,7 +5,7 @@ description: Draft an evidence-linked report or paper from Reference analyses an
 
 # Write Report
 
-Read verified Reference records and analyses, Dataset setups, Benchmark/Experiment specs, Report bundles, execution contexts, and user-confirmed claims. Keep canonical metrics and provenance in their structured records; the draft is a presentation layer and must not rewrite experiment records.
+Read Reference records and analyses, Dataset setups, Benchmark/Experiment specs, Report bundles, execution contexts, and user-confirmed claims. Keep canonical metrics and provenance in their structured records; the draft is a presentation layer and must not rewrite experiment records.
 
 ## Writing directory
 

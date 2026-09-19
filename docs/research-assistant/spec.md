@@ -17,6 +17,7 @@ Capability modules organize source directories; they are not skills or routers. 
 skills/
   investigation/
     search-references/
+    add-references/
     analyze-references/
   experimentation/
     initialize-experiment-workspace/
@@ -69,14 +70,20 @@ Investigation and Writing skills first respect one clearly established project d
 
 ```text
 references/
-  papers/<reference-id>.yaml
-  code/<reference-id>.yaml
-  materials/<reference-id>.yaml
+  papers/<stable-id>/
+    reference.yaml
+    <retained-artifacts>
+  code/<stable-id>/
+    reference.yaml
+    <retained-artifacts>
+  materials/<stable-id>/
+    reference.yaml
+    <retained-artifacts>
   analysis/<reference-id>.md
   analysis/review-<topic>.md
 ```
 
-Complete third-party code repositories remain external checkouts identified by locator and immutable commit. A Reference collection may retain a small attributed code excerpt, or a user-requested and license-permitted PDF or material snapshot, but not a complete third-party repository, model weights, or datasets.
+Each Reference directory co-locates one `reference.yaml` with its retained artifacts. The record's `locator` stores a web URL or other external identity; its `artifacts` list records retained files and external materials with source, storage, media type, size, digest, and acquisition time. Complete third-party code repositories remain external checkouts identified by locator and immutable commit. A Reference collection may retain a small attributed code excerpt or a user-requested document snapshot, but not a complete third-party repository, model weights, or datasets. Licenses are recorded as provenance and do not block an explicit acquisition request.
 
 With no existing writing convention, Writing uses `writing/<writing-id>/`. It assumes nothing about the main filename, document type, internal directories, or supporting files. Experiment evaluation reports remain under `results/`; reader-facing synthesis belongs to the Writing location.
 
@@ -85,6 +92,7 @@ With no existing writing convention, Writing uses `writing/<writing-id>/`. It as
 In scope:
 
 - published-paper and preprint search;
+- direct acquisition of user-selected References from remote locators and local files;
 - GitHub, Hugging Face, official documentation, and high-quality resource search;
 - Reference analysis, reviews, and evidence-linked notes;
 - reproducing an existing model or implementing a model from a user idea through one shared model-implementation entry;
@@ -109,13 +117,15 @@ Out of scope for v1:
 
 ## User-facing skills
 
-Each entry is independently callable. They exchange explicit files, not hidden conversation state.
+Each entry is independently callable. They exchange explicit files or user-selected inputs, not hidden conversation state.
 
 ### Investigation
 
 1. `search-references`
-   Search papers, preprints, code, datasets, model pages, documentation, and other research materials. Produce candidate Reference records with type, locator, version, access date, license, and verification status.
-2. `analyze-references`
+   Search papers, preprints, code, datasets, model pages, documentation, and other research materials. Present a shortlist and hand explicitly selected locators or paths to `add-references`.
+2. `add-references`
+   Acquire user-selected materials from direct sources and create one co-located `reference.yaml` plus retained or external artifact entries per Reference. It does not search for missing metadata or write lifecycle status.
+3. `analyze-references`
    Analyze selected Reference records, extract mechanisms and experimental details with locators, and assemble comparisons or reviews.
 
 ### Experimentation
@@ -142,7 +152,7 @@ Each entry is independently callable. They exchange explicit files, not hidden c
 ### Writing
 
 1. `write-report`
-   Produce an editable reader-facing report or paper from verified References, experiment results, and user-confirmed claims. It does not rewrite canonical evidence, submit, or review the document.
+   Produce an editable reader-facing report or paper from Reference records and analyses, experiment results, and user-confirmed claims. It does not rewrite canonical evidence, submit, or review the document.
 
 ## Component specification workflow
 
@@ -222,7 +232,7 @@ Large checkpoints, datasets, logs, and image collections need not be committed t
 
 ## References and investigation
 
-`search-references` creates candidate Reference records. `analyze-references` consumes selected current `reference-*` or legacy `source-*` records and creates locator-bound Reference analyses and reviews. Search snippets and unverified summaries are never silently promoted to facts. The file-based Reference collection is updated only after explicit user request or confirmation.
+`search-references` presents candidates and does not create durable records. An explicit request in the same conversation can hand selected locators or paths to `add-references`, which creates the new co-located Reference directories. `add-references` reads only direct sources, records optional metadata when directly available, and lists every retained or external material in `artifacts`; it does not write `verification`, `unresolved`, or `match_rationale`. `analyze-references` consumes the current co-located records and their artifacts. This early collection does not migrate or promise compatibility with superseded Reference formats. Search snippets and unverified summaries are never silently promoted to facts. The file-based Reference collection is updated only after explicit user request or confirmation.
 
 ## Evidence and writing
 

@@ -23,7 +23,7 @@ experiments/     # concrete Experiment specs, including optional training settin
 results/         # execution results, manifests, reports, figures, and artifacts
 ```
 
-This skill does not create, choose, or modify a Reference collection or a writing directory. `$search-references`, `$analyze-references`, and `$write-report` follow the target project's existing conventions and create their defaults lazily when needed.
+This skill does not create, choose, or modify a Reference collection or a writing directory. `$search-references`, `$add-references`, `$analyze-references`, and `$write-report` follow the target project's existing conventions and create their defaults lazily when needed.
 
 Directory conventions:
 
