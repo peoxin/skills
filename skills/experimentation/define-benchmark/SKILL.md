@@ -1,15 +1,15 @@
 ---
 name: define-benchmark
-description: Define or revise a self-contained deep-learning Benchmark from committed Dataset setup revisions, including input composition, metric implementations, aggregation, and optional visualizations. Use for reusable evaluation protocols, not concrete model runs.
+description: Define or revise a self-contained data-and-metric Benchmark from committed Dataset derivation revisions, including input composition, metric implementations, aggregation, and optional visualizations. Use for reusable evaluation protocols, not concrete model runs.
 ---
 
 # Define Benchmark
 
-Define one reusable data-and-metric protocol at a time. A Benchmark maps one or more committed Dataset setup revisions into named inputs and fixes the metrics used to interpret them. It does not select a model, baseline, seed, checkpoint, resource request, or concrete run.
+Define one reusable data-and-metric protocol at a time. A Benchmark maps one or more committed Dataset derivation revisions into named inputs and fixes the metrics used to interpret them. It does not select a model, baseline, seed, checkpoint, resource request, or concrete run.
 
 ## Preconditions
 
-Read every referenced Dataset setup and its component commit. Each setup must contain a consistent `SETUP.md`, structured records, and implementation; be identified by a repository, a complete 40-character commit SHA, and paths; and contain no unresolved input semantics required by the Benchmark. If a setup is missing or must change, stop and hand the work to `$dataset-setup`; resume only after the complete setup revision is committed.
+Read every referenced Dataset derivation and its component commit. Each derivation must contain a consistent `DERIVATION.md` and implementation; be identified by a repository, a complete 40-character commit SHA, and paths; and contain no unresolved input semantics required by the Benchmark. If a derivation is missing or must change, stop and hand the work to `$define-dataset`; resume only after the complete derivation revision is committed.
 
 ## Component directory
 
@@ -33,7 +33,7 @@ Before creating or normatively changing a Benchmark, invoke `$grill-with-docs`. 
 Keep `BENCHMARK.md` brief and use these sections:
 
 - **Task and scope**: the behavior being evaluated and explicit exclusions.
-- **Inputs and composition**: selected Dataset setup inputs, their roles, mappings, and composition rules.
+- **Inputs and composition**: selected Dataset derivation inputs, their roles, mappings, and composition rules.
 - **Metrics and aggregation**: metric meaning, direction, reduction, and uncertainty treatment.
 - **Qualitative outputs**: required examples or visualizations and what they demonstrate.
 - **Validation**: implementation checks, acceptance evidence, and failure conditions.
@@ -47,17 +47,17 @@ Use this shape:
 ```yaml
 id: benchmark-<stable-id>
 task: <task definition>
-dataset_setups:
-  - id: dataset-setup-<id>
+dataset_derivations:
+  - id: dataset-derivation-<id>
     role: train | validation | test | auxiliary
     repository: <Git remote or repository identifier>
     commit: <40-character SHA>
-    paths: [<data/<dataset-id>/setups/<setup-id> paths>]
+    paths: [<data/<dataset-id>/derivations/<derivation-id> paths>]
 inputs:
-  train: [<Dataset setup input references>]
-  validation: [<Dataset setup input references>]
-  test: [<Dataset setup input references>]
-  custom-input: [<Dataset setup input references>]
+  train: [<Dataset derivation input references>]
+  validation: [<Dataset derivation input references>]
+  test: [<Dataset derivation input references>]
+  custom-input: [<Dataset derivation input references>]
 composition:
   train: {operation: concat | interleave | join, rule: <composition rule>}
   test: {operation: <operation>, rule: <composition rule>}
@@ -85,7 +85,7 @@ Omit unused named inputs, composition entries, or qualitative outputs rather tha
 
 ## Implement and fix the revision
 
-After alignment, modify only `benchmarks/<benchmark-id>/`. Define each metric's direction, units, inputs, masking, reduction, and output semantics. Implement it inside the Benchmark directory and run focused tests or a low-cost smoke test. Every referenced Dataset setup must be a committed component revision, all input and composition rules must be resolved, and every required metric implementation must pass its checks. A required visualization must also be implemented and checked; otherwise remove it from the specification.
+After alignment, modify only `benchmarks/<benchmark-id>/`. Define each metric's direction, units, inputs, masking, reduction, and output semantics. Implement it inside the Benchmark directory and run focused tests or a low-cost smoke test. Every referenced Dataset derivation must be a committed component revision, all input and composition rules must be resolved, and every required metric implementation must pass its checks. A required visualization must also be implemented and checked; otherwise remove it from the specification.
 
 If implementation requires a change to scope, inputs, composition, metrics, aggregation, qualitative outputs, validation, or failure conditions, pause and repeat `$grill-with-docs`; formatting and mechanical changes that preserve the specification do not require another interview.
 

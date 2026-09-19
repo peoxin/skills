@@ -9,7 +9,7 @@ This entry owns the `evaluate` phase and its report bundle. It can be called dir
 
 Unless the Experiment spec declares another location, write the evaluation report bundle under `results/<experiment-id>/<result-id>/`.
 
-Read the fixed Experiment revision, the Benchmark's selected Dataset setup inputs, checkpoint record, Benchmark-owned metric identities and implementations, and execution context. Never treat a missing, failed, cancelled, or partial phase as zero or success. When called by `$run-experiment`, read and follow the supplied `EXECUTION.md`, then use the supplied run ID, assigned devices, cancellation state, and output locations without allocating a second GPU reservation.
+Read the fixed Experiment revision, the Benchmark's selected Dataset derivation inputs, checkpoint record, Benchmark-owned metric identities and implementations, and execution context. Never treat a missing, failed, cancelled, or partial phase as zero or success. When called by `$run-experiment`, read and follow the supplied `EXECUTION.md`, then use the supplied run ID, assigned devices, cancellation state, and output locations without allocating a second GPU reservation.
 
 Before direct evaluation, require the Experiment control commit and the Git component preflight: consistent Experiment files, clean source paths, complete component SHAs, existing commits, and current checkout paths matching each declared commit. When delegated, use the orchestrator's verified context and re-check it at evaluation start.
 
@@ -42,13 +42,13 @@ title: <report title>
 inputs:
   experiment: <id>
   execution_context: <id>
-  dataset_setups: [<dataset-setup-id>]
+  dataset_derivations: [<dataset-derivation-id>]
   benchmark_inputs: [<named Benchmark inputs>]
 experiment_spec_commit: <40-character SHA>
 component_commits:
   model: {repository: <id>, commit: <40-character SHA>, paths: [<paths>]}
-  dataset_setups:
-    - id: <dataset-setup-id>
+  dataset_derivations:
+    - id: <dataset-derivation-id>
       repository: <id>
       commit: <40-character SHA>
       paths: [<paths>]
@@ -60,7 +60,7 @@ phases:
 metrics:
   - name: <metric>
     value: <number or null>
-    split: <Dataset setup input>
+    split: <Dataset derivation input>
     source: <metric record and manifest locator>
 aggregation: {statistic: <rule>, uncertainty: <rule>}
 figures:

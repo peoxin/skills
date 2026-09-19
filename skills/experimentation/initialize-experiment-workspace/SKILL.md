@@ -16,7 +16,7 @@ Inspect Git as a source of provenance, but do not create commits during initiali
 Create the complete set of root-level experiment directories after confirmation. Do not create component subdirectories; the component-specific skills create those lazily after the user names or confirms a component:
 
 ```text
-data/            # logical Datasets and their Dataset setups
+data/            # logical Datasets, revisions, and derivations
 models/          # self-contained model components
 benchmarks/      # self-contained data-and-metric protocols
 experiments/     # concrete Experiment specs, including optional training settings
@@ -28,8 +28,13 @@ This skill does not create, choose, or modify a Reference collection or a writin
 Directory conventions:
 
 ```text
-data/<dataset-id>/setups/<setup-id>/
-  SETUP.md
+data/<dataset-id>/
+  REVISION.md
+  derivations/
+    <derivation-id>/
+      DERIVATION.md
+      configs/
+      <implementation files>
 models/<model-id>/MODEL.md
 benchmarks/<benchmark-id>/
   BENCHMARK.md
@@ -55,7 +60,7 @@ Create `README.md` files in the root-level directories when useful. A root `READ
 
 This project uses component-oriented experiment directories.
 
-- `data/`: logical Datasets, Dataset setups, processing code, and setup records.
+- `data/`: logical Datasets, Dataset revisions, derivations, processing code, and records.
 - `models/`: self-contained model implementations, configurations, and tests.
 - `benchmarks/`: self-contained data-and-metric protocols, metric implementations, and optional visualizations.
 - `experiments/`: concrete Experiment specs with optional training settings and train/evaluate phases.

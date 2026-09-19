@@ -5,7 +5,7 @@ description: Orchestrate a fixed deep-learning Experiment revision on a research
 
 # Run Experiment
 
-This is the orchestration entry. For formal work, run only an Experiment control commit containing consistent `EXPERIMENT.md` and `experiment.yaml`. Before starting, verify that the Model, every Dataset setup selected by the Benchmark, the self-contained Benchmark and metric implementation, Experiment configuration, and dependencies are fixed revisions. Uncommitted or dirty inputs make the run exploratory and cannot silently produce formal evidence.
+This is the orchestration entry. For formal work, run only an Experiment control commit containing consistent `EXPERIMENT.md` and `experiment.yaml`. Before starting, verify that the Model, every Dataset derivation selected by the Benchmark, the self-contained Benchmark and metric implementation, Experiment configuration, and dependencies are fixed revisions. Uncommitted or dirty inputs make the run exploratory and cannot silently produce formal evidence.
 
 Delegate phase work instead of reimplementing it:
 
@@ -71,8 +71,8 @@ git_commit: <observed HEAD full SHA or null for exploratory work>
 experiment_spec_commit: <40-character SHA>
 component_commits:
   model: {repository: <id>, commit: <40-character SHA>, paths: [<paths>]}
-  dataset_setups:
-    - id: <dataset-setup-id>
+  dataset_derivations:
+    - id: <dataset-derivation-id>
       repository: <id>
       commit: <40-character SHA>
       paths: [<paths>]

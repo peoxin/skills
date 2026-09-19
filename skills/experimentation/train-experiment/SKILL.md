@@ -11,7 +11,7 @@ Unless the Experiment spec declares another location, write training manifests a
 
 ## Inputs
 
-Read the fixed Experiment revision, the Benchmark's selected Dataset setup inputs, Model and Benchmark component revisions, optional training settings, dependency identity, resource assignment, and execution context. Verify that the declared training inputs are available and that the output checkpoint path or locator is writable.
+Read the fixed Experiment revision, the Benchmark's selected Dataset derivation inputs, Model and Benchmark component revisions, optional training settings, dependency identity, resource assignment, and execution context. Verify that the declared training inputs are available and that the output checkpoint path or locator is writable.
 
 Before direct execution, require the Experiment control commit and the Git preflight described by `$run-experiment`: consistent Experiment files, clean source paths, complete component SHAs, existing commits, and current checkout paths matching each component commit. When delegated, consume the orchestrator's verified context rather than repeating or weakening it.
 
@@ -39,8 +39,8 @@ finished_at: <timestamp>
 command: <exact command or immutable command record>
 component_commits:
   model: {repository: <id>, commit: <40-character SHA>, paths: [<paths>]}
-  dataset_setups:
-    - id: <dataset-setup-id>
+  dataset_derivations:
+    - id: <dataset-derivation-id>
       repository: <id>
       commit: <40-character SHA>
       paths: [<paths>]

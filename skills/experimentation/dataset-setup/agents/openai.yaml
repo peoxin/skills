@@ -1,4 +1,0 @@
-interface:
-  display_name: "dataset-setup"
-  short_description: "Deep learning research assistant capability"
-  default_prompt: "Use $dataset-setup to support a focused deep learning research task."

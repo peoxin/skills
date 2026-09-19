@@ -14,8 +14,7 @@ Treat each model as an independent, reproducible component of a deep-learning ex
 3. Write `MODEL.md` as the model contract.
 4. Implement the model in a self-contained `models/<model-id>/` directory.
 5. Keep `MODEL.md`, implementation files, and configuration consistent. If implementation reveals a change to the architecture, module interfaces, input/output behavior, training or inference behavior, or checkpoint contract, pause and repeat `$grill-with-docs` before continuing.
-
-After implementation, list the changed files and show the diff. Do not create a commit.
+6. List the changed files and show the diff. Do not create a commit.
 
 ## Model Directory
 

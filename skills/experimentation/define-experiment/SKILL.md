@@ -5,13 +5,13 @@ description: Define one concrete PyTorch Experiment from fixed Model and Benchma
 
 # Define Experiment
 
-Define one concrete Experiment at a time in `experiments/<experiment-id>/EXPERIMENT.md` and `experiments/<experiment-id>/experiment.yaml`. Read the selected Model and Benchmark revisions, the Benchmark's Dataset setup references, dependency identity, and target-project phase interfaces. This skill consumes component definitions; it does not create or modify them.
+Define one concrete Experiment at a time in `experiments/<experiment-id>/EXPERIMENT.md` and `experiments/<experiment-id>/experiment.yaml`. Read the selected Model and Benchmark revisions, the Benchmark's Dataset derivation references, dependency identity, and target-project phase interfaces. This skill consumes component definitions; it does not create or modify them.
 
 ## Preconditions
 
-Require a Benchmark whose complete directory, including consistent `BENCHMARK.md`, `benchmark.yaml`, metric implementations, and visualizations, has a user-created component commit. Verify its repository, complete 40-character commit SHA, and paths, and verify that its Dataset setup references match their committed component revisions. If the Benchmark is missing, inconsistent, or needs different inputs, metrics, aggregation, or visualizations, stop and hand the work to `$define-benchmark`.
+Require a Benchmark whose complete directory, including consistent `BENCHMARK.md`, `benchmark.yaml`, metric implementations, and visualizations, has a user-created component commit. Verify its repository, complete 40-character commit SHA, and paths, and verify that its Dataset derivation references match their committed component revisions. If the Benchmark is missing, inconsistent, or needs different inputs, metrics, aggregation, or visualizations, stop and hand the work to `$define-benchmark`.
 
-Read the selected model as a committed component. If the model or a Dataset setup must change, hand the work to `$implement-model` or `$dataset-setup`. Modify only `experiments/<experiment-id>/EXPERIMENT.md` and `experiments/<experiment-id>/experiment.yaml` from this skill.
+Read the selected model as a committed component. If the model or a Dataset derivation must change, hand the work to `$implement-model` or `$define-dataset`. Modify only `experiments/<experiment-id>/EXPERIMENT.md` and `experiments/<experiment-id>/experiment.yaml` from this skill.
 
 ## Align the Experiment specification
 
@@ -20,7 +20,7 @@ Before creating or normatively changing an Experiment, invoke `$grill-with-docs`
 Keep `EXPERIMENT.md` brief and use these sections:
 
 - **Research question and comparison**: the question, comparison, and explicit scope.
-- **Fixed components**: the Model, Dataset setups, Benchmark, dependencies, and their roles.
+- **Fixed components**: the Model, Dataset derivations, Benchmark, dependencies, and their roles.
 - **Phases and resources**: train/evaluate phases, commands, checkpoint flow, seed, and resource envelope.
 - **Outputs**: expected checkpoints, metrics, reports, and their locations.
 - **Success and failure criteria**: interpretation boundaries, acceptance evidence, and conditions that stop or invalidate the run.
@@ -45,15 +45,15 @@ component_commits:
     repository: <Git remote or repository identifier>
     commit: <40-character SHA>
     paths: [<model paths>]
-  dataset_setups:
-    - id: dataset-setup-<id>
+  dataset_derivations:
+    - id: dataset-derivation-<id>
       repository: <Git remote or repository identifier>
       commit: <40-character SHA>
-      paths: [<data/<dataset-id>/setups/<setup-id> paths>]
-    - id: dataset-setup-<another-id>
+      paths: [<data/<dataset-id>/derivations/<derivation-id> paths>]
+    - id: dataset-derivation-<another-id>
       repository: <Git remote or repository identifier>
       commit: <40-character SHA>
-      paths: [<data/<dataset-id>/setups/<another-id> paths>]
+      paths: [<data/<dataset-id>/derivations/<another-id> paths>]
   benchmark:
     repository: <Git remote or repository identifier>
     commit: <40-character SHA>
@@ -87,7 +87,7 @@ phases:
     allow_partial_train: false
 ```
 
-For `evaluation-only`, omit `train`, set `training.status` to `not_applicable`, include an External checkpoint record and a non-empty compatibility declaration covering architecture/model revision, format, preprocessing, shape/dtype, labels, and source conditions. The model, every Dataset setup selected by the Benchmark, the Benchmark including its metric implementations, dependencies, and Experiment control commit still require Git commits.
+For `evaluation-only`, omit `train`, set `training.status` to `not_applicable`, include an External checkpoint record and a non-empty compatibility declaration covering architecture/model revision, format, preprocessing, shape/dtype, labels, and source conditions. The model, every Dataset derivation selected by the Benchmark, the Benchmark including its metric implementations, dependencies, and Experiment control commit still require Git commits.
 
 Do not start execution from this skill. After alignment, write both Experiment files. If resolving exact fields requires a change to the research question, comparison, components, phases, resources, outputs, success criteria, or failure conditions, pause and repeat `$grill-with-docs`; formatting and mechanical changes that preserve the specification do not require another interview.
 
