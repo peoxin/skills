@@ -1,79 +1,79 @@
 ---
 name: run-experiment
-description: Orchestrate a fixed deep-learning Experiment revision on a researcher-controlled multi-GPU machine with an aligned execution specification and shared provenance.
+description: Execute one fixed deep-learning Experiment on a researcher-controlled multi-GPU machine and record its phases, provenance, outputs, and report data.
 ---
 
 # Run Experiment
 
-This is the orchestration entry. For formal work, run only an Experiment control commit containing consistent `EXPERIMENT.md` and its declared configuration or phase implementation. Before starting, verify that the Model, every Dataset derivation selected by the Experiment or Benchmark, the self-contained Benchmark and metric implementation, and dependencies are fixed revisions. Read the component repository, commit, and paths from the Experiment control commit message. Uncommitted or dirty inputs make the run exploratory and cannot silently produce formal evidence.
+Execute the phases declared by one fixed Experiment revision. This is the only execution entry: it owns resource allocation, training, evaluation, provenance, cancellation, and the parent Result records. The Experiment definition owns the research question, selected components, commands, configuration, resources, checkpoint flow, outputs, and failure boundaries.
 
-Delegate phase work instead of reimplementing it:
+Do not accept temporary phase, command, configuration, resource, or output overrides. If the requested run needs a normative change, stop and hand the change to `$define-experiment`.
 
-- `train` phase: call `$train-experiment`.
-- `evaluate` phase: call `$evaluate-experiment`.
+Unless the Experiment declares another location, use:
 
-Both child skills remain independently callable. The orchestrator passes them the parent run ID, phase inputs, execution context, assigned devices, cancellation state, and output locations.
+```text
+results/<experiment-id>/<result-id>/
+```
 
-Unless the Experiment revision declares another location, use `results/<experiment-id>/<result-id>/` for the Result directory. Keep `EXECUTION.md`, manifests, report data, rendered reports, figures, and artifact references under that Result directory.
+Keep the execution context, parent Result manifest, logs, checkpoints, metrics, reports, figures, and artifact references under that Result directory. Do not create `EXECUTION.md` or separate train/evaluate phase manifest files.
 
-## Align the execution specification
+## Workflow
 
-Before creating or normatively changing a Result execution, invoke `$grill-with-docs`. If it is unavailable, stop. Work the design tree until its frontier is empty, present the complete shared understanding, and wait for explicit user confirmation before writing `EXECUTION.md` or starting a phase.
+1. Read the target project's instructions, the fixed Experiment directory, its `EXPERIMENT.md`, configuration or phase implementation, selected component paths, and dependency conventions.
+2. Determine the declared phases from the Experiment. Execute only `Train`, `Evaluate`, or both in the declared order. A missing phase is not an implicit success or failure.
+3. Run the formal preflight. Verify the Experiment control commit, complete component bindings, clean selected source paths, existing commits, and checkout paths matching every recorded component revision. If these checks fail, stop before a formal run.
+4. If required component or Experiment commits are missing, optionally prepare them only after the user explicitly chooses automatic preparation. Show every diff, file scope, proposed commit message, and the Experiment control commit's component bindings. Ask for explicit confirmation covering that exact submission set. Create only the confirmed commits; a later or different submission set requires a new confirmation.
+5. If the user explicitly permits an exploratory run despite incomplete formal provenance, label the Result exploratory and record every missing or dirty input. Never present it as formal evidence.
+6. Create the Result directory and write the initial execution context before the first phase. Record the Experiment revision, component bindings, runtime identity, hardware observations, requested resources, and initial statuses.
+7. Observe local NVIDIA devices and allocate only devices satisfying the Experiment request. Record physical indices, free memory, queue or reservation state, working directory, and cancellation method. Use the target project's own launcher and environment; do not add a generic runner or scheduler.
+8. Execute each declared phase using its Experiment command, configuration, inputs, assigned devices, and output locations. Preserve stdout, stderr, checkpoints, metrics, reports, figures, and intermediate artifacts by stable path or locator and digest where practical.
+9. Before each phase and after it returns, repeat HEAD, source-path, Experiment configuration, and component-path verification. A mismatch blocks the next phase and is recorded as a provenance failure.
+10. Update the execution context and parent Result manifest after every phase. Retain each phase status, exact command, resources, outputs, failure reason, and provenance observations. For Evaluate, follow `evaluation-report.md`.
+11. Apply the Experiment's continuation rules. A failed, cancelled, or partial Train blocks Evaluate unless the Experiment explicitly permits partial training. An Evaluate-only Experiment uses its declared external or prior-Result checkpoint and never invents a Train phase.
+12. After all declared phases, verify that the Experiment, execution context, parent manifest, outputs, and observed behavior agree. List every Result file and propose a Result commit message. Ask the user to create the Result commit; do not create that Result commit automatically.
 
-Keep `EXECUTION.md` brief and use these sections:
+A Result is `completed` only when every declared phase completed and all post-run checks pass. Otherwise report the concrete phase statuses and mark the Result `partial`, `failed`, `cancelled`, or `blocked` as applicable.
 
-- **Bound experiment revision**: the Experiment control commit and the fixed component revisions it references.
-- **Commands and resources**: phase commands, working directory, GPU constraints and assignments, timeouts, and seed.
-- **Output locations**: manifests, checkpoints, metrics, logs, reports, figures, and external artifact locators.
-- **Cancellation and failure handling**: cancellation method, partial-work policy, cleanup, and blocking failures.
-- **Verification**: preflight, phase-boundary, output, and provenance checks.
+## Automatic component preparation
 
-`EXECUTION.md` is the human-readable execution contract. The execution context and manifests hold exact machine-consumed fields and must remain consistent with it without copying their complete contents into Markdown. If preparation or execution requires a normative change to phases, resources, commands, outputs, verification, or failure handling, pause and repeat `$grill-with-docs`; formatting and mechanical changes that preserve the specification do not require another interview.
+Automatic preparation is a user-authorized convenience, not a default. It may create separate commits for changed Model, Dataset derivation, Benchmark, or dependency components and then an Experiment control commit. It must:
 
-## Fix Component Revisions
+- show the diff and exact paths for every proposed component commit;
+- keep each reusable component commit separate from the Experiment definition and unrelated work;
+- show the proposed Experiment commit and its complete component bindings;
+- obtain an explicit user confirmation for that exact set of commits immediately before writing any commit;
+- stop without modifying or committing anything when confirmation is absent or refused;
+- ask again if the file set, component revisions, or commit messages change.
 
-Before formal preflight, resolve the component bindings in the Experiment control commit message. Reuse an existing fixed commit when its declared paths match the selected component. If a selected reusable component needs a new revision and the user has chosen automatic preparation, show its diff and commit that component alone. Prepare changed Model, Dataset derivation, Benchmark, and dependency components separately; never combine them with the Experiment definition or unrelated work. Then commit the Experiment directory as the Experiment control commit with the component bindings in its commit message.
+The user may also provide already-fixed component revisions and an Experiment control commit. Reuse them when their declared paths match.
 
-When automatic preparation is not selected, stop with the component diffs, required commits, and proposed Experiment commit message for the user. Do not treat uncommitted component paths as formal inputs.
+## Formal preflight
 
-## Git preflight
+A formal run requires all of the following:
 
-Formal execution is refused until all of these checks pass:
+1. The complete Experiment directory is committed, and `EXPERIMENT.md` agrees with every declared configuration file and phase implementation. Record its full SHA as `experiment_spec_commit`.
+2. The Experiment control commit message lists every selected Model, Dataset derivation, Benchmark, and dependency with its repository, complete 40-character SHA, and paths. Verify every commit exists.
+3. Every declared source checkout is clean for its selected paths and has a successful `git rev-parse HEAD`.
+4. Every selected path matches its recorded component commit using `git diff --quiet <commit> -- <path>` or an equivalent immutable comparison.
+5. The declared commands, resources, inputs, checkpoint flow, output locations, and failure rules are available without adding execution-time behavior.
 
-1. The complete Experiment directory is committed and its `EXPERIMENT.md` agrees with every declared configuration file and phase implementation. Record the full SHA as `experiment_spec_commit` in the run manifest. Read the component bindings from the Experiment control commit message. Read the Benchmark at its declared component commit and require its `BENCHMARK.md` and implementations to agree; a missing or mismatched component blocks formal execution.
-2. `git status --porcelain=v1` is empty for source paths in every declared repository and `git rev-parse HEAD` succeeds. Record each observed HEAD in the execution context. The Experiment control commit message is the version binding for the formal run. It must list every selected Model, Dataset derivation, Benchmark, and dependency source with its repository, complete commit SHA, and paths. Verify each listed commit exists.
-3. For every component binding read from the Experiment control commit message, compare the relevant checkout with the recorded commit (`git diff --quiet <commit> -- <path>` or an equivalent `git show <commit>:<path>` comparison). A mismatch, missing path, short SHA, branch, tag, or uncommitted source change blocks the run.
-4. Before each phase and after each child skill returns, repeat the HEAD, source-path, Experiment configuration, and component-path checks. A change blocks the next phase and is recorded as a provenance failure.
+A dirty or unbound input may be used only for an explicitly authorized exploratory Result. Record the reason and missing provenance instead of silently upgrading it to formal evidence.
 
-Write `EXECUTION.md` before phase execution and keep it consistent with the machine-readable records written during the run. The user reviews and commits the complete Result directory as a Result commit after the run. The orchestrator must never create that commit implicitly.
+## Resource allocation and cancellation
 
-## Resource allocation
+Show the requested GPU count, allowed indices, minimum free memory, queue timeout, working directory, commands, output paths, and cancellation method before allocation. Coordinate concurrent runs through a shared machine-level lock convention; lock records contain GPU index, process owner, and acquisition time. Reclaim locks only when ownership is demonstrably stale, and release only your own locks.
 
-Show the requested GPU count, allowed indices, minimum free memory, queue timeout, working directory, commands, output paths, and cancellation method. Observe local NVIDIA devices and choose only devices satisfying the request. Coordinate concurrent runs through a shared machine-level lock convention; lock records contain GPU index, process owner, and acquisition time. Reclaim locks only when ownership is demonstrably stale, and release only your own locks.
+Do not add cloud allocation or silently change a request. If no local assignment satisfies it, preserve a queued or blocked state and ask how to proceed. Record cancellation, partial-work policy, cleanup, and blocking failures in the parent Result manifest from the Experiment's declared rules.
 
-Do not add cloud allocation or silently change a request. If no local assignment satisfies the request, preserve a queued or blocked state and ask how to proceed.
+## Execution context
 
-## Phase orchestration
-
-Read only the phases declared in the Experiment spec:
-
-- train only: allocate resources and delegate to `$train-experiment`;
-- evaluate only: allocate resources and delegate to `$evaluate-experiment` using the declared or external checkpoint;
-- train followed by evaluate: wait for the training manifest, then check checkpoint and `allow_partial_train` before delegating evaluation.
-
-A failed or cancelled train phase blocks evaluation unless the spec explicitly permits partial work. An evaluation-only experiment must not invent a train phase.
-
-Allocate or reserve physical GPUs once per phase, record the assignment, and pass it to the child skill. Use the target project's own launcher and environment. Set `CUDA_VISIBLE_DEVICES` or the project's equivalent only after recording the assigned physical indices. Do not introduce a generic Python runner or a second scheduler.
-
-## Required records
-
-Create or update a machine-readable execution context before the first phase and after every phase:
+Write or update this machine-readable context before the first phase and after every phase:
 
 ```yaml
 id: execution-context-<run-id>
 captured_at: <timestamp>
-git_commit: <observed HEAD full SHA or null for exploratory work>
 experiment_spec_commit: <40-character SHA>
+exploratory: false
 component_commits:
   model: {repository: <id>, commit: <40-character SHA>, paths: [<paths>]}
   dataset_derivations:
@@ -83,6 +83,7 @@ component_commits:
       paths: [<paths>]
   benchmark: {repository: <id>, commit: <40-character SHA>, paths: [<paths>]}
   dependencies: {repository: <id>, commit: <40-character SHA>, paths: [<lockfile paths>]}
+git: {observed_head: <full SHA or null>, source_paths_clean: true}
 python: <runtime identity>
 pytorch: <runtime identity>
 cuda: <runtime/driver identity or null>
@@ -90,9 +91,37 @@ dependencies: {lockfile: <path>, digest: <digest>}
 hardware: {machine: <identity>, gpu_inventory: [<observations>]}
 assigned_devices: {train: [<indices>], evaluate: [<indices>]}
 resource_observations: {<phase>: <requested and observed resources>}
-phase_statuses: {train: completed | failed | cancelled | blocked, evaluate: <status>}
+phase_statuses: {train: <status>, evaluate: <status>}
+missing_provenance: []
 ```
 
-Persist the execution context before delegating the first phase and after every child returns. Child skills write phase manifests; the orchestrator verifies their parent/run IDs, repeats Git component verification, appends orchestration status and resource observations, and writes the parent manifest. The parent manifest reports `completed` only when every declared phase completed; otherwise report `partial` and retain all phase states. Do not duplicate child metrics or report prose in the parent manifest; link to the child manifest and `$evaluate-experiment` report bundle instead.
+## Parent Result manifest
 
-After the run, verify that `EXECUTION.md`, the execution context, phase manifests, outputs, and observed behavior agree. List the complete Result files and a proposed commit message. Ask the user to create the Result commit, then record or report its full SHA. A formal result is not fully Git-tracked until that commit exists.
+Write one parent manifest under the Result directory. It is authoritative for execution status and links to phase outputs without duplicating metric or report prose:
+
+```yaml
+experiment_id: <experiment>
+run_id: <run>
+status: completed | partial | failed | cancelled | blocked
+started_at: <timestamp>
+finished_at: <timestamp>
+experiment_spec_commit: <40-character SHA>
+execution_context: <path>
+phases:
+  - name: train | evaluate
+    status: completed | failed | cancelled | partial | blocked
+    command: <exact command or immutable command record>
+    assigned_gpus: [<physical indices>]
+    outputs: [<path or locator>]
+    manifest_data: <phase-specific structured record path or inline fields>
+    reason: <required when not completed>
+checkpoint: {path_or_locator: <value>, digest: <value>, model_revision: <value>}
+metrics: [<training metric record locators>]
+evaluation_report: <report bundle path or null>
+logs: [<path or locator>]
+missing_provenance: []
+```
+
+The parent manifest may link to phase-specific structured records when the target project needs them, but the user-facing execution entry remains this skill and the Result has one authoritative parent status. Do not copy evaluation metric definitions or report prose into the parent manifest.
+
+After execution, verify the complete Result directory and propose a user-created Result commit. A formal Result is not Git-tracked until that commit exists.

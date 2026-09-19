@@ -59,7 +59,7 @@ A stable root-level directory for one reusable research component or family, suc
 _Avoid_: Version directory, dated snapshot, commit-named folder
 
 **Component specification document**:
-A Markdown contract named for a Dataset derivation, Model, Benchmark, Experiment, or Result execution. It records user-aligned intent, behavior, boundaries, interfaces, and verification requirements, has no lifecycle status, and remains consistent with the implementation and any Experiment configuration.
+A Markdown contract named for a Dataset derivation, Model, Benchmark, or Experiment. It records user-aligned intent, behavior, boundaries, interfaces, and verification requirements, has no lifecycle status, and remains consistent with the implementation and any Experiment configuration. Result execution facts live in machine-readable execution context and parent Result records.
 _Avoid_: Implementation plan, rendered YAML, draft approval record
 
 **Dataset definition skill**:
@@ -102,17 +102,9 @@ _Avoid_: Component revision, environment default
 An independently executable part of an experiment composition, such as training or evaluation, with its own inputs, status, outputs, and continuation conditions while retaining the parent experiment identity.
 _Avoid_: Pipeline stage, complete run
 
-**Experiment orchestrator**:
-The `run-experiment` entry that aligns one Result execution specification against a fixed Experiment revision, allocates shared resources, calls the declared training and/or evaluation phase skills, preserves execution context, and writes the parent manifest. It does not own phase-specific training, metrics, or report logic.
-_Avoid_: Training runner, evaluation implementation, hidden workflow engine
-
-**Training phase skill**:
-The `train-experiment` entry that executes or documents one training phase, produces checkpoints and training metrics, and writes a phase manifest. It can run directly or under the Experiment orchestrator.
-_Avoid_: Complete experiment, evaluation phase
-
-**Evaluation phase skill**:
-The `evaluate-experiment` entry that consumes a declared checkpoint and Dataset input, checks compatibility, computes metrics, creates visualizations, and writes a report bundle. It can run directly or under the Experiment orchestrator.
-_Avoid_: Training runner, parent experiment manifest
+**Experiment execution entry**:
+The `run-experiment` entry that executes the phases declared by a fixed Experiment revision, allocates shared resources, preserves execution context, handles cancellation and partial states, and writes the parent Result manifest and evaluation report bundle. It is the only execution entry; training and evaluation are Experiment phases owned by this entry. It does not accept temporary phase or configuration overrides.
+_Avoid_: Training phase skill, evaluation phase skill, hidden workflow engine
 
 **Partial experiment**:
 An experiment whose declared phases or outputs are incomplete, failed, cancelled, or not yet executed. Available artifacts may be inspected or used under explicit eligibility rules without being presented as a complete result.
@@ -131,7 +123,7 @@ The Git commit containing consistent `EXPERIMENT.md` and its configuration or cu
 _Avoid_: Component commit, result commit
 
 **Result commit**:
-A user-created Git commit containing `EXECUTION.md`, canonical phase manifests, execution context, metrics, report data, rendered reports, and figure metadata for a completed or partial run. It links back to the Experiment control commit and all component commits.
+A user-created Git commit containing the execution context, parent Result manifest, canonical metrics, report data, rendered reports, figures, logs, and artifact references for a completed or partial run. It links back to the Experiment control commit and all component commits. The Result does not require a separate `EXECUTION.md` contract.
 _Avoid_: Checkpoint file alone, mutable dashboard
 
 **Component verification**:

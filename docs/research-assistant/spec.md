@@ -26,8 +26,10 @@ skills/
     define-benchmark/
     define-experiment/
     run-experiment/
-    train-experiment/
-    evaluate-experiment/
+      SKILL.md
+      evaluation-report.md
+      agents/
+        openai.yaml
     propose-improvements/
   writing/
     write-report/
@@ -67,7 +69,8 @@ experiments/<experiment-id>/
   configs/
   <implementation files>
 results/<experiment-id>/<result-id>/
-  EXECUTION.md
+  execution-context.yaml
+  result.yaml
 ```
 
 Do not create top-level `training/`, `evaluation/`, `metrics/`, `runs/`, `reports/`, `common/`, or `_shared/` directories. Training and evaluation are Experiment phases; Experiment-specific training and evaluation settings and custom phase code live inside the Experiment directory; metric implementations belong to their Benchmark; and each model is self-contained.
@@ -147,12 +150,8 @@ Each entry is independently callable. They exchange explicit files or user-selec
 5. `define-experiment`
    Create `EXPERIMENT.md` and any configuration or custom phase code for one concrete Experiment from selected Model, Dataset derivation, and Benchmark paths. Bind component versions in the Experiment control commit message, optional training settings, phases, seed, resources, checkpoint, and outputs without modifying the referenced components.
 6. `run-experiment`
-   Align `EXECUTION.md` and orchestrate a fixed Experiment revision through the local multi-GPU procedure. Allocate resources, call the training and evaluation entries, preserve shared execution context, handle cancellation and partial states, and write the parent manifest.
-7. `train-experiment`
-   Execute or document the training phase, produce checkpoints and training metrics, and write a training phase manifest. It can be called directly or by `run-experiment`.
-8. `evaluate-experiment`
-   Execute or collect an evaluation phase, check checkpoint compatibility, and generate canonical metric/report records plus rendered reports, tables, plots, and optional visualization-hook outputs. It can be called directly or by `run-experiment`.
-9. `propose-improvements`
+   Execute only the phases declared by a fixed Experiment revision on the local multi-GPU machine. It allocates resources, records execution context and one parent Result manifest, handles cancellation and partial states, and produces the evaluation report bundle when an Evaluate phase is declared.
+7. `propose-improvements`
    Combine Reference analyses and experiment reports into evidence-linked improvement proposals with hypotheses, mechanisms, risks, and ablations.
 
 ### Writing
@@ -162,9 +161,11 @@ Each entry is independently callable. They exchange explicit files or user-selec
 
 ## Component specification workflow
 
-Creating or normatively changing a Dataset derivation, Model, Benchmark, Experiment, or Result execution starts by invoking Matt's `$grill-with-docs`. This is a hard dependency for those planning stages: if it is unavailable, the skill stops before specification or implementation work. The interview follows the design tree until its frontier is empty, then the assistant presents the complete shared understanding and waits for explicit user confirmation.
+Creating or normatively changing a Dataset derivation, Model, Benchmark, or Experiment starts by invoking Matt's `$grill-with-docs`. This is a hard dependency for those planning stages: if it is unavailable, the skill stops before specification or implementation work. The interview follows the design tree until its frontier is empty, then the assistant presents the complete shared understanding and waits for explicit user confirmation.
 
-After confirmation, the relevant skill writes its Markdown specification before implementation: `REVISION.md` and `DERIVATION.md` for a Dataset, `MODEL.md`, `BENCHMARK.md`, `EXPERIMENT.md`, or `EXECUTION.md`. Experiment-specific configuration or custom phase code lives beside `EXPERIMENT.md` when required. These specifications have no `draft` or `confirmed` status. If implementation reveals a normative change to behavior, interfaces, input semantics, metrics, phases, resources, verification requirements, or failure conditions, the skill pauses and repeats `$grill-with-docs`; formatting, typo fixes, and mechanical edits that preserve the specification do not reopen the interview.
+`run-experiment` consumes the already aligned Experiment; it does not create a second execution specification or call `$grill-with-docs` before running. A run records machine-observed facts in its execution context and parent Result manifest. A normative change to phases, resources, commands, outputs, verification, or failure handling returns to `$define-experiment`.
+
+After confirmation, the relevant skill writes its Markdown specification before implementation: `REVISION.md` and `DERIVATION.md` for a Dataset, `MODEL.md`, `BENCHMARK.md`, or `EXPERIMENT.md`. Experiment-specific configuration or custom phase code lives beside `EXPERIMENT.md` when required. These specifications have no `draft` or `confirmed` status. If implementation reveals a normative change to behavior, interfaces, input semantics, metrics, phases, resources, verification requirements, or failure conditions, the skill pauses and repeats `$grill-with-docs`; formatting, typo fixes, and mechanical edits that preserve the specification do not reopen the interview. Result execution facts live in machine-readable context and parent Result records rather than a separate `EXECUTION.md`.
 
 Each component skill defines a short, component-specific section template in its own `SKILL.md`. A user-created Component commit fixes a reusable component's Markdown specification and implementation. An Experiment control commit fixes `EXPERIMENT.md` and its configuration or custom phase code; its commit message binds the reusable component commits. Later normative changes create a new aligned revision; Git history preserves the prior contract.
 
@@ -212,7 +213,7 @@ Every formal reusable component is Git-addressed. A component revision records a
 
 ### Phases and partial work
 
-An Experiment spec may contain independent `train` and `evaluate` phases. `run-experiment` orchestrates only the phases declared in the spec by calling `train-experiment` and/or `evaluate-experiment`. A train-only Experiment requires a Model and Dataset derivations and may omit a Benchmark; an evaluation-only Experiment requires a Model, Benchmark, and checkpoint. Training produces checkpoints and training metrics; evaluation consumes a specifically identified checkpoint and the Dataset inputs selected by the Benchmark. Training settings are phase configuration and may be absent for evaluation-only work. Evaluation may run against an incomplete training output when the spec permits it, but the report marks the training phase as partial, failed, cancelled, or incomplete. Missing phases are never silently treated as zero or success.
+An Experiment spec may contain independent `train` and `evaluate` phases. `run-experiment` executes only the phases declared in the spec, in their declared order, using the commands and configuration already fixed by `define-experiment`. It does not accept temporary phase or configuration overrides. A train-only Experiment requires a Model and Dataset derivations and may omit a Benchmark; an evaluation-only Experiment requires a Model, Benchmark, and checkpoint. Training produces checkpoints and training metrics; evaluation consumes a specifically identified checkpoint and the Dataset inputs selected by the Benchmark. Training settings are phase configuration and may be absent for evaluation-only work. Evaluation may run against an incomplete training output when the spec permits it, but the parent Result and report mark the training phase as partial, failed, cancelled, or incomplete. Missing phases are never silently treated as zero or success.
 
 An external checkpoint is registered with an External checkpoint record and evaluated through an Evaluation-only experiment. The compatibility check validates architecture, format, weights digest, input/label semantics, preprocessing, shape, dtype/device constraints, and source/license information before formal evaluation.
 
@@ -223,16 +224,16 @@ Formal version contract:
 - Model, every Dataset derivation selected by the Experiment or Benchmark, Benchmark when used, dependency lockfiles, and the Experiment directory must be identified by Git repository, complete commit SHA, and paths. Each reusable component's Markdown specification and implementation must agree at that revision. The Experiment control commit fixes `EXPERIMENT.md` and its configuration or custom phase code; its commit message binds the selected component commits. For an external repository, also record its URL or identifier and how the component is used; verify it from a checkout or other immutable source before execution.
 - Before a formal run, each source checkout must be clean for its declared source paths. For every component, compare the checkout paths with `git show <component.commit>:<path>`; a mismatch blocks the run.
 - Record the Experiment control commit containing consistent `EXPERIMENT.md` and configuration or custom phase code. Record the observed `git rev-parse HEAD` in the execution context for audit, and read the component bindings from the control commit message.
-- Check HEAD, source-path cleanliness, and component-path equality before each phase and after each child phase returns. A change blocks the next phase and is written to the manifest.
-- After a complete or partial run, commit `EXECUTION.md`, canonical manifests, execution context, metrics, report data, rendered reports, and figure metadata as a user-created Result commit. Skills propose the files and commit message but do not commit automatically.
+- Check HEAD, source-path cleanliness, and component-path equality before each phase and after each phase returns. A change blocks the next phase and is written to the manifest.
+- After a complete or partial run, commit the execution context, parent Result manifest, metrics, report data, rendered reports, and figure metadata as a user-created Result commit. The execution entry proposes the files and commit message but does not create the Result commit automatically.
 
-Uncommitted or dirty work may support exploratory runs and smoke tests, but it is not eligible for a formal benchmark or report claim.
+Formal execution requires a fixed Experiment control commit and matching component revisions. The assistant may prepare code, validate records, and run low-cost smoke tests before a component commit. It may not silently change a component, resource request, Dataset derivation, Benchmark scope, or Experiment phase.
 
-Formal execution requires an Experiment control commit and an aligned `EXECUTION.md`. The assistant may prepare code, validate records, and run low-cost smoke tests before a Component commit. It may not silently change a component, resource request, Dataset derivation, or Benchmark scope.
+Uncommitted or dirty work may support exploratory runs and smoke tests, but it is not eligible for a formal benchmark or report claim. Automatic component or Experiment commits are allowed only after the user explicitly confirms the exact displayed submission set.
 
 ## Local execution
 
-The first execution target is one researcher-controlled multi-GPU machine. `run-experiment` observes local device availability, accepts explicit GPU count and device constraints, explains queue or reservation steps, creates the shared execution context, delegates phase work, records assignments, supports cancellation, and releases resources after success or failure. Child phase skills do not create a second reservation when called by the orchestrator. There is no cloud implementation or bundled scheduler in v1.
+The first execution target is one researcher-controlled multi-GPU machine. `run-experiment` observes local device availability, accepts explicit GPU count and device constraints, explains queue or reservation steps, creates the shared execution context, executes the declared phases, records assignments, supports cancellation, and releases resources after success or failure. There are no child execution skills and no cloud implementation or bundled scheduler in v1.
 
 Large checkpoints, datasets, logs, and image collections need not be committed to Git. Their manifests record path or external reference, size, SHA256, generation/download time, and the component commits that produced or consumed them. Dataset processing code, Dataset derivation records, checkpoint registration records, specs, code, configs, reports, and small provenance records are Git-tracked.
 

@@ -44,7 +44,8 @@ experiments/<experiment-id>/
   EXPERIMENT.md
   configs/
 results/<experiment-id>/<result-id>/
-  EXECUTION.md
+  execution-context.yaml
+  result.yaml
 ```
 
 Do not create top-level `training/`, `evaluation/`, `metrics/`, `runs/`, `reports/`, `common/`, or `_shared/` directories. Training and evaluation are Experiment phases; Experiment-specific training and evaluation settings and custom phase code live inside the Experiment directory; metric implementations belong to their Benchmark; each model is self-contained.

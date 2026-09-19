@@ -1,4 +1,0 @@
-interface:
-  display_name: "train-experiment"
-  short_description: "Deep learning research assistant capability"
-  default_prompt: "Use $train-experiment to run or prepare a training phase for a deep learning experiment."
