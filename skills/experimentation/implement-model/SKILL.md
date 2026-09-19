@@ -1,20 +1,25 @@
 ---
 name: implement-model
-description: Reproduce an existing model or implement a new PyTorch idea from an aligned model specification with an explicit evidence boundary and tests.
+description: Implement a self-contained, reproducible PyTorch model component from an aligned model design.
 ---
 
 # Implement Model
 
-Use one of two intents:
+Treat each model as an independent, reproducible component of a deep-learning experiment. Keep its architecture, behavior, implementation, and configuration understandable and self-contained.
 
-- `reproduce`: implement an existing method from selected papers, repositories, configurations, or checkpoints.
-- `new-method`: implement a user-proposed mechanism or a confirmed improvement proposal.
+## Workflow
 
-If intent is unclear, ask. Inspect the target project's instructions, architecture, data interfaces, training entry points, tests, and dependency conventions before proposing edits.
+1. Inspect the target project's instructions, architecture, data interfaces, training entry points, and dependency conventions.
+2. Before designing or changing the model, invoke `$grill-with-docs`. Continue until the architecture, module contracts, interfaces, training and inference behavior, and implementation constraints are explicit and confirmed. If it is unavailable, stop.
+3. Write `MODEL.md` as the model contract.
+4. Implement the model in a self-contained `models/<model-id>/` directory.
+5. Keep `MODEL.md`, implementation files, and configuration consistent. If implementation reveals a change to the architecture, module interfaces, input/output behavior, training or inference behavior, or checkpoint contract, pause and repeat `$grill-with-docs` before continuing.
 
-## Default directory
+After implementation, list the changed files and show the diff. Do not create a commit.
 
-Place each logical model in a self-contained root-level directory:
+## Model Directory
+
+Use one self-contained root-level directory for each logical model:
 
 ```text
 models/
@@ -22,35 +27,28 @@ models/
     MODEL.md
     model.py
     config.yaml
-    tests/
 ```
 
-The directory name is not a version; formal runs record its repository, full commit, and paths. Do not create or require `common/`, `lib/`, `_shared/`, or another shared model-code directory. If two models need similar code, copy the relevant implementation into each model directory and maintain each copy independently.
+The directory name identifies the logical model, not a version. Do not create or require shared model-code directories such as `common/`, `lib/`, or `_shared/`. If models need similar code, keep each model implementation self-contained and maintain copies independently.
 
-## Align the model specification
+## MODEL.md
 
-Before creating or normatively changing a Model, invoke `$grill-with-docs`. If it is unavailable, stop. Work the design tree until its frontier is empty, present the complete shared understanding, and wait for explicit user confirmation before writing `MODEL.md` or editing implementation files.
+`MODEL.md` is the human-readable contract for the model. Keep it consistent with the implementation and machine-readable configuration without copying the complete configuration or source code into it.
 
-Keep `MODEL.md` brief and use these sections:
+Use these sections:
 
-- **Intent and evidence boundary**: success criteria and the separation between source-backed behavior, user hypotheses, and inference.
-- **Interface**: inputs, outputs, shapes, dtype/device behavior, train/eval behavior, and state or checkpoint keys.
-- **Required behavior**: architecture and behavior the implementation must preserve.
-- **Integration**: target files, dependencies, callers, and other components that require fixed revisions.
-- **Verification and known deviations**: tests, smoke tests, expected outputs, failure conditions, and accepted departures from source behavior.
+### Purpose
 
-`MODEL.md` is the human-readable contract. Keep it consistent with code and machine-readable configuration without copying the complete configuration into Markdown. Key PyTorch code may appear as Markdown code blocks when it materially helps review the contract.
+Describe the model's role in the experiment, its problem boundary, and any source, paper, repository, checkpoint, or design basis needed to understand its architecture and reproduce it.
 
-For reproduction, maintain this deviation table in `MODEL.md`:
+### Architecture
 
-```markdown
-| Aspect | Source behavior | Proposed implementation | Status |
-| --- | --- | --- | --- |
-| Architecture | ... | ... | exact / approximated / unknown |
-```
+Describe the complete model data flow, model inputs and outputs, tensor shapes, dtype and device constraints, and behavior in training and inference modes.
 
-For a new method, record the mechanism, baseline-relative prediction, falsifiable failure condition, required ablations, and compute implications in `MODEL.md`.
+Give each meaningful module its own subsection. For every module, describe its responsibility, internal architecture, local inputs and outputs, tensor shapes, parameters and state, and behavior that the implementation must preserve.
 
-After writing the aligned specification, edit only the target project and run focused tests and a low-cost smoke test. If implementation requires a change to behavior, interfaces, integration, verification, or failure conditions, pause and repeat `$grill-with-docs`; formatting and mechanical changes that preserve the specification do not require another interview. Do not silently change the Dataset setup, Benchmark spec, or research question.
+### Implementation
 
-Verify that `MODEL.md`, code, configuration, and tests agree. Show `git diff`, the exact files to commit, and a proposed commit message. This skill does not create the commit. A formal run may consume the Model only after the user commits the complete Model directory and records its repository, full SHA, and paths in the Experiment spec.
+Record implementation files, configuration, dependencies, initialization, checkpoint and state-dict details, and implementation choices that affect reproducibility. Keep the code itself in the implementation files.
+
+The specification must remain consistent with the actual implementation. If the implementation changes the model contract, stop and realign the design before continuing.
