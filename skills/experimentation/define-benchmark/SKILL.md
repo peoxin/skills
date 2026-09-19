@@ -1,92 +1,58 @@
 ---
 name: define-benchmark
-description: Define or revise a self-contained data-and-metric Benchmark from committed Dataset derivation revisions, including input composition, metric implementations, aggregation, and optional visualizations. Use for reusable evaluation protocols, not concrete model runs.
+description: Define a reusable Benchmark component that evaluates model behavior with selected Dataset derivations, quantitative metrics, and qualitative visualizations.
 ---
 
 # Define Benchmark
 
-Define one reusable data-and-metric protocol at a time. A Benchmark maps one or more committed Dataset derivation revisions into named inputs and fixes the metrics used to interpret them. It does not select a model, baseline, seed, checkpoint, resource request, or concrete run.
+Treat each Benchmark as a self-contained, reusable evaluation protocol. A Benchmark selects inputs from one or more Dataset derivations, defines the behavior being evaluated, and fixes the quantitative metrics and qualitative visualizations used to interpret results. It does not select a model, baseline, seed, checkpoint, resource request, or concrete experiment run.
 
-## Preconditions
+## Workflow
 
-Read every referenced Dataset derivation and its component commit. Each derivation must contain a consistent `DERIVATION.md` and implementation; be identified by a repository, a complete 40-character commit SHA, and paths; and contain no unresolved input semantics required by the Benchmark. If a derivation is missing or must change, stop and hand the work to `$define-dataset`; resume only after the complete derivation revision is committed.
+1. Inspect the target project's instructions, Dataset derivations, data interfaces, evaluation conventions, and dependency conventions.
+2. Before defining or changing a Benchmark, invoke `$grill-with-docs`. Resolve the task, Dataset inputs, input composition, quantitative metrics, and qualitative visualizations. Continue only after the design is explicit and confirmed. If it is unavailable, stop.
+3. Create or update `BENCHMARK.md` inside `benchmarks/<benchmark-id>/`.
+4. Implement the Benchmark inside the selected `benchmarks/<benchmark-id>/` directory. Keep metric and visualization implementations self-contained within the Benchmark.
+5. Keep `BENCHMARK.md` consistent with the metric and visualization implementations. If the task, Dataset inputs, composition, metrics, aggregation, visualizations, or implementation contract changes, pause and repeat `$grill-with-docs` before continuing.
+6. List the changed files and show the diff. Do not create a commit.
 
-## Component directory
+## Benchmark Directory
 
-Create or modify only the selected Benchmark directory:
+Use one self-contained directory for each logical Benchmark:
 
 ```text
 benchmarks/
   <benchmark-id>/
     BENCHMARK.md
-    benchmark.yaml
     metrics/
     visualizations/
+    <implementation files>
 ```
 
-Keep every metric implementation and Benchmark-specific visualization inside this directory. Each Benchmark is self-contained; copy and maintain any needed implementation locally instead of introducing shared metric or evaluation code.
+Keep every Benchmark-specific metric and visualization implementation inside this directory. The Benchmark may contain other implementation files, configurations, and tests as required by the project. Do not introduce shared metric or evaluation directories for the Benchmark; keep its implementation self-contained.
 
-## Align the Benchmark specification
+## BENCHMARK.md
 
-Before creating or normatively changing a Benchmark, invoke `$grill-with-docs`. If it is unavailable, stop. Work the design tree until its frontier is empty, present the complete shared understanding, and wait for explicit user confirmation before writing `BENCHMARK.md`, `benchmark.yaml`, or implementation files.
+`BENCHMARK.md` is the human-readable contract for the Benchmark. Keep it concise and consistent with the implementation.
 
-Keep `BENCHMARK.md` brief and use these sections:
+Use these sections:
 
-- **Task and scope**: the behavior being evaluated and explicit exclusions.
-- **Inputs and composition**: selected Dataset derivation inputs, their roles, mappings, and composition rules.
-- **Metrics and aggregation**: metric meaning, direction, reduction, and uncertainty treatment.
-- **Qualitative outputs**: required examples or visualizations and what they demonstrate.
-- **Validation**: implementation checks, acceptance evidence, and failure conditions.
+### Description
 
-`BENCHMARK.md` is the human-readable contract. `benchmark.yaml` holds exact machine-consumed fields and must remain consistent with it without copying the full YAML into Markdown.
+Describe the behavior being evaluated, the Benchmark's purpose, and its explicit boundaries. State what the Benchmark does not evaluate when that boundary matters.
 
-## Benchmark spec
+### Dataset
 
-Use this shape:
+Identify the Dataset derivations and named inputs used by the Benchmark. Describe each input's role, mappings, selection boundaries, and composition rules. Describe the data contract the metric and visualization implementations consume.
 
-```yaml
-id: benchmark-<stable-id>
-task: <task definition>
-dataset_derivations:
-  - id: dataset-derivation-<id>
-    role: train | validation | test | auxiliary
-    repository: <Git remote or repository identifier>
-    commit: <40-character SHA>
-    paths: [<data/<dataset-id>/derivations/<derivation-id> paths>]
-inputs:
-  train: [<Dataset derivation input references>]
-  validation: [<Dataset derivation input references>]
-  test: [<Dataset derivation input references>]
-  custom-input: [<Dataset derivation input references>]
-composition:
-  train: {operation: concat | interleave | join, rule: <composition rule>}
-  test: {operation: <operation>, rule: <composition rule>}
-metric_inputs:
-  <metric-id>: [<named Benchmark inputs>]
-metrics:
-  - id: <metric-id>
-    direction: higher | lower
-    units: <unit>
-    inputs: [<prediction and target fields>]
-    masking: <rule>
-    reduction: <rule>
-    output_semantics: <meaning>
-    implementation_paths: [benchmarks/<benchmark-id>/metrics/<paths>]
-aggregation:
-  statistic: <rule>
-  confidence_or_uncertainty: <rule>
-qualitative_outputs:
-  - id: <output-id>
-    implementation_paths: [benchmarks/<benchmark-id>/visualizations/<paths>]
-unavailable_inputs: [<input name and reason>]
-```
+### Metrics
 
-Omit unused named inputs, composition entries, or qualitative outputs rather than inventing placeholders. The directory name is a logical identity, not a version.
+Define the quantitative metrics. For each metric, record its meaning, direction, units, prediction and target inputs, masking, reduction, aggregation, uncertainty treatment, and output semantics when applicable.
 
-## Implement and fix the revision
+### Visualizations
 
-After alignment, modify only `benchmarks/<benchmark-id>/`. Define each metric's direction, units, inputs, masking, reduction, and output semantics. Implement it inside the Benchmark directory and run focused tests or a low-cost smoke test. Every referenced Dataset derivation must be a committed component revision, all input and composition rules must be resolved, and every required metric implementation must pass its checks. A required visualization must also be implemented and checked; otherwise remove it from the specification.
+Define required qualitative visualizations or example outputs. Record the inputs, output form, and behavior each visualization is intended to demonstrate. Omit this section when the Benchmark has no qualitative output.
 
-If implementation requires a change to scope, inputs, composition, metrics, aggregation, qualitative outputs, validation, or failure conditions, pause and repeat `$grill-with-docs`; formatting and mechanical changes that preserve the specification do not require another interview.
+### Implementation
 
-Verify that `BENCHMARK.md`, `benchmark.yaml`, implementations, and tests agree. Show `git diff`, the exact files to commit, and a proposed commit message. Do not create the commit. The Benchmark becomes a fixed component revision only after the user commits the complete Benchmark directory and records the full SHA. Hand that committed revision to `$define-experiment` when the user wants a concrete experiment.
+Record implementation files and dependencies when they are needed to understand or reproduce the Benchmark. Keep metric and visualization code in the Benchmark directory. The specification must remain consistent with the actual implementation. If implementation changes the Benchmark's task, Dataset inputs, composition, metrics, aggregation, visualizations, or other contract, stop and realign the design before continuing.

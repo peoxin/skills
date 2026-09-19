@@ -39,7 +39,7 @@ The optional `configs/` directory may contain multiple reusable model configurat
 
 Use these sections:
 
-### Purpose
+### Description
 
 Describe the model's role in the experiment, its problem boundary, and any source, paper, repository, checkpoint, or design basis needed to understand its architecture and reproduce it.
 
