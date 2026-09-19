@@ -5,7 +5,7 @@ description: Propose evidence-linked model or training improvements from Referen
 
 # Propose Improvements
 
-Use selected Reference analyses, Dataset derivations, Benchmark/Experiment specs, execution contexts, and Report bundles. Use `$research` when a proposal depends on a current external fact and `$analyze-references` for Reference-level reading.
+Use selected Reference analyses, Dataset derivations, Benchmark/Experiment specs, and declared Experiment outputs. Use `$research` when a proposal depends on a current external fact and `$analyze-references` for Reference-level reading.
 
 Write one falsifiable proposal at a time:
 

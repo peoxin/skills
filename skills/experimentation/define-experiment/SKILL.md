@@ -10,7 +10,7 @@ Treat each Experiment as one concrete training, evaluation, or train-then-evalua
 ## Workflow
 
 1. Inspect the target project's instructions, selected component paths, training and evaluation entry points, configuration and implementation conventions, and dependency conventions.
-2. Before defining or changing an Experiment, invoke `$grill-with-docs`. Resolve the question and comparison, component paths, declared phases, configuration, resources, checkpoint flow, outputs, and failure boundaries. Continue only after the design is explicit and confirmed. If it is unavailable, stop.
+2. Before defining or changing an Experiment, invoke `$grill-with-docs`. Resolve the question and comparison, component paths, environment configuration, declared phases, configuration, resources, checkpoint flow, outputs, and failure boundaries. Continue only after the design is explicit and confirmed. If it is unavailable, stop.
 3. Create or update `EXPERIMENT.md` inside `experiments/<experiment-id>/`.
 4. Implement the declared phases using the target project's existing configuration or code conventions. Create or update project-native configuration, custom phase code, or both as required.
 5. Keep `EXPERIMENT.md`, configuration or phase code, and commands consistent. If the question, components, phases, configuration, implementation, resources, checkpoint flow, outputs, or failure boundaries change, pause and repeat `$grill-with-docs` before continuing.
@@ -45,9 +45,13 @@ Describe the research question, comparison, purpose, and explicit boundaries of 
 
 ### Components
 
-Identify the Model, Dataset derivations, Benchmark, dependencies, and other inputs used by the declared phases. Record their logical identities, roles, repositories when external, and paths. Record component versions in the Experiment control commit message, not in this document.
+Identify the Model, Dataset derivations, Benchmark, and other inputs used by the declared phases. Record their logical identities, roles, repositories when external, and paths. Record component versions in the Experiment control commit message, not in this document.
 
 A Train phase requires a Model and its training Dataset derivations. A Benchmark is optional unless training consumes its protocol. An Evaluate phase requires a Model, Benchmark, and checkpoint; the Benchmark identifies its Dataset derivations and evaluation inputs.
+
+### Environment
+
+Identify the environment configuration files or directory used by the Experiment, such as `pyproject.toml`, `requirements.txt`, `uv.lock`, `poetry.lock`, or `environment.yml`. Record the paths and use the target project's existing environment convention. Do not duplicate configuration content in `EXPERIMENT.md` or require a setup command here. The configuration files express the Python and package versions used by the Experiment; this section does not define CUDA or hardware requirements.
 
 ### Phases
 
@@ -65,13 +69,13 @@ Describe the checkpoints, training metrics, Benchmark metrics, visualizations, r
 
 ### Implementation
 
-Record the phase commands, configuration files, custom phase code, dependencies, and implementation choices needed to run the Experiment. Keep optimizer, scheduler, learning rate, batch size, epochs, seed, trainer, precision, resources, and other run-specific settings in the Experiment configuration or implementation when the target project consumes them there.
+Record the phase commands, configuration files, custom phase code, environment files, and implementation choices needed to run the Experiment. Keep optimizer, scheduler, learning rate, batch size, epochs, seed, trainer, precision, resources, and other run-specific settings in the Experiment configuration or implementation when the target project consumes them there.
 
 The specification must remain consistent with the configuration and commands. If implementation changes the Experiment contract, stop and realign the design before continuing.
 
 ## Versioning
 
-An Experiment is a concrete definition, not a reusable component. Before formal execution, every selected Model, Dataset derivation, Benchmark, and dependency must be fixed by an existing component commit or by a new commit containing only that component. Components that already have the required fixed revision do not need another commit.
+An Experiment is a concrete definition, not a reusable component. Before formal execution, every selected Model, Dataset derivation, and Benchmark must be fixed by an existing component commit or by a new commit containing only that component. Components that already have the required fixed revision do not need another commit.
 
 The Experiment control commit fixes `EXPERIMENT.md` and its configuration. Its commit message records every selected component's repository, complete commit SHA, and paths using this body format:
 
@@ -80,9 +84,8 @@ Components:
 - model: repository=<repository>; commit=<40-character SHA>; paths=<paths>
 - dataset-derivation: repository=<repository>; commit=<40-character SHA>; paths=<paths>
 - benchmark: repository=<repository>; commit=<40-character SHA>; paths=<paths>
-- dependencies: repository=<repository>; commit=<40-character SHA>; paths=<paths>
 ```
 
-Repeat entries when multiple Dataset derivations or dependency sources apply. Formal execution rejects missing entries, branches, tags, short SHAs, dirty selected paths, or paths that do not match the recorded commit.
+Repeat entries when multiple Dataset derivations apply. Formal execution rejects missing entries, branches, tags, short SHAs, dirty selected paths, or paths that do not match the recorded commit. Environment configuration paths are fixed by the Experiment control commit when they are in the same repository and are not repeated in the commit message.
 
 The user may create these commits manually. A pre-run workflow may create them automatically only when the user selects that option: show each component diff, commit each changed reusable component separately, then commit the Experiment definition with the component bindings in its message. Do not include unrelated or parallel work.

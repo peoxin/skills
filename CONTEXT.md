@@ -59,7 +59,7 @@ A stable root-level directory for one reusable research component or family, suc
 _Avoid_: Version directory, dated snapshot, commit-named folder
 
 **Component specification document**:
-A Markdown contract named for a Dataset derivation, Model, Benchmark, or Experiment. It records user-aligned intent, behavior, boundaries, interfaces, and verification requirements, has no lifecycle status, and remains consistent with the implementation and any Experiment configuration. Result execution facts live in machine-readable execution context and parent Result records.
+A Markdown contract named for a Dataset derivation, Model, Benchmark, or Experiment. It records user-aligned intent, behavior, boundaries, interfaces, and verification requirements, has no lifecycle status, and remains consistent with the implementation and any Experiment configuration. Run outputs are determined by the Experiment contract.
 _Avoid_: Implementation plan, rendered YAML, draft approval record
 
 **Dataset definition skill**:
@@ -75,7 +75,7 @@ The `define-benchmark` entry that creates or revises one self-contained Benchmar
 _Avoid_: Experiment definition, evaluation run
 
 **Experiment spec**:
-A fully resolved declaration for one concrete experiment, binding the selected Model, Dataset derivations, optional Benchmark, optional training configuration, seed, resources, commands, phases, and output locations. Training configuration may be absent for evaluation-only work; an Experiment control commit fixes the complete declaration.
+A fully resolved declaration for one concrete experiment, binding the selected Model, Dataset derivations, optional Benchmark, environment configuration paths, optional training configuration, seed, resources, commands, phases, and output locations. Training configuration may be absent for evaluation-only work; an Experiment control commit fixes the complete declaration.
 _Avoid_: Component specification document, benchmark protocol, training config
 
 **Experiment definition skill**:
@@ -87,23 +87,19 @@ The functional view of one experiment as `Result = f_eval(f_train(Model, Data_tr
 _Avoid_: Training job, benchmark number
 
 **Reusable component revision**:
-The Git identity of an intentional, reusable input or implementation. It records a repository, a complete commit SHA, and the paths whose contents belong to the component, such as a Model, Dataset derivation, Benchmark, benchmark-owned metric implementation, or dependency lockfile. An Experiment is not a reusable component; its concrete training and evaluation settings belong to its Experiment control commit.
+The Git identity of an intentional, reusable input or implementation. It records a repository, a complete commit SHA, and the paths whose contents belong to the component, such as a Model, Dataset derivation, or Benchmark implementation. An Experiment is not a reusable component; its concrete training, environment references, and evaluation settings belong to its Experiment control commit.
 _Avoid_: Latest code, branch-only reference, file version without a commit
 
 **Component commit**:
 The user-created commit that fixes one reusable component's specification document, implementation, and applicable configuration as a consistent revision of its declared paths. Different components in one repository may use different commits; a formal run verifies that the current checkout still matches each component commit at its paths.
 _Avoid_: Unverified version label, execution snapshot
 
-**Execution context record**:
-The immutable record of facts about one actual execution, including the observed Git HEAD, component commits, Python/PyTorch/CUDA and dependency identities, hardware and assigned devices, timestamps, resource observations, and phase status. The observed HEAD is audit evidence; component commits define the reproducible input paths.
-_Avoid_: Component revision, environment default
-
 **Experiment phase**:
 An independently executable part of an experiment composition, such as training or evaluation, with its own inputs, status, outputs, and continuation conditions while retaining the parent experiment identity.
 _Avoid_: Pipeline stage, complete run
 
 **Experiment execution entry**:
-The `run-experiment` entry that executes the phases declared by a fixed Experiment revision, allocates shared resources, preserves execution context, handles cancellation and partial states, and writes the parent Result manifest and evaluation report bundle. It is the only execution entry; training and evaluation are Experiment phases owned by this entry. It does not accept temporary phase or configuration overrides.
+The `run-experiment` entry that reads a fixed Experiment, prepares its declared environment using the target project's convention, executes its declared phases, and checks its declared outputs. It does not define environment formats, output formats, Result schemas, or unrequested execution records.
 _Avoid_: Training phase skill, evaluation phase skill, hidden workflow engine
 
 **Partial experiment**:
@@ -111,27 +107,27 @@ An experiment whose declared phases or outputs are incomplete, failed, cancelled
 _Avoid_: Successful experiment, missing run
 
 **Runnable revision**:
-A formal runnable revision is identified by a Git repository, a complete 40-character commit SHA, and paths for every code, configuration, Dataset derivation, and environment input required for a deliverable run. An external repository is acceptable when its URL or identifier and use are recorded and its commit can be independently verified. Draft or dirty-worktree material may support exploration but is not eligible for a formal run.
+A formal runnable revision is identified by a Git repository, a complete 40-character commit SHA, and paths for every code, configuration, Dataset derivation, and environment input required by a deliverable run. An external repository is acceptable when its URL or identifier and use are recorded and its commit can be independently verified. Draft or dirty-worktree material may support exploration but is not eligible for a formal run.
 _Avoid_: Latest version, working copy
 
 **Git-tracked experiment**:
-An experiment whose reusable Model, Dataset derivation(s), Benchmark, dependency inputs, and Experiment definition are identified by Git commits. Large outputs may remain external only when their source, digest, and producing commits are recorded.
+An experiment whose reusable Model, Dataset derivation(s), Benchmark, environment configuration, and Experiment definition are identified by Git commits. Large outputs may remain external only when their source, digest, and producing commits are recorded.
 _Avoid_: One undifferentiated commit, tracker run
 
 **Experiment control commit**:
-The Git commit containing consistent `EXPERIMENT.md` and its configuration or custom phase code for one concrete run. Its commit message binds the selected Model, Dataset derivations, Benchmark, and dependency sources by repository, complete commit SHA, and paths. It is not a reusable Component commit.
+The immutable revision containing `EXPERIMENT.md`, its configuration, and its custom phase code for one concrete run. It fixes the environment configuration paths used by the Experiment when those files are in the same repository. Its commit message binds the selected Model, Dataset derivations, and Benchmark by repository, complete commit SHA, and paths; it does not repeat environment paths.
 _Avoid_: Component commit, result commit
 
 **Result commit**:
-A user-created Git commit containing the execution context, parent Result manifest, canonical metrics, report data, rendered reports, figures, logs, and artifact references for a completed or partial run. It links back to the Experiment control commit and all component commits. The Result does not require a separate `EXECUTION.md` contract.
+A user-created Git commit containing the outputs declared by an Experiment and any files the user chooses to retain from the run. It links back to the Experiment control commit. It does not require a generic execution context, parent manifest, or fixed Result directory.
 _Avoid_: Checkpoint file alone, mutable dashboard
 
 **Component verification**:
-The preflight and phase-boundary check that the worktree is clean for source paths, HEAD is unchanged, and every declared component path matches the contents of its recorded Git commit. A failed check blocks formal execution or the next phase.
+The check before execution that the Experiment control commit exists, the Experiment path is clean, and the Model, Dataset derivation, and Benchmark commits named by the control commit message exist. It does not define a generic environment or phase-boundary audit.
 _Avoid_: Trusting a branch name, checking only the commit message
 
 **Local multi-GPU execution**:
-The documented procedure for one researcher-controlled multi-GPU machine: observe devices, select and reserve resources, run approved commands, record assignments and context, and release resources without claiming cloud-provider support. The skill collection does not ship a scheduler or runtime.
+The documented procedure for one researcher-controlled multi-GPU machine: read the Experiment's resource declaration, allocate suitable local devices using project instructions, run approved commands, and release resources without claiming cloud-provider support. The skill collection does not ship a scheduler or runtime.
 _Avoid_: Cluster platform, cloud backend, bundled scheduler
 
 **External checkpoint record**:
@@ -181,7 +177,7 @@ A structured and human-readable analysis or review of one or more Reference reco
 _Avoid_: Paper summary without provenance
 
 **Evidence link**:
-A link from a report, proposal, or written claim to the Reference record, Reference analysis, experiment spec, execution context, or report data that supports it.
+An evidence link from a report, proposal, or written claim to the Reference record, Reference analysis, Experiment spec, declared Experiment output, or report data that supports it.
 _Avoid_: Citation without locator, unsupported assertion
 
 **Writing project**:
