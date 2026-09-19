@@ -25,11 +25,14 @@ Use one self-contained root-level directory for each logical model:
 models/
   <model-id>/
     MODEL.md
-    model.py
-    config.yaml
+    configs/
+      <preset>.yaml
+    <implementation files>
 ```
 
-The directory name identifies the logical model, not a version. Do not create or require shared model-code directories such as `common/`, `lib/`, or `_shared/`. If models need similar code, keep each model implementation self-contained and maintain copies independently.
+The directory name identifies the logical model, not a version. The implementation may contain one or more files, with no required filename or subdirectory. Keep all model implementation code inside `models/<model-id>/`. Do not create or require shared model-code directories such as `common/`, `lib/`, or `_shared/`. If models need similar code, keep each model implementation self-contained and maintain copies independently.
+
+The optional `configs/` directory may contain multiple reusable model configuration presets. Record each preset's purpose and its effects on architecture or behavior in `MODEL.md`; keep training hyperparameters and resource settings in the Experiment configuration.
 
 ## MODEL.md
 
