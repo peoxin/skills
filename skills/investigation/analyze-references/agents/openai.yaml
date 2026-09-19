@@ -1,0 +1,4 @@
+interface:
+  display_name: "analyze-references"
+  short_description: "Analyze and synthesize research references"
+  default_prompt: "Use $analyze-references to analyze selected references and produce traceable synthesis."

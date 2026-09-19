@@ -1,0 +1,4 @@
+interface:
+  display_name: "initialize-experiment-workspace"
+  short_description: "Prepare an experiment workspace"
+  default_prompt: "Use $initialize-experiment-workspace to prepare the component directories for deep learning experiments."

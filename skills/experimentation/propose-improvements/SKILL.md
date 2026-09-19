@@ -1,11 +1,11 @@
 ---
 name: propose-improvements
-description: Propose evidence-linked model or training improvements from literature, project knowledge, and experiment reports.
+description: Propose evidence-linked model or training improvements from Reference analyses, project knowledge, and experiment reports.
 ---
 
 # Propose Improvements
 
-Use selected Source analyses, Dataset setups, Benchmark/Experiment specs, execution contexts, and Report bundles. Use `$research` when a proposal depends on a current external fact and `$analyze-literature` for source-level reading.
+Use selected Reference analyses, Dataset setups, Benchmark/Experiment specs, execution contexts, and Report bundles. Use `$research` when a proposal depends on a current external fact and `$analyze-references` for Reference-level reading.
 
 Write one falsifiable proposal at a time:
 
@@ -13,7 +13,7 @@ Write one falsifiable proposal at a time:
 # Proposal: <short name>
 
 ## Evidence
-- Source or experiment record: <locator>
+- Reference or experiment record: <locator>
 - Reported fact: <what is directly supported>
 - Inference: <what follows and why>
 

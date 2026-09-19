@@ -21,7 +21,8 @@ Single-context repo (most repos):
 │   ├── 0001-event-sourced-orders.md
 │   └── 0002-postgres-for-write-model.md
 └── skills/
-    └── <skill-name>/
+    └── <capability-module>/
+        └── <skill-name>/
 ```
 
 Multi-context repo (presence of `CONTEXT-MAP.md` at the root):

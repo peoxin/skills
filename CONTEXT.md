@@ -5,23 +5,23 @@ This context defines the vocabulary for a user-directed, Python/PyTorch research
 ## Core
 
 **Research assistant**:
-A user-directed collection of portable, Markdown-defined skills that supports literature work, model implementation, experiments, analysis, and technical writing while leaving research goals and consequential decisions with the researcher.
+A user-directed collection of portable, Markdown-defined skills that supports Reference investigation, model implementation, experiments, analysis, and technical writing while leaving research goals and consequential decisions with the researcher.
 _Avoid_: Autonomous research system, research platform
 
 **User-facing research skill**:
 A directly invocable capability organized around a research task, with explicit inputs and outputs and no hidden session state.
 _Avoid_: Pipeline stage, internal utility
 
-**Convenience skill**:
-A thin entry that recommends or sequences existing skills while preserving their separate files, rules, outputs, and alignment points.
-_Avoid_: Central orchestrator, hidden workflow engine
+**Capability module**:
+A non-invocable source-layout category that groups independently callable skills by responsibility. The modules are Investigation, Experimentation, Writing, and planned Utilities; a module does not route calls or own hidden workflow state.
+_Avoid_: Router skill, pipeline stage, installed skill identity
 
-**Source collection**:
-A file-based local collection of literature and resource records, source links or snapshots, analysis notes, resource indexes, and project terminology that skills can search and update alongside on-demand web research. It is stored under the target project's root-level `sources/` directory and is not an experiment component.
+**Reference collection**:
+A file-based local collection of records for papers, code, datasets, documentation, and other research materials plus their analyses and reviews. Skills preserve an established project location; a new collection defaults to `references/` and is not an experiment component.
 _Avoid_: Research library, knowledge service, vector database
 
-**Source collection write policy**:
-Search and synthesis results become durable local records only after an explicit user request or confirmation; machine-generated indexes may refresh without promoting unverified claims to facts.
+**Reference collection write policy**:
+Search and synthesis results become durable Reference records only after an explicit user request or confirmation; machine-generated indexes may refresh without promoting unverified claims to facts. Complete third-party code repositories remain external checkouts fixed by commit.
 _Avoid_: Automatic web archive, conversation memory
 
 **V1 workspace scope**:
@@ -149,7 +149,7 @@ The paired machine-readable data and human-readable narrative produced from an e
 _Avoid_: Results table, dashboard
 
 **Rendered research report**:
-A human-readable Markdown, HTML, or other presentation generated from canonical structured records, with links to source records, figures, inputs, and unresolved or partial results.
+A human-readable Markdown, HTML, or other presentation generated from canonical structured records, with links to Reference records, figures, inputs, and unresolved or partial results.
 _Avoid_: Authoritative result file, dashboard snapshot
 
 **Report edit boundary**:
@@ -164,17 +164,21 @@ _Avoid_: Metric name, score
 The input-mapping and metric-evaluation portion of a Benchmark spec, including how one or more Dataset setups become named inputs and how metric values are aggregated.
 _Avoid_: Baseline suite, scoring script, ad hoc evaluation
 
-**Source record**:
-A literature or resource entry containing source type, title/author or owner, URL or locator, access date, version/commit when available, citation data, and verification status.
+**Reference record**:
+A paper, code, dataset, documentation, or other research-material entry containing its type, title or owner, locator, access date, version or commit when available, license, citation data, and verification status. New records use `reference-*` identities; legacy `source-*` records remain readable.
 _Avoid_: Search snippet, unverified fact
 
-**Source analysis**:
-A structured and human-readable analysis of a source record, with claims, mechanisms, implementation details, experimental details, limitations, and exact locators or links.
+**Reference analysis**:
+A structured and human-readable analysis or review of one or more Reference records, with claims, mechanisms, implementation details, experimental details, limitations, and exact locators or links.
 _Avoid_: Paper summary without provenance
 
 **Evidence link**:
-A reference from a report, proposal, or written claim to the source record, source analysis, experiment spec, execution context, or report data that supports it.
+A link from a report, proposal, or written claim to the Reference record, Reference analysis, experiment spec, execution context, or report data that supports it.
 _Avoid_: Citation without locator, unsupported assertion
+
+**Writing project**:
+A coherent reader-facing report, paper, note, or other writing effort that lives directly under the project's chosen writing location. Its document names, type metadata, internal directories, and supporting files follow project and user conventions rather than a universal template.
+_Avoid_: Report-type bucket, experiment report bundle
 
 **Exploratory run**:
 A low-cost or uncommitted execution used to learn about a pipeline, Model, Dataset setup, or hypothesis. It is not formal benchmark evidence unless fixed Component revisions make it eligible.
@@ -202,12 +206,12 @@ _Avoid_: Domain-complete API, universal task model
 An optional project-provided function that adds task-specific qualitative plots or examples to a standard Report bundle without changing its machine-readable fields or provenance rules.
 _Avoid_: Required domain pipeline, untracked figure
 
-**Research workspace initializer**:
-A prompt-driven, confirm-before-write capability that explores a target workspace, presents proposed research directories, instructions, templates, and skill registration, then creates only agreed files without silently overwriting existing content.
+**Experiment workspace initializer**:
+A prompt-driven, confirm-before-write capability that explores a target workspace and creates only agreed experiment-component directories without owning Reference or Writing locations.
 _Avoid_: Project migration, blind scaffold
 
 **Research skill distribution**:
-The portable `skills/` directory containing independently callable Agent Skill directories. It can be copied into another project or skill collection while leaving Matt's separately installed skills intact and unmodified; component planning stops when the required `$grill-with-docs` skill is unavailable.
+The `skills/` source tree groups independently callable leaf skills under Capability module directories. `npx skills` discovers and installs the leaves by their stable skill names; the repository does not provide a router skill or custom installer, and component planning stops when the required `$grill-with-docs` skill is unavailable.
 _Avoid_: Project-local runtime, skill fork, runtime bundle
 
 **Portable capability**:

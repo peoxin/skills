@@ -1,0 +1,4 @@
+interface:
+  display_name: "search-references"
+  short_description: "Find and record research references"
+  default_prompt: "Use $search-references to find traceable references for a research question."

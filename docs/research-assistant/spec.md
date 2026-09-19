@@ -5,16 +5,40 @@ Audience: one researcher using Python and PyTorch on a researcher-controlled mul
 
 ## Purpose
 
-This repository develops a user-directed research assistant, not an autonomous research system. Its deliverable is a portable `skills/` directory of directly callable, Markdown-defined Agent Skills for literature work, model implementation, experiment definition and execution, evaluation, improvement proposals, and technical writing.
+This repository develops a user-directed research assistant, not an autonomous research system. Its deliverable is a module-organized `skills/` source tree of directly callable, Markdown-defined Agent Skills for Reference investigation, deep-learning experimentation, and technical writing.
 
 The assistant may search, summarize, align component specifications, generate code, run static checks, run smoke tests, queue fixed Experiment revisions, and assemble reports. The researcher owns the research question, hypotheses, benchmark acceptance, interpretation, and final written claims.
 
-## Target project layout
+## Skill source layout
 
-The initialized target project uses visible root-level directories organized by research component:
+Capability modules organize source directories; they are not skills or routers. Every leaf remains independently callable by its frontmatter name:
 
 ```text
-sources/       # papers, preprints, repositories, documentation, and analyses
+skills/
+  investigation/
+    search-references/
+    analyze-references/
+  experimentation/
+    initialize-experiment-workspace/
+    dataset-setup/
+    implement-model/
+    define-benchmark/
+    define-experiment/
+    run-experiment/
+    train-experiment/
+    evaluate-experiment/
+    propose-improvements/
+  writing/
+    write-report/
+```
+
+`utilities` is a planned fourth module for small independent tools such as PDF-to-Markdown conversion and Python style or formatting support. It has no directory or implemented skill yet. Module directories do not contain `SKILL.md` or module README files.
+
+## Target project layout
+
+`initialize-experiment-workspace` creates only the visible root-level experiment directories after confirmation:
+
+```text
 data/          # logical Datasets and Dataset setups
 models/        # self-contained model implementations and tests
 benchmarks/    # self-contained data-and-metric protocols
@@ -22,7 +46,7 @@ experiments/   # concrete Experiment specs, including optional training settings
 results/       # execution results, manifests, reports, figures, and artifacts
 ```
 
-The initializer creates these six root directories after confirmation. Component skills create subdirectories lazily:
+Component skills create subdirectories lazily:
 
 ```text
 data/<dataset-id>/setups/<setup-id>/
@@ -41,13 +65,28 @@ results/<experiment-id>/<result-id>/
 
 Do not create top-level `training/`, `evaluation/`, `metrics/`, `runs/`, `reports/`, `common/`, or `_shared/` directories. Training and evaluation are Experiment phases; training settings belong in `experiment.yaml`; metric implementations belong to their Benchmark; and each model is self-contained.
 
+Investigation and Writing skills first respect one clearly established project directory. They do not rename or migrate it; ambiguous candidates require user selection. With no existing convention, Investigation creates only the needed paths from:
+
+```text
+references/
+  papers/<reference-id>.yaml
+  code/<reference-id>.yaml
+  materials/<reference-id>.yaml
+  analysis/<reference-id>.md
+  analysis/review-<topic>.md
+```
+
+Complete third-party code repositories remain external checkouts identified by locator and immutable commit. A Reference collection may retain a small attributed code excerpt, or a user-requested and license-permitted PDF or material snapshot, but not a complete third-party repository, model weights, or datasets.
+
+With no existing writing convention, Writing uses `writing/<writing-id>/`. It assumes nothing about the main filename, document type, internal directories, or supporting files. Experiment evaluation reports remain under `results/`; reader-facing synthesis belongs to the Writing location.
+
 ## Scope
 
 In scope:
 
 - published-paper and preprint search;
 - GitHub, Hugging Face, official documentation, and high-quality resource search;
-- source analysis, literature reviews, and evidence-linked notes;
+- Reference analysis, reviews, and evidence-linked notes;
 - reproducing an existing model or implementing a model from a user idea through one shared model-implementation entry;
 - explicit raw dataset records and reusable Dataset setups;
 - reusable data-and-metric Benchmark specs and concrete Experiment specs;
@@ -72,32 +111,38 @@ Out of scope for v1:
 
 Each entry is independently callable. They exchange explicit files, not hidden conversation state.
 
-1. `initialize-research-workspace`
-   Explore a target workspace, show the proposed files and conventions, obtain confirmation, then create the minimum research workspace without overwriting existing content.
-2. `search-research`
-   Search papers, preprints, code, model repositories, documentation, and other declared resource classes. Produce candidate Source records with source type, locator, version, access date, and verification status.
-3. `analyze-literature`
-   Analyze selected Source records, extract mechanisms and experimental details with locators, and assemble literature-review material.
-4. `implement-model`
-   Handle either `reproduce` or `new-method` intent. Align `MODEL.md`, including evidence or hypothesis separation, interfaces, required behavior, integration, and verification, before implementation.
-5. `dataset-setup`
+### Investigation
+
+1. `search-references`
+   Search papers, preprints, code, datasets, model pages, documentation, and other research materials. Produce candidate Reference records with type, locator, version, access date, license, and verification status.
+2. `analyze-references`
+   Analyze selected Reference records, extract mechanisms and experimental details with locators, and assemble comparisons or reviews.
+
+### Experimentation
+
+1. `initialize-experiment-workspace`
+   Explore a target workspace, show the proposed experiment files and conventions, obtain confirmation, then create the minimum experiment workspace without overwriting existing content.
+2. `dataset-setup`
    Register a raw Dataset revision and create or validate `SETUP.md`, structured records, and implementation describing inputs, splits, preprocessing, sampling, label mapping, and derived input digests.
-6. `define-benchmark`
+3. `implement-model`
+   Handle either `reproduce` or `new-method` intent. Align `MODEL.md`, including evidence or hypothesis separation, interfaces, required behavior, integration, and verification, before implementation.
+4. `define-benchmark`
    Create or revise one self-contained data-and-metric Benchmark from committed Dataset setup revisions. Own `BENCHMARK.md`, its structured record, input composition, metric implementations, aggregation, optional visualizations, validation, and proposed component commit without selecting a Model or run.
-7. `define-experiment`
+5. `define-experiment`
    Create `EXPERIMENT.md` and one machine-readable Experiment record from committed Model, Dataset setup, and Benchmark revisions. Bind component commits, optional training settings, phases, seed, resources, checkpoint, and outputs without modifying its inputs.
-8. `run-experiment`
+6. `run-experiment`
    Align `EXECUTION.md` and orchestrate a fixed Experiment revision through the local multi-GPU procedure. Allocate resources, call the training and evaluation entries, preserve shared execution context, handle cancellation and partial states, and write the parent manifest.
-9. `train-experiment`
+7. `train-experiment`
    Execute or document the training phase, produce checkpoints and training metrics, and write a training phase manifest. It can be called directly or by `run-experiment`.
-10. `evaluate-experiment`
+8. `evaluate-experiment`
    Execute or collect an evaluation phase, check checkpoint compatibility, and generate canonical metric/report records plus rendered reports, tables, plots, and optional visualization-hook outputs. It can be called directly or by `run-experiment`.
-11. `propose-improvements`
-   Combine Source analyses, Source collection records, and experiment reports into evidence-linked improvement proposals with hypotheses, mechanisms, risks, and ablations.
-12. `write-report`
-    Produce an editable paper or technical-report draft from confirmed sources, reports, and claims. It does not submit or review the document.
-13. `research-assistant` (optional convenience entry)
-    Recommend or sequence the skills above while preserving each skill's files, rules, and alignment points. It is not a second workflow engine.
+9. `propose-improvements`
+   Combine Reference analyses and experiment reports into evidence-linked improvement proposals with hypotheses, mechanisms, risks, and ablations.
+
+### Writing
+
+1. `write-report`
+   Produce an editable reader-facing report or paper from verified References, experiment results, and user-confirmed claims. It does not rewrite canonical evidence, submit, or review the document.
 
 ## Component specification workflow
 
@@ -175,25 +220,25 @@ The first execution target is one researcher-controlled multi-GPU machine. `run-
 
 Large checkpoints, datasets, logs, and image collections need not be committed to Git. Their manifests record path or external reference, size, SHA256, generation/download time, and the component commits that produced or consumed them. Dataset processing code, Dataset setup records, checkpoint registration records, specs, code, configs, reports, and small provenance records are Git-tracked.
 
-## Literature and knowledge
+## References and investigation
 
-`search-research` creates candidate Source records. `analyze-literature` consumes selected records and creates locator-bound Source analyses. A literature review aggregates selected analyses; search snippets and unverified summaries are never silently promoted to facts. The local Source collection is file-based and is updated only after explicit user request or confirmation.
+`search-references` creates candidate Reference records. `analyze-references` consumes selected current `reference-*` or legacy `source-*` records and creates locator-bound Reference analyses and reviews. Search snippets and unverified summaries are never silently promoted to facts. The file-based Reference collection is updated only after explicit user request or confirmation.
 
 ## Evidence and writing
 
-Numbers, comparisons, data-processing descriptions, and literature facts in reports link to canonical source or experiment records. Improvement proposals distinguish reported evidence, inference, and new hypothesis. `write-report` can add discussion and narrative, but authoritative metrics and provenance remain in structured records. The output is a draft paper or technical report, not a submission package.
+Numbers, comparisons, data-processing descriptions, and Reference-derived facts in reports link to canonical Reference or experiment records. Improvement proposals distinguish reported evidence, inference, and new hypothesis. `write-report` can add discussion and narrative under the chosen Writing project, but authoritative Reference and experiment records remain unchanged. The output is an editable document, not a submission package.
 
-## Initialization and Matt compatibility
+## Initialization and distribution
 
-`initialize-research-workspace` follows the setup-matt-pocock-skills interaction pattern:
+`initialize-experiment-workspace` follows a confirm-before-write interaction:
 
-1. explore the target directory and existing `AGENTS.md`, `CLAUDE.md`, `CONTEXT.md`, `docs/agents/`, and skill configuration;
-2. present the proposed workspace files, templates, and registration block;
+1. explore the target directory, instructions, domain docs, Git state, and existing experiment directories;
+2. present the proposed experiment directories, starter files, and registration block;
 3. let the user revise or approve the proposal;
 4. write only agreed files and preserve existing content.
 
-The portable `skills/` directory is developed here and can be copied or installed beside Matt's collection in another project. Component planning requires the separately installed `grill-with-docs`; it stops if that skill is unavailable. The collection may also recommend or invoke `research`, `prototype`, `tdd`, and `code-review`, but does not copy or fork those skills. The root `CONTEXT.md` and this design spec are development documents, not runtime dependencies of the delivered skills.
+Install the nested leaf skills with `npx skills`, which preserves their frontmatter names as installed identities. The repository does not provide an installer or flattened export and does not promise that copying the grouped source tree directly into an agent's skill directory will work. Component planning requires the separately installed `grill-with-docs`; it stops if that skill is unavailable. The collection may also invoke `research`, `prototype`, `tdd`, and `code-review`, but does not copy or fork those skills. The root `CONTEXT.md` and this design spec are development documents, not runtime dependencies of the delivered skills.
 
 ## Implementation order
 
-The initial implementation builds all user-facing entries as self-contained Markdown workflows before reviewing the collection as a whole. Review covers initialization, Dataset setup, Model registration or implementation, separately defined Benchmark and Experiment specifications, local execution guidance, phase-level evaluation, structured record templates, and rendered reports. No Python package, CLI, or repository-specific runtime is part of v1.
+The initial implementation keeps every leaf skill as a self-contained Markdown workflow before reviewing each Capability module and the collection as a whole. Review covers Reference investigation, experiment initialization, Dataset setup, Model registration or implementation, separately defined Benchmark and Experiment specifications, local execution guidance, phase-level evaluation, structured record templates, and reader-facing writing. No Python package, custom installer, CLI, or repository-specific runtime is part of v1.

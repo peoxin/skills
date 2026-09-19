@@ -1,0 +1,3 @@
+# Group Skills and Decouple Workspace Concerns
+
+The skill source tree groups independently callable leaves under `investigation/`, `experimentation/`, and `writing/`, with `utilities/` reserved for future small tools; modules are not routers, and `npx skills` owns recursive discovery and installation. The experiment initializer creates only `data/`, `models/`, `benchmarks/`, `experiments/`, and `results/`, while Investigation and Writing preserve clear existing project locations or lazily default to `references/` and `writing/`; this supersedes ADR-0001 only for its `sources/` and unified-workspace decisions.
