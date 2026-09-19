@@ -11,7 +11,7 @@ Prepare the user's target project; do not treat this skill repository as the res
 
 Read the target project's Git status, root instructions, `AGENTS.md` or `CLAUDE.md`, existing domain docs, and any existing experiment-component directories. Identify conflicts and conventions without writing files.
 
-Inspect Git as a source of provenance, but do not create commits during initialization. The formal workflow requires the user to commit each component's Markdown specification, structured records, and implementation together before formal use; the user also creates the Result commit after a run. The initializer may document the repository identifier and expected paths in starter Markdown, but must not claim a component is fixed until a full commit SHA is available.
+Inspect Git as a source of provenance, but do not create commits during initialization. The formal workflow requires reusable components to be fixed by user-created commits, while the Experiment definition and its configuration or custom phase code are fixed by an Experiment control commit before formal use; the user also creates the Result commit after a run. The initializer may document the repository identifier and expected paths in starter Markdown, but must not claim a revision is fixed until its commit SHA is available.
 
 Create the complete set of root-level experiment directories after confirmation. Do not create component subdirectories; the component-specific skills create those lazily after the user names or confirms a component:
 
@@ -42,12 +42,12 @@ benchmarks/<benchmark-id>/
   visualizations/
 experiments/<experiment-id>/
   EXPERIMENT.md
-  experiment.yaml
+  configs/
 results/<experiment-id>/<result-id>/
   EXECUTION.md
 ```
 
-Do not create top-level `training/`, `evaluation/`, `metrics/`, `runs/`, `reports/`, `common/`, or `_shared/` directories. Training and evaluation are Experiment phases; training settings live in `experiment.yaml`; metric implementations belong to their Benchmark; each model is self-contained.
+Do not create top-level `training/`, `evaluation/`, `metrics/`, `runs/`, `reports/`, `common/`, or `_shared/` directories. Training and evaluation are Experiment phases; Experiment-specific training and evaluation settings and custom phase code live inside the Experiment directory; metric implementations belong to their Benchmark; each model is self-contained.
 
 Show the exact files to create, existing files to preserve, and any optional registration text for the target project's agent instructions. Wait for confirmation. Create missing files only; overwrite a file only when the user names it explicitly.
 
@@ -65,7 +65,8 @@ This project uses component-oriented experiment directories.
 - `benchmarks/`: self-contained data-and-metric protocols, metric implementations, and optional visualizations.
 - `experiments/`: concrete Experiment specs with optional training settings and train/evaluate phases.
 - `results/`: one directory per execution result, including manifests, reports, figures, and artifact references.
-- Each component directory contains its component-named Markdown specification. The specification, structured records, and implementation are kept consistent and fixed together by a user-created Git commit.
+- Each reusable component directory contains its Markdown specification, implementation, and applicable configuration. The specification and implementation are kept consistent and fixed together by a user-created component commit.
+- The `experiments/` directory contains Experiment definitions, optional configuration, and custom phase code fixed by an Experiment control commit.
 - Large datasets, checkpoints, logs, and figures may live outside Git; records identify them by stable path or locator, source, size, SHA256, and relevant component commits.
 - Formal results require fixed Git component revisions. Exploratory work is labeled and cannot silently become benchmark evidence.
 ```

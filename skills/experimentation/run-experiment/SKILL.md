@@ -5,7 +5,7 @@ description: Orchestrate a fixed deep-learning Experiment revision on a research
 
 # Run Experiment
 
-This is the orchestration entry. For formal work, run only an Experiment control commit containing consistent `EXPERIMENT.md` and `experiment.yaml`. Before starting, verify that the Model, every Dataset derivation selected by the Benchmark, the self-contained Benchmark and metric implementation, Experiment configuration, and dependencies are fixed revisions. Uncommitted or dirty inputs make the run exploratory and cannot silently produce formal evidence.
+This is the orchestration entry. For formal work, run only an Experiment control commit containing consistent `EXPERIMENT.md` and its declared configuration or phase implementation. Before starting, verify that the Model, every Dataset derivation selected by the Experiment or Benchmark, the self-contained Benchmark and metric implementation, and dependencies are fixed revisions. Read the component repository, commit, and paths from the Experiment control commit message. Uncommitted or dirty inputs make the run exploratory and cannot silently produce formal evidence.
 
 Delegate phase work instead of reimplementing it:
 
@@ -28,17 +28,22 @@ Keep `EXECUTION.md` brief and use these sections:
 - **Cancellation and failure handling**: cancellation method, partial-work policy, cleanup, and blocking failures.
 - **Verification**: preflight, phase-boundary, output, and provenance checks.
 
-`EXECUTION.md` is the human-readable execution contract. The Experiment record, execution context, and manifests hold exact machine-consumed fields and must remain consistent with it without copying their complete contents into Markdown. If preparation or execution requires a normative change to phases, resources, commands, outputs, verification, or failure handling, pause and repeat `$grill-with-docs`; formatting and mechanical changes that preserve the specification do not require another interview.
+`EXECUTION.md` is the human-readable execution contract. The execution context and manifests hold exact machine-consumed fields and must remain consistent with it without copying their complete contents into Markdown. If preparation or execution requires a normative change to phases, resources, commands, outputs, verification, or failure handling, pause and repeat `$grill-with-docs`; formatting and mechanical changes that preserve the specification do not require another interview.
+
+## Fix Component Revisions
+
+Before formal preflight, resolve the component bindings in the Experiment control commit message. Reuse an existing fixed commit when its declared paths match the selected component. If a selected reusable component needs a new revision and the user has chosen automatic preparation, show its diff and commit that component alone. Prepare changed Model, Dataset derivation, Benchmark, and dependency components separately; never combine them with the Experiment definition or unrelated work. Then commit the Experiment directory as the Experiment control commit with the component bindings in its commit message.
+
+When automatic preparation is not selected, stop with the component diffs, required commits, and proposed Experiment commit message for the user. Do not treat uncommitted component paths as formal inputs.
 
 ## Git preflight
 
 Formal execution is refused until all of these checks pass:
 
-1. The complete Experiment directory is committed and its `EXPERIMENT.md` agrees with `experiment.yaml`. Record the full SHA as `experiment_spec_commit` in the run manifest. Read the Benchmark at its declared component commit and require its `BENCHMARK.md`, `benchmark.yaml`, and implementations to agree; a missing or mismatched component blocks formal execution.
-2. `git status --porcelain=v1` is empty for source paths in every declared repository and `git rev-parse HEAD` succeeds. Record each observed HEAD in the execution context.
-3. Every declared component revision has a repository identifier, a complete 40-character commit SHA, and one or more paths. Verify the commit exists with `git cat-file -e <commit>^{commit}`.
-4. For every declared path, compare the relevant checkout with the recorded commit (`git diff --quiet <commit> -- <path>` or an equivalent `git show <commit>:<path>` comparison). A mismatch, missing path, short SHA, branch, tag, or uncommitted source change blocks the run.
-5. Before each phase and after each child skill returns, repeat the HEAD, source-path, and component-path checks. A change blocks the next phase and is recorded as a provenance failure.
+1. The complete Experiment directory is committed and its `EXPERIMENT.md` agrees with every declared configuration file and phase implementation. Record the full SHA as `experiment_spec_commit` in the run manifest. Read the component bindings from the Experiment control commit message. Read the Benchmark at its declared component commit and require its `BENCHMARK.md` and implementations to agree; a missing or mismatched component blocks formal execution.
+2. `git status --porcelain=v1` is empty for source paths in every declared repository and `git rev-parse HEAD` succeeds. Record each observed HEAD in the execution context. The Experiment control commit message is the version binding for the formal run. It must list every selected Model, Dataset derivation, Benchmark, and dependency source with its repository, complete commit SHA, and paths. Verify each listed commit exists.
+3. For every component binding read from the Experiment control commit message, compare the relevant checkout with the recorded commit (`git diff --quiet <commit> -- <path>` or an equivalent `git show <commit>:<path>` comparison). A mismatch, missing path, short SHA, branch, tag, or uncommitted source change blocks the run.
+4. Before each phase and after each child skill returns, repeat the HEAD, source-path, Experiment configuration, and component-path checks. A change blocks the next phase and is recorded as a provenance failure.
 
 Write `EXECUTION.md` before phase execution and keep it consistent with the machine-readable records written during the run. The user reviews and commits the complete Result directory as a Result commit after the run. The orchestrator must never create that commit implicitly.
 

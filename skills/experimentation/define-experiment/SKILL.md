@@ -1,94 +1,88 @@
 ---
 name: define-experiment
-description: Define one concrete PyTorch Experiment from fixed Model and Benchmark revisions without executing it. Use for model, seed, training, phase, resource, checkpoint, and output choices; use define-benchmark for evaluation protocols.
+description: Define one concrete PyTorch Experiment with selected component paths, phases, configuration or custom phase code, and outputs, without executing it.
 ---
 
 # Define Experiment
 
-Define one concrete Experiment at a time in `experiments/<experiment-id>/EXPERIMENT.md` and `experiments/<experiment-id>/experiment.yaml`. Read the selected Model and Benchmark revisions, the Benchmark's Dataset derivation references, dependency identity, and target-project phase interfaces. This skill consumes component definitions; it does not create or modify them.
+Treat each Experiment as one concrete training, evaluation, or train-then-evaluate declaration. It selects reusable components and fixes the phase behavior, configuration, resources, checkpoint flow, and outputs for one run design. It does not define Model, Dataset, or Benchmark components and does not execute the Experiment.
 
-## Preconditions
+## Workflow
 
-Require a Benchmark whose complete directory, including consistent `BENCHMARK.md`, `benchmark.yaml`, metric implementations, and visualizations, has a user-created component commit. Verify its repository, complete 40-character commit SHA, and paths, and verify that its Dataset derivation references match their committed component revisions. If the Benchmark is missing, inconsistent, or needs different inputs, metrics, aggregation, or visualizations, stop and hand the work to `$define-benchmark`.
+1. Inspect the target project's instructions, selected component paths, training and evaluation entry points, configuration and implementation conventions, and dependency conventions.
+2. Before defining or changing an Experiment, invoke `$grill-with-docs`. Resolve the question and comparison, component paths, declared phases, configuration, resources, checkpoint flow, outputs, and failure boundaries. Continue only after the design is explicit and confirmed. If it is unavailable, stop.
+3. Create or update `EXPERIMENT.md` inside `experiments/<experiment-id>/`.
+4. Implement the declared phases using the target project's existing configuration or code conventions. Create or update project-native configuration, custom phase code, or both as required.
+5. Keep `EXPERIMENT.md`, configuration or phase code, and commands consistent. If the question, components, phases, configuration, implementation, resources, checkpoint flow, outputs, or failure boundaries change, pause and repeat `$grill-with-docs` before continuing.
+6. List the changed files, show the diff, and propose an Experiment control commit message. Do not create a commit or execute the Experiment.
 
-Read the selected model as a committed component. If the model or a Dataset derivation must change, hand the work to `$implement-model` or `$define-dataset`. Modify only `experiments/<experiment-id>/EXPERIMENT.md` and `experiments/<experiment-id>/experiment.yaml` from this skill.
+If a selected Model, Dataset derivation, or Benchmark must change, hand the work to `$implement-model`, `$define-dataset`, or `$define-benchmark`.
 
-## Align the Experiment specification
+## Experiment Directory
 
-Before creating or normatively changing an Experiment, invoke `$grill-with-docs`. If it is unavailable, stop. Work the design tree until its frontier is empty, present the complete shared understanding, and wait for explicit user confirmation before writing either Experiment file.
+Use one directory for each concrete Experiment:
 
-Keep `EXPERIMENT.md` brief and use these sections:
-
-- **Research question and comparison**: the question, comparison, and explicit scope.
-- **Fixed components**: the Model, Dataset derivations, Benchmark, dependencies, and their roles.
-- **Phases and resources**: train/evaluate phases, commands, checkpoint flow, seed, and resource envelope.
-- **Outputs**: expected checkpoints, metrics, reports, and their locations.
-- **Success and failure criteria**: interpretation boundaries, acceptance evidence, and conditions that stop or invalidate the run.
-
-`EXPERIMENT.md` is the human-readable contract. `experiment.yaml` holds exact machine-consumed fields and must remain consistent with it without copying the full YAML into Markdown.
-
-## Git revision contract
-
-For formal work, replace every placeholder with a repository, a complete 40-character commit SHA, and the paths that define the component. An external repository is allowed when its URL or identifier and use are recorded and its commit is independently verifiable. Do not use a branch, tag, short SHA, `latest`, dirty-worktree marker, or `locator@revision` in place of a commit. Components in one repository may use different commits; the formal runner verifies that each source checkout matches each declared path at its commit.
-
-## Experiment spec
-
-Use for one concrete model/configuration/seed and one or both independent phases:
-
-```yaml
-id: experiment-<stable-id>
-mode: train-evaluate | evaluation-only
-benchmark: benchmark-<id>
-model: <model-id>
-component_commits:
-  model:
-    repository: <Git remote or repository identifier>
-    commit: <40-character SHA>
-    paths: [<model paths>]
-  dataset_derivations:
-    - id: dataset-derivation-<id>
-      repository: <Git remote or repository identifier>
-      commit: <40-character SHA>
-      paths: [<data/<dataset-id>/derivations/<derivation-id> paths>]
-    - id: dataset-derivation-<another-id>
-      repository: <Git remote or repository identifier>
-      commit: <40-character SHA>
-      paths: [<data/<dataset-id>/derivations/<another-id> paths>]
-  benchmark:
-    repository: <Git remote or repository identifier>
-    commit: <40-character SHA>
-    paths: [<benchmark paths>]
-  dependencies:
-    repository: <Git remote or repository identifier>
-    commit: <40-character SHA>
-    paths: [<lockfile paths>]
-seed: <integer>
-resource_request:
-  gpu_count: <positive integer>
-  allowed_indices: [<GPU index>]
-  min_free_memory_mb: <integer>
-  queue_timeout_seconds: <number>
-outputs: {checkpoint: <path or locator>, metrics: <path or locator>}
-training:
-  status: applicable | not_applicable
-  reason: <required when not_applicable>
-  optimizer: <optimizer>
-  scheduler: <scheduler>
-  batch_size: <integer>
-  epochs: <integer>
-phases:
-  - name: train
-    command: <target-project command>
-    inputs: [<Benchmark input names>]
-  - name: evaluate
-    command: <target-project command>
-    checkpoint: <path or external checkpoint reference>
-    benchmark_inputs: [test | validation | <custom input>]
-    allow_partial_train: false
+```text
+experiments/
+  <experiment-id>/
+    EXPERIMENT.md
+    configs/
+      <configuration files>
+    <implementation files>
 ```
 
-For `evaluation-only`, omit `train`, set `training.status` to `not_applicable`, include an External checkpoint record and a non-empty compatibility declaration covering architecture/model revision, format, preprocessing, shape/dtype, labels, and source conditions. The model, every Dataset derivation selected by the Benchmark, the Benchmark including its metric implementations, dependencies, and Experiment control commit still require Git commits.
+The optional `configs/` directory contains configuration consumed directly by the target project or framework. The Experiment may also contain custom phase implementation files when the target project does not provide the required training or evaluation entry point. Use existing project conventions; do not require a framework, schema, filename, or one configuration file per phase. Keep Experiment-specific training and evaluation configuration and code inside the Experiment directory; keep architecture and model-behavior configuration in the Model component.
 
-Do not start execution from this skill. After alignment, write both Experiment files. If resolving exact fields requires a change to the research question, comparison, components, phases, resources, outputs, success criteria, or failure conditions, pause and repeat `$grill-with-docs`; formatting and mechanical changes that preserve the specification do not require another interview.
+## EXPERIMENT.md
 
-Verify that `EXPERIMENT.md` and `experiment.yaml` agree. Show `git diff`, the exact files to commit, and a proposed commit message. Do not create the commit. The Experiment is eligible for formal execution only after the user commits the complete Experiment directory and records that full SHA as the Experiment control commit. Hand that fixed revision to `$run-experiment`, `$train-experiment`, or `$evaluate-experiment` only when the user requests execution.
+`EXPERIMENT.md` is the human-readable contract for the Experiment. Keep it concise and consistent with its configuration and commands.
+
+Use these sections:
+
+### Description
+
+Describe the research question, comparison, purpose, and explicit boundaries of the Experiment.
+
+### Components
+
+Identify the Model, Dataset derivations, Benchmark, dependencies, and other inputs used by the declared phases. Record their logical identities, roles, repositories when external, and paths. Record component versions in the Experiment control commit message, not in this document.
+
+A Train phase requires a Model and its training Dataset derivations. A Benchmark is optional unless training consumes its protocol. An Evaluate phase requires a Model, Benchmark, and checkpoint; the Benchmark identifies its Dataset derivations and evaluation inputs.
+
+### Phases
+
+Use `#### Train` and `#### Evaluate` subsections for the phases that apply. Declare at least one phase.
+
+For Train, record the data inputs, command or entry point, configuration paths, seed, resources, checkpoint selection, and continuation or failure conditions. Validation used for early stopping, checkpoint selection, or training monitoring remains part of Train.
+
+For Evaluate, record the Benchmark inputs, command or entry point, configuration paths when needed, resources, checkpoint source, and failure conditions. An evaluation-only Experiment may consume an external checkpoint or a checkpoint from a prior Result. Record its locator, digest when available, provenance, and compatibility requirements. In a train-then-evaluate Experiment, reference the selected checkpoint produced by Train; the Result records its final path and digest.
+
+Evaluation configuration controls execution parameters such as batch size, workers, precision, devices, checkpoint selection, and output locations. It may select a declared Benchmark input or an explicitly allowed metric subset, but it must not redefine the Benchmark's metrics, masking, reduction, aggregation, or visualizations. Omit evaluation configuration when the target project does not need it.
+
+### Outputs
+
+Describe the checkpoints, training metrics, Benchmark metrics, visualizations, reports, logs, and other outputs produced by the declared phases, including their expected locations or location rules.
+
+### Implementation
+
+Record the phase commands, configuration files, custom phase code, dependencies, and implementation choices needed to run the Experiment. Keep optimizer, scheduler, learning rate, batch size, epochs, seed, trainer, precision, resources, and other run-specific settings in the Experiment configuration or implementation when the target project consumes them there.
+
+The specification must remain consistent with the configuration and commands. If implementation changes the Experiment contract, stop and realign the design before continuing.
+
+## Versioning
+
+An Experiment is a concrete definition, not a reusable component. Before formal execution, every selected Model, Dataset derivation, Benchmark, and dependency must be fixed by an existing component commit or by a new commit containing only that component. Components that already have the required fixed revision do not need another commit.
+
+The Experiment control commit fixes `EXPERIMENT.md` and its configuration. Its commit message records every selected component's repository, complete commit SHA, and paths using this body format:
+
+```text
+Components:
+- model: repository=<repository>; commit=<40-character SHA>; paths=<paths>
+- dataset-derivation: repository=<repository>; commit=<40-character SHA>; paths=<paths>
+- benchmark: repository=<repository>; commit=<40-character SHA>; paths=<paths>
+- dependencies: repository=<repository>; commit=<40-character SHA>; paths=<paths>
+```
+
+Repeat entries when multiple Dataset derivations or dependency sources apply. Formal execution rejects missing entries, branches, tags, short SHAs, dirty selected paths, or paths that do not match the recorded commit.
+
+The user may create these commits manually. A pre-run workflow may create them automatically only when the user selects that option: show each component diff, commit each changed reusable component separately, then commit the Experiment definition with the component bindings in its message. Do not include unrelated or parallel work.

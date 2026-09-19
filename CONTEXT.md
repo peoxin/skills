@@ -59,7 +59,7 @@ A stable root-level directory for one reusable research component or family, suc
 _Avoid_: Version directory, dated snapshot, commit-named folder
 
 **Component specification document**:
-A component-named Markdown contract that records the user-aligned intent, behavior, boundaries, interfaces, and verification requirements for one Dataset derivation, Model, Benchmark, Experiment, or Result execution. It has no lifecycle status, remains consistent with the component's structured records and implementation, and is fixed with them by a Component commit.
+A Markdown contract named for a Dataset derivation, Model, Benchmark, Experiment, or Result execution. It records user-aligned intent, behavior, boundaries, interfaces, and verification requirements, has no lifecycle status, and remains consistent with the implementation and any Experiment configuration.
 _Avoid_: Implementation plan, rendered YAML, draft approval record
 
 **Dataset definition skill**:
@@ -71,27 +71,27 @@ A reusable data-and-metric evaluation contract that may combine multiple Dataset
 _Avoid_: Baseline suite, one run config, score table
 
 **Benchmark definition skill**:
-The `define-benchmark` entry that creates or revises one self-contained Benchmark from committed Dataset derivation revisions, including its Component specification document, metric implementations, and optional visualizations, without selecting a model or concrete run.
+The `define-benchmark` entry that creates or revises one self-contained Benchmark from Dataset derivation paths, including its Benchmark specification document, metric implementations, and optional visualizations, without selecting a model or concrete run.
 _Avoid_: Experiment definition, evaluation run
 
 **Experiment spec**:
-A fully resolved, executable declaration for one concrete experiment, binding model, one or more Dataset derivations through a Benchmark, the optional training configuration, seed, resources, commands, phases, and output locations. Training configuration may be absent or not applicable for evaluation-only work; the Experiment control commit fixes the complete declaration.
+A fully resolved declaration for one concrete experiment, binding the selected Model, Dataset derivations, optional Benchmark, optional training configuration, seed, resources, commands, phases, and output locations. Training configuration may be absent for evaluation-only work; an Experiment control commit fixes the complete declaration.
 _Avoid_: Component specification document, benchmark protocol, training config
 
 **Experiment definition skill**:
-The `define-experiment` entry that consumes a committed Benchmark revision and other committed components to create one concrete Experiment specification document and its machine-readable Experiment record. It changes only the selected Experiment directory and never defines or revises the Benchmark it references.
+The `define-experiment` entry that consumes selected component paths to create one concrete Experiment definition and its configuration or custom phase code. It changes only the selected Experiment directory and never defines or revises the Model, Dataset, or Benchmark it references.
 _Avoid_: Benchmark definition, experiment execution
 
 **Experiment composition**:
-The functional view of one experiment as `Result = f_eval(f_train(Model, Data_train, Hyperparameter_config), Data_test, Eval_metric)`, where named train and test inputs are selected by a Benchmark and may be composed from multiple Dataset derivations; every input, transformation, and function implementation has a fixed revision.
+The functional view of one experiment as `Result = f_eval(f_train(Model, Data_train, Hyperparameter_config), Data_test, Eval_metric)`, where Train may select Dataset derivation inputs directly and Evaluate uses the Benchmark's declared inputs and metrics; every input, transformation, and function implementation has a fixed revision.
 _Avoid_: Training job, benchmark number
 
-**Experiment component revision**:
-The Git identity of an intentional, reusable input or implementation. It records a repository, a complete commit SHA, and the paths whose contents belong to the component, such as a model, Dataset derivation, Benchmark, benchmark-owned metric implementation, or dependency lockfile. The concrete training and evaluation settings belong to the Experiment control commit.
+**Reusable component revision**:
+The Git identity of an intentional, reusable input or implementation. It records a repository, a complete commit SHA, and the paths whose contents belong to the component, such as a Model, Dataset derivation, Benchmark, benchmark-owned metric implementation, or dependency lockfile. An Experiment is not a reusable component; its concrete training and evaluation settings belong to its Experiment control commit.
 _Avoid_: Latest code, branch-only reference, file version without a commit
 
 **Component commit**:
-The user-created commit that fixes one component's specification document, structured records, implementation, and checks as a consistent revision of its declared paths. Different components in one repository may use different commits; a formal run verifies that the current checkout still matches each component commit at its paths.
+The user-created commit that fixes one reusable component's specification document, implementation, and applicable configuration as a consistent revision of its declared paths. Different components in one repository may use different commits; a formal run verifies that the current checkout still matches each component commit at its paths.
 _Avoid_: Unverified version label, execution snapshot
 
 **Execution context record**:
@@ -123,11 +123,11 @@ A formal runnable revision is identified by a Git repository, a complete 40-char
 _Avoid_: Latest version, working copy
 
 **Git-tracked experiment**:
-An experiment whose Model, Dataset derivation(s), Benchmark, Experiment specification and machine-readable record, and Result records are identified by Git commits. Large outputs may remain external only when their source, digest, and producing commits are recorded.
+An experiment whose reusable Model, Dataset derivation(s), Benchmark, dependency inputs, and Experiment definition are identified by Git commits. Large outputs may remain external only when their source, digest, and producing commits are recorded.
 _Avoid_: One undifferentiated commit, tracker run
 
 **Experiment control commit**:
-The Component commit containing the consistent `EXPERIMENT.md` and `experiment.yaml` used to start a formal run. It binds the selected Model, Dataset derivation references, Benchmark, optional training settings, phase declarations, seed, resources, commands, and output locations.
+The Git commit containing consistent `EXPERIMENT.md` and its configuration or custom phase code for one concrete run. Its commit message binds the selected Model, Dataset derivations, Benchmark, and dependency sources by repository, complete commit SHA, and paths. It is not a reusable Component commit.
 _Avoid_: Component commit, result commit
 
 **Result commit**:
