@@ -1,4 +1,4 @@
 interface:
   display_name: "write-report"
   short_description: "Write evidence-linked reports and papers"
-  default_prompt: "Use $write-report to synthesize Reference analyses and experiment results into a reader-facing document."
+  default_prompt: "Use the `write-report` skill to synthesize Reference analyses and experiment results into a reader-facing document."

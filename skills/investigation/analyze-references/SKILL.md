@@ -5,7 +5,7 @@ description: Analyze selected Reference records and their artifacts with evidenc
 
 # Analyze References
 
-Analyze selected, inspectable Reference records created by `$add-references`. Read each `reference.yaml` and its retained or external artifacts. Separate reported facts, derivations, your inference, conflicts, and missing details. Bind every material claim to a page, section, table, figure, equation, code path, artifact path, commit, or URL anchor.
+Analyze selected, inspectable Reference records created by the `add-references` skill. Read each `reference.yaml` and its retained or external artifacts. Separate reported facts, derivations, your inference, conflicts, and missing details. Bind every material claim to a page, section, table, figure, equation, code path, artifact path, commit, or URL anchor.
 
 This early collection uses the current co-located Reference format only. It does not migrate or promise compatibility with superseded `source-*`, flat YAML, or status-bearing records.
 
@@ -45,4 +45,4 @@ For implementation mapping, identify inputs, outputs, shapes, losses, optimizati
 
 For a review, synthesize selected analyses rather than search snippets. Compare terminology, assumptions, datasets, implementations, baselines, metrics, compute, and evidence quality. Keep disagreements visible and label cross-Reference conclusions as synthesis or inference.
 
-Do not silently convert an analysis into code changes or a scientific conclusion. Hand implementation work to `$define-model` and hypotheses to `$propose-improvements`.
+Do not silently convert an analysis into code changes or a scientific conclusion. Hand implementation work to the `define-model` skill and hypotheses to the `propose-improvements` skill.

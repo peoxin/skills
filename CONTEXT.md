@@ -215,7 +215,7 @@ A prompt-driven, confirm-before-write capability that explores a target workspac
 _Avoid_: Project migration, blind scaffold
 
 **Research skill distribution**:
-The `skills/` source tree groups independently callable leaf skills under Capability module directories. `npx skills` discovers and installs the leaves by their stable skill names; the repository does not provide a router skill or custom installer, and component planning stops when the required `$grill-with-docs` skill is unavailable.
+The `skills/` source tree groups independently callable leaf skills under Capability module directories. `npx skills` discovers and installs the leaves by their stable skill names; the repository does not provide a router skill or custom installer, and The `grill-with-docs` skill is a required dependency for component planning; the skill stops when it is unavailable.
 _Avoid_: Project-local runtime, skill fork, runtime bundle
 
 **Portable capability**:

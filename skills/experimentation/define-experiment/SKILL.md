@@ -10,13 +10,13 @@ Treat each Experiment as one concrete training, evaluation, or train-then-evalua
 ## Workflow
 
 1. Inspect the target project's instructions, selected component paths, training and evaluation entry points, configuration and implementation conventions, and dependency conventions.
-2. Before defining or changing an Experiment, invoke `$grill-with-docs`. Resolve the question and comparison, component paths, environment configuration, declared phases, configuration, resources, checkpoint flow, outputs, and failure boundaries. Continue only after the design is explicit and confirmed. If it is unavailable, stop.
+2. Before defining or changing an Experiment, invoke the `grill-with-docs` skill. Resolve the question and comparison, component paths, environment configuration, declared phases, configuration, resources, checkpoint flow, outputs, and failure boundaries. Continue only after the design is explicit and confirmed. If it is unavailable, stop.
 3. Create or update `EXPERIMENT.md` inside `experiments/<experiment-id>/`.
 4. Implement the declared phases using the target project's existing configuration or code conventions. Create or update project-native configuration, custom phase code, or both as required.
-5. Keep `EXPERIMENT.md`, configuration or phase code, and commands consistent. If the question, components, phases, configuration, implementation, resources, checkpoint flow, outputs, or failure boundaries change, pause and repeat `$grill-with-docs` before continuing.
+5. Keep `EXPERIMENT.md`, configuration or phase code, and commands consistent. If the question, components, phases, configuration, implementation, resources, checkpoint flow, outputs, or failure boundaries change, pause and repeat the `grill-with-docs` skill before continuing.
 6. List the changed files, show the diff, and propose an Experiment control commit message. Do not create a commit or execute the Experiment.
 
-If a selected Model, Dataset derivation, or Benchmark must change, hand the work to `$define-model`, `$define-dataset`, or `$define-benchmark`.
+If a selected Model, Dataset derivation, or Benchmark must change, hand the work to the `define-model`, `define-dataset`, or `define-benchmark` skill.
 
 ## Experiment Directory
 

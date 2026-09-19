@@ -10,10 +10,10 @@ Treat each Dataset as an independent, reproducible data component. A Dataset rev
 ## Workflow
 
 1. Inspect the target project's instructions, data directories, existing Dataset records, data interfaces, and dependency conventions.
-2. Before defining or changing a Dataset, invoke `$grill-with-docs`. Resolve the Dataset revision, required named inputs, applicable derivation rules, data boundaries, and implementation constraints. If it is unavailable, stop.
+2. Before defining or changing a Dataset, invoke the `grill-with-docs` skill. Resolve the Dataset revision, required named inputs, applicable derivation rules, data boundaries, and implementation constraints. If it is unavailable, stop.
 3. Reuse the existing `REVISION.md` when it matches the required raw Dataset revision. If it is missing, incomplete, or does not match, stop and tell the user what must be resolved before continuing. Create a new `REVISION.md` only for a new Dataset directory. Then create or update the selected `DERIVATION.md`.
 4. Implement the derivation inside the selected `data/<dataset-id>/derivations/<derivation-id>/` directory. Keep its data processing code and configuration self-contained.
-5. Keep `REVISION.md` and `DERIVATION.md`, implementation files, and configuration consistent. If the Dataset revision, derived data, derivation rules, or label semantics change, pause and repeat `$grill-with-docs` before continuing.
+5. Keep `REVISION.md` and `DERIVATION.md`, implementation files, and configuration consistent. If the Dataset revision, derived data, derivation rules, or label semantics change, pause and repeat the `grill-with-docs` skill before continuing.
 6. List the changed files and show the diff. Do not create a commit.
 
 ## Dataset Directory

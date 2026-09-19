@@ -10,10 +10,10 @@ Treat each Benchmark as a self-contained, reusable evaluation protocol. A Benchm
 ## Workflow
 
 1. Inspect the target project's instructions, Dataset derivations, data interfaces, evaluation conventions, and dependency conventions.
-2. Before defining or changing a Benchmark, invoke `$grill-with-docs`. Resolve the task, Dataset inputs, input composition, quantitative metrics, and qualitative visualizations. Continue only after the design is explicit and confirmed. If it is unavailable, stop.
+2. Before defining or changing a Benchmark, invoke the `grill-with-docs` skill. Resolve the task, Dataset inputs, input composition, quantitative metrics, and qualitative visualizations. Continue only after the design is explicit and confirmed. If it is unavailable, stop.
 3. Create or update `BENCHMARK.md` inside `benchmarks/<benchmark-id>/`.
 4. Implement the Benchmark inside the selected `benchmarks/<benchmark-id>/` directory. Keep metric and visualization implementations self-contained within the Benchmark.
-5. Keep `BENCHMARK.md` consistent with the metric and visualization implementations. If the task, Dataset inputs, composition, metrics, aggregation, visualizations, or implementation contract changes, pause and repeat `$grill-with-docs` before continuing.
+5. Keep `BENCHMARK.md` consistent with the metric and visualization implementations. If the task, Dataset inputs, composition, metrics, aggregation, visualizations, or implementation contract changes, pause and repeat the `grill-with-docs` skill before continuing.
 6. List the changed files and show the diff. Do not create a commit.
 
 ## Benchmark Directory

@@ -7,7 +7,7 @@ description: Acquire user-selected research materials from direct sources and cr
 
 Acquire one or more user-selected research materials from a direct source and create a durable Reference record for each one. A direct source is the URL, DOI, arXiv identifier, repository or model identifier, local file, local directory, or versioned checkout explicitly supplied by the user. Do not search for missing metadata or follow citation and discovery chains.
 
-This skill can be called directly or handed selected inputs by `$search-references`. An explicit request to add, download, import, or save selected material is authorization to write the requested records and retained artifacts. Do not ask for a second confirmation merely because optional metadata is missing.
+This skill can be called directly or handed selected inputs by the `search-references` skill. An explicit request to add, download, import, or save selected material is authorization to write the requested records and retained artifacts. Do not ask for a second confirmation merely because optional metadata is missing.
 
 ## Inputs
 
@@ -40,7 +40,7 @@ references/
       <retained-artifact>
 ```
 
-Map `paper` to `papers/`, `code` to `code/`, and `dataset`, `model`, `document`, or `other` to `materials/`. Keep `analysis/` for `$analyze-references`.
+Map `paper` to `papers/`, `code` to `code/`, and `dataset`, `model`, `document`, or `other` to `materials/`. Keep `analysis/` for the `analyze-references` skill.
 
 Do not migrate or overwrite existing records. This early skill collection defines the new format below and does not promise compatibility with superseded `source-*`, flat YAML, or status-bearing records; new additions use the current format even when older files remain in the same collection.
 
@@ -112,6 +112,6 @@ Process batches independently. Keep successful records when another input fails,
 
 ## Handoff from search
 
-`$search-references` may hand selected locators or local paths to this skill after the user explicitly asks to add them in the same conversation. Do not rely on hidden candidate files or session state. The user may also call `$add-references` directly with the same inputs.
+The `search-references` skill may hand selected locators or local paths to this skill after the user explicitly asks to add them in the same conversation. Do not rely on hidden candidate files or session state. The user may also call the `add-references` skill directly with the same inputs.
 
-Finish by listing each created Reference directory and its retained or external artifacts. Do not turn the record into an analysis; hand selected records to `$analyze-references`.
+Finish by listing each created Reference directory and its retained or external artifacts. Do not turn the record into an analysis; hand selected records to the `analyze-references` skill.

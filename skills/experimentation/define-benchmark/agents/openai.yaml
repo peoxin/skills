@@ -1,4 +1,4 @@
 interface:
   display_name: "define-benchmark"
   short_description: "Define a reusable Benchmark component"
-  default_prompt: "Use $define-benchmark to define a Benchmark with Dataset inputs, quantitative metrics, qualitative visualizations, and their implementations."
+  default_prompt: "Use the `define-benchmark` skill to define a Benchmark with Dataset inputs, quantitative metrics, qualitative visualizations, and their implementations."

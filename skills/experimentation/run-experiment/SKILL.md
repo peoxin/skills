@@ -14,4 +14,4 @@ description: Run the phases declared by a fixed Experiment.
 3. Prepare the declared environment and run the declared phases in order.
 4. Check that the declared outputs exist and report the result. Propose the files and message for a user-created Result commit.
 
-Return to `$define-experiment` when the Experiment contract must change. Report failed phases or missing outputs; do not create the Result commit.
+Return to the `define-experiment` skill when the Experiment contract must change. Report failed phases or missing outputs; do not create the Result commit.

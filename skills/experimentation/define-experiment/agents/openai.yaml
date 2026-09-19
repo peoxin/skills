@@ -1,4 +1,4 @@
 interface:
   display_name: "define-experiment"
   short_description: "Define one concrete PyTorch Experiment"
-  default_prompt: "Use $define-experiment to define an Experiment with selected component paths, phases, project-native configuration or custom phase code, and outputs."
+  default_prompt: "Use the `define-experiment` skill to define an Experiment with selected component paths, phases, project-native configuration or custom phase code, and outputs."

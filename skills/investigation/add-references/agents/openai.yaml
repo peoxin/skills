@@ -1,4 +1,4 @@
 interface:
   display_name: "add-references"
   short_description: "Acquire and record research materials"
-  default_prompt: "Use $add-references to add selected research materials and create traceable Reference records."
+  default_prompt: "Use the `add-references` skill to add selected research materials and create traceable Reference records."

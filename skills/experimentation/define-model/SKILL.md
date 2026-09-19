@@ -10,10 +10,10 @@ Treat each model as an independent, reproducible component of a deep-learning ex
 ## Workflow
 
 1. Inspect the target project's instructions, architecture, data interfaces, training entry points, and dependency conventions.
-2. Before designing or changing the model, invoke `$grill-with-docs`. Continue until the architecture, module contracts, interfaces, training and inference behavior, and implementation constraints are explicit and confirmed. If it is unavailable, stop.
+2. Before designing or changing the model, invoke the `grill-with-docs` skill. Continue until the architecture, module contracts, interfaces, training and inference behavior, and implementation constraints are explicit and confirmed. If it is unavailable, stop.
 3. Write `MODEL.md` as the model contract.
 4. Implement the model in a self-contained `models/<model-id>/` directory.
-5. Keep `MODEL.md`, implementation files, and configuration consistent. If implementation reveals a change to the architecture, module interfaces, input/output behavior, training or inference behavior, or checkpoint contract, pause and repeat `$grill-with-docs` before continuing.
+5. Keep `MODEL.md`, implementation files, and configuration consistent. If implementation reveals a change to the architecture, module interfaces, input/output behavior, training or inference behavior, or checkpoint contract, pause and repeat the `grill-with-docs` skill before continuing.
 6. List the changed files and show the diff. Do not create a commit.
 
 ## Model Directory

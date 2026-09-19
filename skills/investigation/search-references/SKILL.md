@@ -15,13 +15,13 @@ Read the target project's instructions, root `CONTEXT.md` or `CONTEXT-MAP.md`, a
 
 Present a shortlist before any durable write. For each candidate, show the available source identity, type, title or owner, locator, version or commit when directly available, and a concise explanation of why it appeared in the shortlist. Keep that relevance explanation in the conversation; it is not a field in the Reference record.
 
-Candidates are not Reference records. Do not create candidate YAML, do not create Reference directories, and do not add lifecycle or verification status. `$search-references` is complete when it has presented the shortlist or handed selected inputs to `$add-references`.
+Candidates are not Reference records. Do not create candidate YAML, do not create Reference directories, and do not add lifecycle or verification status. The `search-references` skill is complete when it has presented the shortlist or handed selected inputs to the `add-references` skill.
 
 ## Explicit handoff
 
-The user may skip adding anything. If the user explicitly says to add selected candidates, download a named document, or import a listed path, hand those selected locators or paths to `$add-references` in the same conversation. Examples of explicit intent include "add the first and third candidates" and "save this PDF in references". A vague request to search or discuss does not authorize a write.
+The user may skip adding anything. If the user explicitly says to add selected candidates, download a named document, or import a listed path, hand those selected locators or paths to the `add-references` skill in the same conversation. Examples of explicit intent include "add the first and third candidates" and "save this PDF in references". A vague request to search or discuss does not authorize a write.
 
-Show the shortlist before handing off, even when the original request combines searching and adding. Ask which candidates to add when the selection is ambiguous. `$add-references` independently performs direct-source acquisition, creates the new per-Reference directories, and reports the resulting artifacts.
+Show the shortlist before handing off, even when the original request combines searching and adding. Ask which candidates to add when the selection is ambiguous. The `add-references` skill independently performs direct-source acquisition, creates the new per-Reference directories, and reports the resulting artifacts.
 
 ## Type vocabulary
 
@@ -34,4 +34,4 @@ Use these simple semantic types in the shortlist and handoff:
 - `document`: official documentation, standards, blogs, tutorials, and web materials;
 - `other`: anything that cannot reasonably use the above, with an optional `type_detail`.
 
-Do not turn a candidate list into an analysis. Pass selected inputs to `$add-references`, then pass created records to `$analyze-references` when the user asks for evidence-linked reading.
+Do not turn a candidate list into an analysis. Pass selected inputs to the `add-references` skill, then pass created records to the `analyze-references` skill when the user asks for evidence-linked reading.
