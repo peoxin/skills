@@ -7,7 +7,7 @@ Audience: one researcher using Python and PyTorch on a researcher-controlled mul
 
 This repository develops a user-directed research assistant, not an autonomous research system. Its deliverable is a portable `skills/` directory of directly callable, Markdown-defined Agent Skills for literature work, model implementation, experiment definition and execution, evaluation, improvement proposals, and technical writing.
 
-The assistant may search, summarize, generate plans and code, run static checks, run smoke tests, queue confirmed experiments, and assemble reports. The researcher owns the research question, hypotheses, benchmark acceptance, interpretation, and final written claims.
+The assistant may search, summarize, align component specifications, generate code, run static checks, run smoke tests, queue fixed Experiment revisions, and assemble reports. The researcher owns the research question, hypotheses, benchmark acceptance, interpretation, and final written claims.
 
 ## Target project layout
 
@@ -26,11 +26,17 @@ The initializer creates these six root directories after confirmation. Component
 
 ```text
 data/<dataset-id>/setups/<setup-id>/
-models/<model-id>/
-benchmarks/<benchmark-id>/metrics/
-benchmarks/<benchmark-id>/visualizations/
-experiments/<experiment-id>/experiment.yaml
+  SETUP.md
+models/<model-id>/MODEL.md
+benchmarks/<benchmark-id>/
+  BENCHMARK.md
+  metrics/
+  visualizations/
+experiments/<experiment-id>/
+  EXPERIMENT.md
+  experiment.yaml
 results/<experiment-id>/<result-id>/
+  EXECUTION.md
 ```
 
 Do not create top-level `training/`, `evaluation/`, `metrics/`, `runs/`, `reports/`, `common/`, or `_shared/` directories. Training and evaluation are Experiment phases; training settings belong in `experiment.yaml`; metric implementations belong to their Benchmark; and each model is self-contained.
@@ -73,15 +79,15 @@ Each entry is independently callable. They exchange explicit files, not hidden c
 3. `analyze-literature`
    Analyze selected Source records, extract mechanisms and experimental details with locators, and assemble literature-review material.
 4. `implement-model`
-   Handle either `reproduce` or `new-method` intent. Produce an implementation plan, evidence or hypothesis separation, code proposal, tests, and a runnable integration plan before confirmed edits.
+   Handle either `reproduce` or `new-method` intent. Align `MODEL.md`, including evidence or hypothesis separation, interfaces, required behavior, integration, and verification, before implementation.
 5. `dataset-setup`
-   Register a raw Dataset revision and create or validate a Dataset setup describing splits, preprocessing, sampling, label mapping, and derived input digests.
+   Register a raw Dataset revision and create or validate `SETUP.md`, structured records, and implementation describing inputs, splits, preprocessing, sampling, label mapping, and derived input digests.
 6. `define-benchmark`
-   Create or revise one self-contained data-and-metric Benchmark from confirmed Dataset setups. Own its input composition, metric implementations, aggregation, optional visualizations, validation, confirmation, and proposed component commit without selecting a model or run.
+   Create or revise one self-contained data-and-metric Benchmark from committed Dataset setup revisions. Own `BENCHMARK.md`, its structured record, input composition, metric implementations, aggregation, optional visualizations, validation, and proposed component commit without selecting a Model or run.
 7. `define-experiment`
-   Create one concrete Experiment spec from a committed model and confirmed Benchmark. Bind component commits, optional training settings, phases, seed, resources, checkpoint, and outputs without modifying its Model, Dataset setups, or Benchmark.
+   Create `EXPERIMENT.md` and one machine-readable Experiment record from committed Model, Dataset setup, and Benchmark revisions. Bind component commits, optional training settings, phases, seed, resources, checkpoint, and outputs without modifying its inputs.
 8. `run-experiment`
-   Orchestrate confirmed Experiment phases through the local multi-GPU procedure. Allocate resources, call the training and evaluation entries, preserve shared execution context, handle cancellation and partial states, and write the parent manifest.
+   Align `EXECUTION.md` and orchestrate a fixed Experiment revision through the local multi-GPU procedure. Allocate resources, call the training and evaluation entries, preserve shared execution context, handle cancellation and partial states, and write the parent manifest.
 9. `train-experiment`
    Execute or document the training phase, produce checkpoints and training metrics, and write a training phase manifest. It can be called directly or by `run-experiment`.
 10. `evaluate-experiment`
@@ -91,11 +97,19 @@ Each entry is independently callable. They exchange explicit files, not hidden c
 12. `write-report`
     Produce an editable paper or technical-report draft from confirmed sources, reports, and claims. It does not submit or review the document.
 13. `research-assistant` (optional convenience entry)
-    Recommend or sequence the skills above while preserving each skill's files, rules, and confirmation points. It is not a second workflow engine.
+    Recommend or sequence the skills above while preserving each skill's files, rules, and alignment points. It is not a second workflow engine.
+
+## Component specification workflow
+
+Creating or normatively changing a Dataset setup, Model, Benchmark, Experiment, or Result execution starts by invoking Matt's `$grill-with-docs`. This is a hard dependency for those planning stages: if it is unavailable, the component skill stops before specification or implementation work. The interview follows the design tree until its frontier is empty, then the assistant presents the complete shared understanding and waits for explicit user confirmation.
+
+After confirmation, the component skill writes its component-named Markdown specification before implementation: `SETUP.md`, `MODEL.md`, `BENCHMARK.md`, `EXPERIMENT.md`, or `EXECUTION.md`. These specifications have no `draft` or `confirmed` status. If implementation reveals a normative change to behavior, interfaces, input semantics, metrics, phases, resources, verification requirements, or failure conditions, the skill pauses and repeats `$grill-with-docs`; formatting, typo fixes, and mechanical edits that preserve the specification do not reopen the interview.
+
+Each component skill defines a short, component-specific section template in its own `SKILL.md`. The user-created Component commit fixes the Markdown specification, structured records, implementation, and checks as one consistent revision. Later normative changes create a new aligned revision; Git history preserves the prior contract.
 
 ## Shared records
 
-YAML or JSON is authoritative for machine-readable specs, manifests, metrics, and report data. Markdown or HTML is rendered from those records and links back to them. Direct edits to rendered reports do not change canonical results; any corrected number or provenance must be changed in the structured record and rendered again.
+The component-named Markdown specification is authoritative for human-readable intent, behavior, boundaries, interfaces, and verification requirements. YAML or JSON is authoritative for exact machine-consumed fields in component records, manifests, metrics, and report data. The formats must agree, but Markdown does not duplicate the complete structured record. Markdown or HTML reports rendered from canonical results remain presentation views; direct edits to them do not change structured values.
 
 ### Dataset and experiment layers
 
@@ -119,7 +133,7 @@ Benchmark spec (one or more Dataset setups, inputs, metrics, aggregation)
 
 Benchmark does not own baselines or model comparisons. An Experiment may compare models by referencing the same Benchmark from multiple Experiment specs.
 
-`define-benchmark` is the only entry that creates or revises a Benchmark. It consumes confirmed Dataset setup commits, keeps metric and visualization implementations inside the Benchmark directory, verifies them, and proposes a user-created Benchmark component commit. `define-experiment` consumes that confirmed commit and writes only one concrete Experiment spec. If the Benchmark needs to change, Experiment definition stops until `define-benchmark` produces a newly confirmed commit.
+`define-benchmark` is the only entry that creates or revises a Benchmark. It consumes committed Dataset setup revisions, keeps `BENCHMARK.md`, the machine-readable Benchmark record, metric implementations, and visualizations inside the Benchmark directory, verifies their consistency, and proposes a user-created Benchmark Component commit. `define-experiment` consumes that fixed revision and writes only the selected Experiment directory. If the Benchmark needs to change, Experiment definition stops until `define-benchmark` produces a new aligned Component commit.
 
 The functional model of a complete experiment is:
 
@@ -133,7 +147,7 @@ Result = f_eval(
 
 `Data_train` and `Data_test` are named Benchmark inputs and may be composed from multiple Dataset setups.
 
-Every formal component is Git-addressed. A component revision records a repository, a complete 40-character commit SHA, and the paths that belong to it. A Benchmark directory is self-contained, including its metric implementations and optional visualizations; model directories are likewise self-contained and do not use a shared model directory. An execution context records the observed HEAD and all component commits used in one run; it does not replace them with a separate execution snapshot. Environment facts may change between runs; each run gets its own context record.
+Every formal component is Git-addressed. A component revision records a repository, a complete 40-character commit SHA, and the paths containing its aligned specification, structured records, implementation, and checks. A Benchmark directory is self-contained, including its metric implementations and optional visualizations; Model directories are likewise self-contained and do not use a shared Model directory. An execution context records the observed HEAD and all component commits used in one run; it does not replace them with a separate execution snapshot. Environment facts may change between runs; each run gets its own context record.
 
 ### Phases and partial work
 
@@ -145,15 +159,15 @@ An external checkpoint is registered with an External checkpoint record and eval
 
 Formal version contract:
 
-- Model, every Dataset setup selected by the Benchmark, Benchmark (including its metric implementations), dependency lockfiles, and the confirmed Experiment spec must be identified by Git repository, complete commit SHA, and paths. The Experiment control commit fixes its training and evaluation phase settings. For an external repository, also record its URL or identifier and how the component is used; verify it from a checkout or other immutable source before execution.
+- Model, every Dataset setup selected by the Benchmark, Benchmark (including its metric implementations), dependency lockfiles, and the Experiment directory must be identified by Git repository, complete commit SHA, and paths. Each component's Markdown specification, structured records, implementation, and checks must agree at that revision. The Experiment control commit fixes `EXPERIMENT.md`, `experiment.yaml`, and its training and evaluation phase settings. For an external repository, also record its URL or identifier and how the component is used; verify it from a checkout or other immutable source before execution.
 - Before a formal run, each source checkout must be clean for its declared source paths. For every component, compare the checkout paths with `git show <component.commit>:<path>`; a mismatch blocks the run.
-- Record the Experiment control commit containing the confirmed Experiment spec. Record the observed `git rev-parse HEAD` in the execution context for audit, but use component commits as the reproducibility binding.
+- Record the Experiment control commit containing consistent `EXPERIMENT.md` and `experiment.yaml`. Record the observed `git rev-parse HEAD` in the execution context for audit, but use component commits as the reproducibility binding.
 - Check HEAD, source-path cleanliness, and component-path equality before each phase and after each child phase returns. A change blocks the next phase and is written to the manifest.
-- After a complete or partial run, commit canonical manifests, execution context, metrics, report data, rendered reports, and figure metadata as a user-confirmed Result commit. Skills propose the files and commit message but do not commit automatically.
+- After a complete or partial run, commit `EXECUTION.md`, canonical manifests, execution context, metrics, report data, rendered reports, and figure metadata as a user-created Result commit. Skills propose the files and commit message but do not commit automatically.
 
-Draft or dirty work may support exploratory runs and smoke tests, but it is not eligible for a formal benchmark or report claim.
+Uncommitted or dirty work may support exploratory runs and smoke tests, but it is not eligible for a formal benchmark or report claim.
 
-Formal execution requires a user-confirmed Experiment spec and resource plan. The assistant may prepare code, validate records, and run low-cost smoke tests before confirmation. It may not silently change a component, resource request, Dataset setup, or benchmark scope.
+Formal execution requires an Experiment control commit and an aligned `EXECUTION.md`. The assistant may prepare code, validate records, and run low-cost smoke tests before a Component commit. It may not silently change a component, resource request, Dataset setup, or Benchmark scope.
 
 ## Local execution
 
@@ -178,8 +192,8 @@ Numbers, comparisons, data-processing descriptions, and literature facts in repo
 3. let the user revise or approve the proposal;
 4. write only agreed files and preserve existing content.
 
-The portable `skills/` directory is developed here and can be copied or installed beside Matt's collection in another project. It may recommend or invoke `grill-with-docs`, `research`, `prototype`, `tdd`, and `code-review`, but it does not copy or fork those skills. The root `CONTEXT.md` and this design spec are development documents, not runtime dependencies of the delivered skills.
+The portable `skills/` directory is developed here and can be copied or installed beside Matt's collection in another project. Component planning requires the separately installed `grill-with-docs`; it stops if that skill is unavailable. The collection may also recommend or invoke `research`, `prototype`, `tdd`, and `code-review`, but does not copy or fork those skills. The root `CONTEXT.md` and this design spec are development documents, not runtime dependencies of the delivered skills.
 
 ## Implementation order
 
-The implementation plan intentionally builds all user-facing entries as self-contained Markdown workflows before reviewing the collection as a whole. Review covers initialization, Dataset setup, model registration or implementation, separately defined Benchmark and Experiment specs, local execution guidance, phase-level evaluation, structured record templates, and rendered reports. No Python package, CLI, or repository-specific runtime is part of v1.
+The initial implementation builds all user-facing entries as self-contained Markdown workflows before reviewing the collection as a whole. Review covers initialization, Dataset setup, Model registration or implementation, separately defined Benchmark and Experiment specifications, local execution guidance, phase-level evaluation, structured record templates, and rendered reports. No Python package, CLI, or repository-specific runtime is part of v1.

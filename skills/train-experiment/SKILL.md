@@ -1,6 +1,6 @@
 ---
 name: train-experiment
-description: Execute or document the training phase of a confirmed deep-learning Experiment spec and record its checkpoint and phase provenance.
+description: Execute or document the training phase of a fixed deep-learning Experiment revision and record its checkpoint and phase provenance.
 ---
 
 # Train Experiment
@@ -11,11 +11,13 @@ Unless the Experiment spec declares another location, write training manifests a
 
 ## Inputs
 
-Read the confirmed Experiment spec, the Benchmark's selected Dataset setup inputs, model and Benchmark component revisions, optional training settings, dependency identity, resource assignment, and execution context. Verify that the declared training inputs are available and that the output checkpoint path or locator is writable.
+Read the fixed Experiment revision, the Benchmark's selected Dataset setup inputs, Model and Benchmark component revisions, optional training settings, dependency identity, resource assignment, and execution context. Verify that the declared training inputs are available and that the output checkpoint path or locator is writable.
 
-Before direct execution, require the confirmed Experiment spec commit and the Git preflight described by `$run-experiment`: clean source paths, complete component SHAs, existing commits, and current checkout paths matching each component commit. When delegated, consume the orchestrator's verified context rather than repeating or weakening it.
+Before direct execution, require the Experiment control commit and the Git preflight described by `$run-experiment`: consistent Experiment files, clean source paths, complete component SHAs, existing commits, and current checkout paths matching each component commit. When delegated, consume the orchestrator's verified context rather than repeating or weakening it.
 
-When called by `$run-experiment`, use the parent run ID, assigned devices, cancellation state, working directory, and execution context supplied by the orchestrator. Do not allocate a second set of GPUs or silently change the request. For a direct invocation, show and confirm the resource plan before starting.
+When called by `$run-experiment`, read and follow the supplied `EXECUTION.md`, then use the parent run ID, assigned devices, cancellation state, working directory, and execution context supplied by the orchestrator. Do not allocate a second set of GPUs or silently change the request.
+
+For a direct invocation, apply `$run-experiment`'s execution-specification workflow before starting. `$grill-with-docs` is required; if it is unavailable, stop. Write `results/<experiment-id>/<result-id>/EXECUTION.md` with the bound Experiment revision, commands and resources, output locations, cancellation and failure handling, and verification. If training requires a normative change to that specification, pause and repeat `$grill-with-docs` before continuing.
 
 ## Training procedure
 

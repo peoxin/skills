@@ -1,4 +1,4 @@
 interface:
   display_name: "define-experiment"
   short_description: "Define one experiment from fixed components"
-  default_prompt: "Use $define-experiment to define one concrete experiment from a confirmed Benchmark."
+  default_prompt: "Use $define-experiment to define one concrete experiment from a committed Benchmark revision."

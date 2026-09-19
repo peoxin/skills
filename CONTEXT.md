@@ -13,7 +13,7 @@ A directly invocable capability organized around a research task, with explicit 
 _Avoid_: Pipeline stage, internal utility
 
 **Convenience skill**:
-A thin entry that recommends or sequences existing skills while preserving their separate files, rules, outputs, and confirmation points.
+A thin entry that recommends or sequences existing skills while preserving their separate files, rules, outputs, and alignment points.
 _Avoid_: Central orchestrator, hidden workflow engine
 
 **Source collection**:
@@ -42,6 +42,10 @@ _Avoid_: Dataset view, data folder, eval split
 A stable root-level directory for one reusable research component or family, such as `data/<dataset-id>`, `models/<model-id>`, or `benchmarks/<benchmark-id>`. Its name identifies the logical component, not a version; formal reproducibility comes from the recorded Git commit and paths.
 _Avoid_: Version directory, dated snapshot, commit-named folder
 
+**Component specification document**:
+A component-named Markdown contract that records the user-aligned intent, behavior, boundaries, interfaces, and verification requirements for one Dataset setup, Model, Benchmark, Experiment, or Result execution. It has no lifecycle status, remains consistent with the component's structured records and implementation, and is fixed with them by a Component commit.
+_Avoid_: Implementation plan, rendered YAML, draft approval record
+
 **Dataset setup skill**:
 A user-facing capability that inspects or creates a Dataset setup independently of model implementation and experiment execution, validates its derived inputs, and records the source dataset and transformation choices for reuse.
 _Avoid_: Dataset loader, hidden preprocessing
@@ -51,19 +55,15 @@ A reusable data-and-metric evaluation contract that may combine multiple Dataset
 _Avoid_: Baseline suite, one run config, score table
 
 **Benchmark definition skill**:
-The `define-benchmark` entry that creates or revises one self-contained Benchmark from confirmed Dataset setups, including metric implementations and optional visualizations, without selecting a model or concrete run.
+The `define-benchmark` entry that creates or revises one self-contained Benchmark from committed Dataset setup revisions, including its Component specification document, metric implementations, and optional visualizations, without selecting a model or concrete run.
 _Avoid_: Experiment definition, evaluation run
-
-**Experiment plan**:
-The research design for a set of experiments, including questions, comparisons, intended benchmark coverage, evaluation approach, and resource envelope. It is not directly executable.
-_Avoid_: Experiment config, run config
 
 **Experiment spec**:
 A fully resolved, executable declaration for one concrete experiment, binding model, one or more Dataset setups through a Benchmark, the optional training configuration, seed, resources, commands, phases, and output locations. Training configuration may be absent or not applicable for evaluation-only work; the Experiment control commit fixes the complete declaration.
-_Avoid_: Experiment plan, benchmark protocol, training config
+_Avoid_: Component specification document, benchmark protocol, training config
 
 **Experiment definition skill**:
-The `define-experiment` entry that consumes a confirmed Benchmark and committed components to create one concrete Experiment spec. It changes only the selected Experiment directory and never defines or revises the Benchmark it references.
+The `define-experiment` entry that consumes a committed Benchmark revision and other committed components to create one concrete Experiment specification document and its machine-readable Experiment record. It changes only the selected Experiment directory and never defines or revises the Benchmark it references.
 _Avoid_: Benchmark definition, experiment execution
 
 **Experiment composition**:
@@ -75,7 +75,7 @@ The Git identity of an intentional, reusable input or implementation. It records
 _Avoid_: Latest code, branch-only reference, file version without a commit
 
 **Component commit**:
-The commit that defines the exact contents of one component's declared paths. Different components in one repository may use different commits; a formal run verifies that the current checkout still matches each component commit at its paths.
+The user-created commit that fixes one component's specification document, structured records, implementation, and checks as a consistent revision of its declared paths. Different components in one repository may use different commits; a formal run verifies that the current checkout still matches each component commit at its paths.
 _Avoid_: Unverified version label, execution snapshot
 
 **Execution context record**:
@@ -87,7 +87,7 @@ An independently executable part of an experiment composition, such as training 
 _Avoid_: Pipeline stage, complete run
 
 **Experiment orchestrator**:
-The `run-experiment` entry that prepares one confirmed run, allocates shared resources, calls the declared training and/or evaluation phase skills, preserves execution context, and writes the parent manifest. It does not own phase-specific training, metrics, or report logic.
+The `run-experiment` entry that aligns one Result execution specification against a fixed Experiment revision, allocates shared resources, calls the declared training and/or evaluation phase skills, preserves execution context, and writes the parent manifest. It does not own phase-specific training, metrics, or report logic.
 _Avoid_: Training runner, evaluation implementation, hidden workflow engine
 
 **Training phase skill**:
@@ -107,15 +107,15 @@ A formal runnable revision is identified by a Git repository, a complete 40-char
 _Avoid_: Latest version, working copy
 
 **Git-tracked experiment**:
-An experiment whose model, Dataset setup(s), Benchmark, confirmed Experiment spec including applicable training settings, and result records are identified by Git commits. Large outputs may remain external only when their source, digest, and producing commits are recorded.
+An experiment whose Model, Dataset setup(s), Benchmark, Experiment specification and machine-readable record, and Result records are identified by Git commits. Large outputs may remain external only when their source, digest, and producing commits are recorded.
 _Avoid_: One undifferentiated commit, tracker run
 
 **Experiment control commit**:
-The Git commit containing the confirmed Experiment spec used to start a formal run. It binds the selected model, Dataset setup references, Benchmark, optional training settings, phase declarations, seed, resources, commands, and output locations.
+The Component commit containing the consistent `EXPERIMENT.md` and `experiment.yaml` used to start a formal run. It binds the selected Model, Dataset setup references, Benchmark, optional training settings, phase declarations, seed, resources, commands, and output locations.
 _Avoid_: Component commit, result commit
 
 **Result commit**:
-A user-confirmed Git commit containing canonical phase manifests, execution context, metrics, report data, rendered reports, and figure metadata for a completed or partial run. It links back to the Experiment control commit and all component commits.
+A user-created Git commit containing `EXECUTION.md`, canonical phase manifests, execution context, metrics, report data, rendered reports, and figure metadata for a completed or partial run. It links back to the Experiment control commit and all component commits.
 _Avoid_: Checkpoint file alone, mutable dashboard
 
 **Component verification**:
@@ -141,7 +141,7 @@ _Avoid_: State-dict load, filename match
 ## Evidence and reports
 
 **Canonical structured record**:
-The authoritative machine-readable YAML or JSON representation of a spec, manifest, metric result, or report data product. Markdown or HTML is a rendered view and cannot become authoritative through direct editing.
+A YAML or JSON record that is authoritative for exact machine-consumed fields in a component, manifest, metric result, or report data product. A Component specification document is authoritative for the component's user-aligned human contract; rendered reports remain presentation views and cannot change structured values through direct editing.
 _Avoid_: Notes file, formatted copy
 
 **Report bundle**:
@@ -177,7 +177,7 @@ A reference from a report, proposal, or written claim to the source record, sour
 _Avoid_: Citation without locator, unsupported assertion
 
 **Exploratory run**:
-A low-cost or draft execution used to learn about a pipeline, model, dataset setup, or hypothesis. It is not formal benchmark evidence unless an explicit confirmed spec makes it eligible.
+A low-cost or uncommitted execution used to learn about a pipeline, Model, Dataset setup, or hypothesis. It is not formal benchmark evidence unless fixed Component revisions make it eligible.
 _Avoid_: Final result, successful run
 
 **Smoke test**:
@@ -207,7 +207,7 @@ A prompt-driven, confirm-before-write capability that explores a target workspac
 _Avoid_: Project migration, blind scaffold
 
 **Research skill distribution**:
-The portable `skills/` directory containing independently callable Agent Skill directories. It can be copied into another project or skill collection while leaving Matt's separately installed skills intact and unmodified.
+The portable `skills/` directory containing independently callable Agent Skill directories. It can be copied into another project or skill collection while leaving Matt's separately installed skills intact and unmodified; component planning stops when the required `$grill-with-docs` skill is unavailable.
 _Avoid_: Project-local runtime, skill fork, runtime bundle
 
 **Portable capability**:

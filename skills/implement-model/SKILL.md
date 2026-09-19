@@ -1,6 +1,6 @@
 ---
 name: implement-model
-description: Reproduce an existing model or implement a new PyTorch idea with an explicit evidence boundary, tests, and a confirmed integration plan.
+description: Reproduce an existing model or implement a new PyTorch idea from an aligned model specification with an explicit evidence boundary and tests.
 ---
 
 # Implement Model
@@ -19,6 +19,7 @@ Place each logical model in a self-contained root-level directory:
 ```text
 models/
   <model-id>/
+    MODEL.md
     model.py
     config.yaml
     tests/
@@ -26,21 +27,21 @@ models/
 
 The directory name is not a version; formal runs record its repository, full commit, and paths. Do not create or require `common/`, `lib/`, `_shared/`, or another shared model-code directory. If two models need similar code, copy the relevant implementation into each model directory and maintain each copy independently.
 
-## Plan before edits
+## Align the model specification
 
-Present:
+Before creating or normatively changing a Model, invoke `$grill-with-docs`. If it is unavailable, stop. Work the design tree until its frontier is empty, present the complete shared understanding, and wait for explicit user confirmation before writing `MODEL.md` or editing implementation files.
 
-1. Intent and success criteria.
-2. Evidence boundary: source-backed behavior versus user hypothesis or your inference.
-3. Model interface: inputs, outputs, shapes, dtype/device behavior, train/eval behavior, and state/checkpoint keys.
-4. Target files and integration points.
-5. Key PyTorch code as Markdown code blocks when it helps review the design.
-6. Tests, smoke test, expected outputs, and known deviations.
-7. Components that must receive fixed revisions for a formal experiment.
+Keep `MODEL.md` brief and use these sections:
 
-After editing, show `git diff`, the exact files to commit, and a proposed commit message. A formal run may consume the change only after the user has created a commit with a complete SHA; this skill does not silently commit changes. Record the `models/<model-id>/` commit and paths in the Experiment spec.
+- **Intent and evidence boundary**: success criteria and the separation between source-backed behavior, user hypotheses, and inference.
+- **Interface**: inputs, outputs, shapes, dtype/device behavior, train/eval behavior, and state or checkpoint keys.
+- **Required behavior**: architecture and behavior the implementation must preserve.
+- **Integration**: target files, dependencies, callers, and other components that require fixed revisions.
+- **Verification and known deviations**: tests, smoke tests, expected outputs, failure conditions, and accepted departures from source behavior.
 
-For reproduction, maintain a deviation table:
+`MODEL.md` is the human-readable contract. Keep it consistent with code and machine-readable configuration without copying the complete configuration into Markdown. Key PyTorch code may appear as Markdown code blocks when it materially helps review the contract.
+
+For reproduction, maintain this deviation table in `MODEL.md`:
 
 ```markdown
 | Aspect | Source behavior | Proposed implementation | Status |
@@ -48,6 +49,8 @@ For reproduction, maintain a deviation table:
 | Architecture | ... | ... | exact / approximated / unknown |
 ```
 
-For a new method, record the mechanism, baseline-relative prediction, falsifiable failure condition, required ablations, and compute implications.
+For a new method, record the mechanism, baseline-relative prediction, falsifiable failure condition, required ablations, and compute implications in `MODEL.md`.
 
-After user confirmation, edit only the target project, run focused tests and a low-cost smoke test, and summarize the resulting revision. Do not silently change the Dataset setup, Benchmark spec, or research question.
+After writing the aligned specification, edit only the target project and run focused tests and a low-cost smoke test. If implementation requires a change to behavior, interfaces, integration, verification, or failure conditions, pause and repeat `$grill-with-docs`; formatting and mechanical changes that preserve the specification do not require another interview. Do not silently change the Dataset setup, Benchmark spec, or research question.
+
+Verify that `MODEL.md`, code, configuration, and tests agree. Show `git diff`, the exact files to commit, and a proposed commit message. This skill does not create the commit. A formal run may consume the Model only after the user commits the complete Model directory and records its repository, full SHA, and paths in the Experiment spec.

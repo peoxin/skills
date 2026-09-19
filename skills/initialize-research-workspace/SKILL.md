@@ -11,7 +11,7 @@ Prepare the user's target project; do not treat this skill repository as the res
 
 Read the target project's Git status, root instructions, `AGENTS.md` or `CLAUDE.md`, existing domain docs, and any existing root-level research directories. Identify conflicts and conventions without writing files.
 
-Inspect Git as a source of provenance, but do not create commits during initialization. The formal workflow requires the user to commit component records and the confirmed Experiment spec before execution; the user also creates the Result commit after a run. The initializer may document the repository identifier and expected paths in starter Markdown, but must not claim a component is fixed until a full commit SHA is available.
+Inspect Git as a source of provenance, but do not create commits during initialization. The formal workflow requires the user to commit each component's Markdown specification, structured records, and implementation together before formal use; the user also creates the Result commit after a run. The initializer may document the repository identifier and expected paths in starter Markdown, but must not claim a component is fixed until a full commit SHA is available.
 
 Create the complete set of root-level research directories after confirmation. Do not create component subdirectories; the component-specific skills create those lazily after the user names or confirms a component:
 
@@ -28,11 +28,17 @@ Directory conventions:
 
 ```text
 data/<dataset-id>/setups/<setup-id>/
-models/<model-id>/
-benchmarks/<benchmark-id>/metrics/
-benchmarks/<benchmark-id>/visualizations/
-experiments/<experiment-id>/experiment.yaml
+  SETUP.md
+models/<model-id>/MODEL.md
+benchmarks/<benchmark-id>/
+  BENCHMARK.md
+  metrics/
+  visualizations/
+experiments/<experiment-id>/
+  EXPERIMENT.md
+  experiment.yaml
 results/<experiment-id>/<result-id>/
+  EXECUTION.md
 ```
 
 Do not create top-level `training/`, `evaluation/`, `metrics/`, `runs/`, `reports/`, `common/`, or `_shared/` directories. Training and evaluation are Experiment phases; training settings live in `experiment.yaml`; metric implementations belong to their Benchmark; each model is self-contained.
@@ -54,8 +60,9 @@ This project uses component-oriented research directories.
 - `benchmarks/`: self-contained data-and-metric protocols, metric implementations, and optional visualizations.
 - `experiments/`: concrete Experiment specs with optional training settings and train/evaluate phases.
 - `results/`: one directory per execution result, including manifests, reports, figures, and artifact references.
+- Each component directory contains its component-named Markdown specification. The specification, structured records, and implementation are kept consistent and fixed together by a user-created Git commit.
 - Large datasets, checkpoints, logs, and figures may live outside Git; records identify them by stable path or locator, source, size, SHA256, and relevant component commits.
-- Formal results require confirmed specs and fixed Git component records. Exploratory work is labeled and cannot silently become benchmark evidence.
+- Formal results require fixed Git component revisions. Exploratory work is labeled and cannot silently become benchmark evidence.
 ```
 
 Do not generate model code, training scripts, cloud configuration, or a generic experiment runtime during initialization. Finish by listing created and preserved files and the next relevant skill.

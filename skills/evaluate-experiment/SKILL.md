@@ -9,9 +9,11 @@ This entry owns the `evaluate` phase and its report bundle. It can be called dir
 
 Unless the Experiment spec declares another location, write the evaluation report bundle under `results/<experiment-id>/<result-id>/`.
 
-Read the Experiment spec, the Benchmark's selected Dataset setup inputs, checkpoint record, Benchmark-owned metric identities and implementations, and execution context. Never treat a missing, failed, cancelled, or partial phase as zero or success. When called by `$run-experiment`, use the supplied run ID, assigned devices, cancellation state, and output locations without allocating a second GPU reservation.
+Read the fixed Experiment revision, the Benchmark's selected Dataset setup inputs, checkpoint record, Benchmark-owned metric identities and implementations, and execution context. Never treat a missing, failed, cancelled, or partial phase as zero or success. When called by `$run-experiment`, read and follow the supplied `EXECUTION.md`, then use the supplied run ID, assigned devices, cancellation state, and output locations without allocating a second GPU reservation.
 
-Before direct evaluation, require the confirmed Experiment spec commit and the Git component preflight: clean source paths, complete component SHAs, existing commits, and current checkout paths matching each declared commit. When delegated, use the orchestrator's verified context and re-check it at evaluation start.
+Before direct evaluation, require the Experiment control commit and the Git component preflight: consistent Experiment files, clean source paths, complete component SHAs, existing commits, and current checkout paths matching each declared commit. When delegated, use the orchestrator's verified context and re-check it at evaluation start.
+
+For a direct invocation, apply `$run-experiment`'s execution-specification workflow before starting. `$grill-with-docs` is required; if it is unavailable, stop. Write `results/<experiment-id>/<result-id>/EXECUTION.md` with the bound Experiment revision, commands and resources, output locations, cancellation and failure handling, and verification. If evaluation requires a normative change to that specification, pause and repeat `$grill-with-docs` before continuing.
 
 ## Compatibility and metrics
 
