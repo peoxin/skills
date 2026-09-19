@@ -1,9 +1,9 @@
 ---
-name: implement-model
-description: Implement a self-contained, reproducible PyTorch model component from an aligned model design.
+name: define-model
+description: Define and implement a self-contained, reproducible PyTorch model component from an aligned model design.
 ---
 
-# Implement Model
+# Define Model
 
 Treat each model as an independent, reproducible component of a deep-learning experiment. Keep its architecture, behavior, implementation, and configuration understandable and self-contained.
 

@@ -45,4 +45,4 @@ For implementation mapping, identify inputs, outputs, shapes, losses, optimizati
 
 For a review, synthesize selected analyses rather than search snippets. Compare terminology, assumptions, datasets, implementations, baselines, metrics, compute, and evidence quality. Keep disagreements visible and label cross-Reference conclusions as synthesis or inference.
 
-Do not silently convert an analysis into code changes or a scientific conclusion. Hand implementation work to `$implement-model` and hypotheses to `$propose-improvements`.
+Do not silently convert an analysis into code changes or a scientific conclusion. Hand implementation work to `$define-model` and hypotheses to `$propose-improvements`.

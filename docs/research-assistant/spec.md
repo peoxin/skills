@@ -22,7 +22,7 @@ skills/
   experimentation/
     initialize-experiment-workspace/
     define-dataset/
-    implement-model/
+    define-model/
     define-benchmark/
     define-experiment/
     run-experiment/
@@ -141,7 +141,7 @@ Each entry is independently callable. They exchange explicit files or user-selec
    Explore a target workspace, show the proposed experiment files and conventions, obtain confirmation, then create the minimum experiment workspace without overwriting existing content.
 2. `define-dataset`
    Define a raw Dataset revision and create or validate `REVISION.md` and `DERIVATION.md`, implementation, and applicable validation rules describing inputs, splits, preprocessing, sampling, label mapping, and derived input identities.
-3. `implement-model`
+3. `define-model`
    Handle either `reproduce` or `new-method` intent. Align `MODEL.md`, including evidence or hypothesis separation, interfaces, required behavior, integration, and verification, before implementation.
 4. `define-benchmark`
    Create or revise one self-contained data-and-metric Benchmark from Dataset derivation paths. Own `BENCHMARK.md`, input composition, metric implementations, aggregation, optional visualizations, and proposed Benchmark commit without selecting a Model or run.

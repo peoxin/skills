@@ -16,7 +16,7 @@ Treat each Experiment as one concrete training, evaluation, or train-then-evalua
 5. Keep `EXPERIMENT.md`, configuration or phase code, and commands consistent. If the question, components, phases, configuration, implementation, resources, checkpoint flow, outputs, or failure boundaries change, pause and repeat `$grill-with-docs` before continuing.
 6. List the changed files, show the diff, and propose an Experiment control commit message. Do not create a commit or execute the Experiment.
 
-If a selected Model, Dataset derivation, or Benchmark must change, hand the work to `$implement-model`, `$define-dataset`, or `$define-benchmark`.
+If a selected Model, Dataset derivation, or Benchmark must change, hand the work to `$define-model`, `$define-dataset`, or `$define-benchmark`.
 
 ## Experiment Directory
 

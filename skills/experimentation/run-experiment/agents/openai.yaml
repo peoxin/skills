@@ -1,4 +1,4 @@
 interface:
   display_name: "run-experiment"
   short_description: "Execute a fixed deep-learning Experiment and record its Result"
-  default_prompt: "Use $run-experiment to execute the phases declared by a fixed Experiment and record its provenance, outputs, and reports."
+  default_prompt: "Use $run-experiment to run the phases declared by a fixed Experiment."
