@@ -1,4 +1,4 @@
 interface:
   display_name: "implement-model"
-  short_description: "Deep learning research assistant capability"
-  default_prompt: "Use $implement-model to support a focused deep learning research task."
+  short_description: "Implement a self-contained, reproducible PyTorch model"
+  default_prompt: "Use $implement-model to align a model design, write MODEL.md, and implement the model component."
