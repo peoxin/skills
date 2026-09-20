@@ -5,82 +5,46 @@ description: Define a self-contained, reproducible Dataset component, including 
 
 # Define Dataset
 
-Treat each Dataset as an independent, reproducible data component. A Dataset revision identifies the source content; a Dataset derivation defines the rules that turn that revision into named inputs for training, validation, testing, or other declared uses.
+Treat each **Dataset** as an independent, reusable component. A **Dataset revision** identifies the source content; a **Dataset derivation** defines the rules that turn that revision into named inputs for training, validation, testing, or other declared uses.
 
 ## Workflow
 
-1. Inspect the target project's instructions, data directories, existing Dataset records, data interfaces, and dependency conventions.
-2. Before defining or changing a Dataset, invoke the `grill-with-docs` skill. Resolve the Dataset revision, required named inputs, applicable derivation rules, data boundaries, and implementation constraints. If it is unavailable, stop.
-3. Reuse the existing `REVISION.md` when it matches the required raw Dataset revision. If it is missing, incomplete, or does not match, stop and tell the user what must be resolved before continuing. Create a new `REVISION.md` only for a new Dataset directory. Then create or update the selected `DERIVATION.md`.
-4. Implement the derivation inside the selected `data/<dataset-id>/derivations/<derivation-id>/` directory. Keep its data processing code and configuration self-contained.
-5. Implement the selected Dataset derivation, then record the explicit Python file or directory scope containing the code created or modified by this invocation. Keep `REVISION.md`, `DERIVATION.md`, implementation files, and configuration consistent. If the Dataset revision, derived data, derivation rules, or label semantics change, pause and repeat the `grill-with-docs` skill before continuing.
-6. After the implementation and Dataset contracts agree, invoke `improve-python-documentation` with that explicit Python scope. Then invoke `fix-python-quality` with the same explicit scope. Do not let either utility infer scope from Git status or the diff.
-7. List the changed files, documentation changes, quality commands and results, and unverified checks, then show the diff. Do not create a commit.
+1. Inspect the project, then invoke `grill-with-docs`. Stop if unavailable. Align the Dataset revision, named inputs, derivation rules, boundaries, and implementation constraints.
+2. Reuse a matching `REVISION.md`; create one only for a new Dataset directory. If an existing revision is missing, incomplete, or incompatible, stop and identify what the user must resolve. Create or update the selected `DERIVATION.md`.
+3. Implement the derivation under `data/<dataset-id>/derivations/<derivation-id>/`. Keep its contract, code, and configuration consistent and self-contained. If implementation can't remain consistent, rerun `grill-with-docs` to realign the design.
+4. Record the explicit Python file or directory scope changed. Run `improve-python-documentation`, then `fix-python-quality`, with that same scope.
+5. Report what you've done. Do not commit.
 
-## Dataset Directory
-
-Use one self-contained root-level directory for each logical Dataset:
+## Layout
 
 ```text
-data/
-  <dataset-id>/
-    REVISION.md
-    derivations/
-      <derivation-id>/
-        DERIVATION.md
-        configs/
-          <preset>.yaml
-        <implementation files>
+data/<dataset-id>/
+  REVISION.md
+  derivations/<derivation-id>/
+    DERIVATION.md
+    configs/<preset>.yaml  # optional
+    <implementation files>
 ```
 
-One `data/<dataset-id>/` directory represents one selected raw Dataset revision. Multiple derivations may reuse its `REVISION.md`. The optional `configs/` directory may contain multiple reusable derivation presets. Keep all derivation implementation code inside the corresponding `<derivation-id>/` directory, with no required filename or subdirectory.
+A Dataset directory contains one raw revision; its derivations share `REVISION.md`. Keep each derivation's processing code and configuration within its directory, using any internal layout it needs. Keep similar derivations independently self-contained instead of introducing shared processing directories such as `common/`, `lib/`, or `_shared/`.
 
-Do not create or require shared data-processing directories such as `common/`, `lib/`, `_shared/`, or top-level processing directories. If derivations need similar code, keep each derivation self-contained and maintain copies independently.
+Do not create `dataset.yaml` or `derivation.yaml`.
 
-Do not create `dataset.yaml` or `derivation.yaml`. A formal Experiment control commit fixes the selected Dataset derivation's specification, implementation, and configuration in its declared dependency closure. A user may create an ordinary Dataset commit for local history or reuse.
+## Contracts
 
-## REVISION.md
+### REVISION.md
 
-`REVISION.md` describes the selected raw Dataset revision shared by its derivations. Keep it consistent with the source and with every derivation that consumes it. If the revision is missing, incomplete, or does not match the requested derivation, stop and tell the user what must be resolved.
+Document the raw revision shared by all derivations with these sections:
 
-Use these sections:
+- **Description**: what the Dataset is, its purpose, and its boundaries, its source, license, etc.
+- **Raw Data**: files, fields, sample structure, labels.
+- **Known Constraints**: missing content, data quality issues, etc.
 
-### Description
+### DERIVATION.md
 
-Describe the Dataset's source and role in the experiment, without describing any derived inputs.
+Document one derivation without copying complete configuration or source code:
 
-### Dataset Source
-
-Record the source locator, publisher, source version or release, acquisition details, content identity or digest, license, and access conditions.
-
-### Raw Data
-
-Describe the raw files, fields, sample structure, labels, and availability exposed by the source.
-
-### Known Constraints
-
-Record source-defined limitations, missing content, access restrictions, licensing conditions, and other facts that derivations must respect.
-
-## DERIVATION.md
-
-`DERIVATION.md` is the human-readable contract for one Dataset derivation. Keep it consistent with the implementation and configuration without copying complete configuration or source code into it.
-
-Use these sections:
-
-### Description
-
-Describe the purpose and boundaries of this derivation.
-
-### Dataset Derivation
-
-Identify the existing `REVISION.md`, describe the Raw Data used by this derivation, and record the ordered rules that transform or select it. Reuse the revision; do not copy or redefine it. Record filtering, sampling, preprocessing, augmentation, label mapping, and other transformations when applicable, along with relevant seeds and configuration choices.
-
-### Derived Data
-
-Describe the named data produced by this derivation for training, evaluation, or other declared uses. For each one, record its purpose, selection boundary, format, fields, label meaning, and derived identity when applicable. Record only the data and properties that apply to this Dataset.
-
-### Implementation
-
-Record implementation files, configurations, dependencies, generation commands, materialized or cached artifacts, and choices that affect reproducibility. Keep the code itself in the implementation files.
-
-The specification must remain consistent with the actual implementation. If the implementation changes the Dataset revision, derived data, derivation rules, or label semantics, stop and realign the design before continuing.
+- **Description**: purpose and boundaries.
+- **Dataset Derivation**: referenced `REVISION.md`, raw data used, and how it is transformed into named inputs.
+- **Derived Data**: each named input's purpose, selection boundary, format, fields, label meaning.
+- **Implementation**: files, configurations, dependencies, generation commands, materialized or cached artifacts.
