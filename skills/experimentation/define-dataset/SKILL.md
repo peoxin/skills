@@ -13,8 +13,9 @@ Treat each Dataset as an independent, reproducible data component. A Dataset rev
 2. Before defining or changing a Dataset, invoke the `grill-with-docs` skill. Resolve the Dataset revision, required named inputs, applicable derivation rules, data boundaries, and implementation constraints. If it is unavailable, stop.
 3. Reuse the existing `REVISION.md` when it matches the required raw Dataset revision. If it is missing, incomplete, or does not match, stop and tell the user what must be resolved before continuing. Create a new `REVISION.md` only for a new Dataset directory. Then create or update the selected `DERIVATION.md`.
 4. Implement the derivation inside the selected `data/<dataset-id>/derivations/<derivation-id>/` directory. Keep its data processing code and configuration self-contained.
-5. Keep `REVISION.md` and `DERIVATION.md`, implementation files, and configuration consistent. If the Dataset revision, derived data, derivation rules, or label semantics change, pause and repeat the `grill-with-docs` skill before continuing.
-6. List the changed files and show the diff. Do not create a commit.
+5. Implement the selected Dataset derivation, then record the explicit Python file or directory scope containing the code created or modified by this invocation. Keep `REVISION.md`, `DERIVATION.md`, implementation files, and configuration consistent. If the Dataset revision, derived data, derivation rules, or label semantics change, pause and repeat the `grill-with-docs` skill before continuing.
+6. After the implementation and Dataset contracts agree, invoke `improve-python-documentation` with that explicit Python scope. Then invoke `fix-python-quality` with the same explicit scope. Do not let either utility infer scope from Git status or the diff.
+7. List the changed files, documentation changes, quality commands and results, and unverified checks, then show the diff. Do not create a commit.
 
 ## Dataset Directory
 

@@ -9,12 +9,13 @@ Treat each Experiment as one concrete training, evaluation, or train-then-evalua
 
 ## Workflow
 
-1. Inspect the target project's instructions, selected component paths, training and evaluation entry points, configuration and implementation conventions, and dependency conventions.
+1. Inspect the target project's instructions, selected component paths, training and evaluation entry points, framework conventions, configuration and implementation conventions, and dependency conventions.
 2. Before defining or changing an Experiment, invoke the `grill-with-docs` skill. Resolve the question and comparison, component paths, environment configuration, declared phases, configuration, resources, checkpoint flow, outputs, and failure boundaries. Continue only after the design is explicit and confirmed. If it is unavailable, stop.
 3. Create or update `EXPERIMENT.md` inside `experiments/<experiment-id>/`.
-4. Implement the declared phases using the target project's existing configuration or code conventions. Create or update project-native configuration, custom phase code, or both as required.
-5. Keep `EXPERIMENT.md`, configuration or phase code, and commands consistent. If the question, components, phases, configuration, implementation, resources, checkpoint flow, outputs, or failure boundaries change, pause and repeat the `grill-with-docs` skill before continuing.
-6. List the changed files, show the diff, and propose an Experiment control commit message. Do not create a commit or execute the Experiment.
+4. Implement the declared phases using the target project's existing configuration or code conventions. Create or update project-native configuration, custom phase code, or both as required. When the confirmed design uses a supported framework, use its optional integration skill if available or follow the project's established convention directly. Run a bounded lifecycle smoke test only when the Experiment contract requires it.
+5. Implement the declared phases, then record the explicit Python file or directory scope containing the code created or modified by this invocation. Keep `EXPERIMENT.md`, configuration or phase code, and commands consistent. If the question, components, phases, configuration, implementation, resources, checkpoint flow, outputs, or failure boundaries change, pause and repeat the `grill-with-docs` skill before continuing.
+6. After the implementation and Experiment contract agree, invoke `improve-python-documentation` with that explicit Python scope. Then invoke `fix-python-quality` with the same explicit scope. Do not let either utility infer scope from Git status or the diff.
+7. List the changed files, documentation changes, quality commands and results, and unverified checks, show the diff, and propose an Experiment control commit message. Do not create a commit or execute the Experiment.
 
 If a selected Model, Dataset derivation, or Benchmark must change, hand the work to the `define-model`, `define-dataset`, or `define-benchmark` skill.
 
@@ -57,7 +58,7 @@ Identify the environment configuration files or directory used by the Experiment
 
 Use `#### Train` and `#### Evaluate` subsections for the phases that apply. Declare at least one phase.
 
-For Train, record the data inputs, command or entry point, configuration paths, seed, resources, checkpoint selection, and continuation or failure conditions. Validation used for early stopping, checkpoint selection, or training monitoring remains part of Train.
+For Train, record the data inputs, command or entry point, configuration paths, seed, resources, checkpoint selection, and continuation or failure conditions. Validation used for early stopping, checkpoint selection, or training monitoring remains part of Train. When a framework-native checkpoint applies, identify how its learned weights map to the Model's canonical weight contract and distinguish model-weight loading from full training-state restoration.
 
 For Evaluate, record the Benchmark inputs, command or entry point, configuration paths when needed, resources, checkpoint source, and failure conditions. An evaluation-only Experiment may consume an external checkpoint or a checkpoint from a prior Result. Record its locator, digest when available, provenance, and compatibility requirements. In a train-then-evaluate Experiment, reference the selected checkpoint produced by Train; the Result records its final path and digest.
 

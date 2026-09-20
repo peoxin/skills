@@ -13,7 +13,7 @@ A directly invocable capability organized around a research task, with explicit 
 _Avoid_: Pipeline stage, internal utility
 
 **Capability module**:
-A non-invocable source-layout category that groups independently callable skills by responsibility. The modules are Investigation, Experimentation, Writing, and planned Utilities; a module does not route calls or own hidden workflow state.
+A non-invocable source-layout category that groups independently callable skills by responsibility. The modules are Investigation, Experimentation, Writing, and Utilities; a module does not route calls or own hidden workflow state.
 _Avoid_: Router skill, pipeline stage, installed skill identity
 
 **Reference collection**:
@@ -206,6 +206,26 @@ _Avoid_: Domain-complete adapter, universally comparable model
 The task-neutral shape used by research skills to locate and execute model, data, training, evaluation, metric, configuration, and report components while leaving their domain semantics to the supplied implementation and declared metadata.
 _Avoid_: Domain-complete API, universal task model
 
+**Python project initializer**:
+The user-invoked `initialize-python-project` utility that creates an empty-target project with the installed uv defaults, a fixed Ruff baseline, and a fixed Git ignore file. It owns only initial project setup and establishes no contract with other skills.
+_Avoid_: Project migration, universal Python template
+
+**Ruff repair skill**:
+The `fix-python-quality` utility that runs Ruff through uv to fix and verify formatting and lint failures inside an explicit Python file or directory scope.
+_Avoid_: Quality configuration profile, independent check mode
+
+**Python documentation review skill**:
+The `improve-python-documentation` utility that improves docstrings and comments inside an explicit Python file or directory scope without changing behavior.
+_Avoid_: General code review, automatic contract design
+
+**Framework integration skill**:
+An optional, independently callable capability that implements a named framework within an already aligned Model or Experiment scope without owning or redefining that component's contract.
+_Avoid_: Framework-specific Experiment owner, generic framework runtime
+
+**Canonical model weight contract**:
+The framework-neutral identity, naming, and load semantics of a Model's learned parameters, including mappings from framework-native checkpoints when required.
+_Avoid_: Trainer checkpoint, checkpoint filename
+
 **Visualization hook**:
 An optional project-provided function that adds task-specific qualitative plots or examples to a standard Report bundle without changing its machine-readable fields or provenance rules.
 _Avoid_: Required domain pipeline, untracked figure
@@ -215,7 +235,7 @@ A prompt-driven, confirm-before-write capability that explores a target workspac
 _Avoid_: Project migration, blind scaffold
 
 **Research skill distribution**:
-The `skills/` source tree groups independently callable leaf skills under Capability module directories. `npx skills` discovers and installs the leaves by their stable skill names; the repository does not provide a router skill or custom installer, and The `grill-with-docs` skill is a required dependency for component planning; the skill stops when it is unavailable.
+The `skills/` source tree groups independently callable leaf skills under Capability module directories. `npx skills` discovers and installs the leaves by their stable skill names; the repository does not provide a router skill or custom installer, and the `grill-with-docs` skill is a required dependency for component planning; the skill stops when it is unavailable.
 _Avoid_: Project-local runtime, skill fork, runtime bundle
 
 **Portable capability**:

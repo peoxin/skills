@@ -13,8 +13,9 @@ Treat each Benchmark as a self-contained, reusable evaluation protocol. A Benchm
 2. Before defining or changing a Benchmark, invoke the `grill-with-docs` skill. Resolve the task, Dataset inputs, input composition, quantitative metrics, and qualitative visualizations. Continue only after the design is explicit and confirmed. If it is unavailable, stop.
 3. Create or update `BENCHMARK.md` inside `benchmarks/<benchmark-id>/`.
 4. Implement the Benchmark inside the selected `benchmarks/<benchmark-id>/` directory. Keep metric and visualization implementations self-contained within the Benchmark.
-5. Keep `BENCHMARK.md` consistent with the metric and visualization implementations. If the task, Dataset inputs, composition, metrics, aggregation, visualizations, or implementation contract changes, pause and repeat the `grill-with-docs` skill before continuing.
-6. List the changed files and show the diff. Do not create a commit.
+5. Implement the selected Benchmark, then record the explicit Python file or directory scope containing the code created or modified by this invocation. Keep `BENCHMARK.md` consistent with the metric and visualization implementations. If the task, Dataset inputs, composition, metrics, aggregation, visualizations, or implementation contract changes, pause and repeat the `grill-with-docs` skill before continuing.
+6. After the implementation and Benchmark contract agree, invoke `improve-python-documentation` with that explicit Python scope. Then invoke `fix-python-quality` with the same explicit scope. Do not let either utility infer scope from Git status or the diff.
+7. List the changed files, documentation changes, quality commands and results, and unverified checks, then show the diff. Do not create a commit.
 
 ## Benchmark Directory
 

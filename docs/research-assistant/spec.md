@@ -25,6 +25,7 @@ skills/
     define-model/
     define-benchmark/
     define-experiment/
+    integrate-pytorch-lightning/
     run-experiment/
       SKILL.md
       agents/
@@ -32,9 +33,13 @@ skills/
     propose-improvements/
   writing/
     write-report/
+  utilities/
+    initialize-python-project/
+    fix-python-quality/
+    improve-python-documentation/
 ```
 
-`utilities` is a planned fourth module for small independent tools such as PDF-to-Markdown conversion and Python style or formatting support. It has no directory or implemented skill yet. Module directories do not contain `SKILL.md` or module README files.
+`utilities` is the fourth module for small independent tools. `initialize-python-project` creates a new uv project with the preferred Ruff and Git ignore baseline; `fix-python-quality` repairs Ruff formatting and lint failures in an explicit Python scope; `improve-python-documentation` improves docstrings and comments in an explicit Python scope. Module directories do not contain `SKILL.md` or module README files.
 
 ## Target project layout
 
@@ -106,6 +111,8 @@ In scope:
 - explicit raw Dataset revision records and reusable Dataset derivations;
 - reusable data-and-metric Benchmark specs and concrete Experiment specs;
 - local multi-GPU execution using the resources and environment convention declared by each Experiment;
+- opinionated initialization of new uv-managed Python projects and scoped Ruff formatting and lint repair;
+- optional framework integration within already aligned Model or Experiment contracts, beginning with PyTorch Lightning;
 - train and evaluate phases that may complete independently;
 - external-checkpoint evaluation-only experiments;
 - machine-readable records plus rendered human-readable reports when an Experiment declares them, with quantitative analysis and optional qualitative visualizations;
@@ -147,15 +154,26 @@ Each entry is independently callable. They exchange explicit files or user-selec
    Create or revise one self-contained data-and-metric Benchmark from Dataset derivation paths. Own `BENCHMARK.md`, input composition, metric implementations, aggregation, optional visualizations, and proposed Benchmark commit without selecting a Model or run.
 5. `define-experiment`
    Create `EXPERIMENT.md` and any configuration or custom phase code for one concrete Experiment from selected Model, Dataset derivation, and Benchmark paths. Bind component versions, environment configuration paths, optional training settings, phases, seed, resources, checkpoint, and outputs without modifying the referenced components.
-6. `run-experiment`
+6. `integrate-pytorch-lightning`
+   Implement PyTorch Lightning within one already aligned Model or Experiment contract without changing that contract.
+7. `run-experiment`
    Run the phases declared by a fixed Experiment using its declared environment configuration, resources, commands, and outputs. It checks the minimum commit preconditions and does not define generic execution records or output formats.
-7. `propose-improvements`
+8. `propose-improvements`
    Combine Reference analyses and experiment reports into evidence-linked improvement proposals with hypotheses, mechanisms, risks, and ablations.
 
 ### Writing
 
 1. `write-report`
    Produce an editable reader-facing report or paper from Reference records and analyses, experiment results, and user-confirmed claims. It does not rewrite canonical evidence, submit, or review the document.
+
+### Utilities
+
+1. `initialize-python-project`
+   Create a new Python project in an absent or empty target using the installed uv defaults, then add the fixed Ruff configuration and Git ignore baseline. It is user-invoked and does not migrate existing projects or establish requirements for other skills.
+2. `fix-python-quality`
+   Run Ruff through uv to fix and verify formatting and lint failures in an explicitly provided Python file or directory scope. It does not configure tools, expose a check-only mode, infer scope from Git changes, or run tests.
+3. `improve-python-documentation`
+   Improve docstrings and comments in an explicitly provided Python file or directory scope without changing behavior. It does not infer scope from Git changes or resolve component contract questions.
 
 ## Component specification workflow
 
@@ -164,6 +182,8 @@ Creating or normatively changing a Dataset derivation, Model, Benchmark, or Expe
 `run-experiment` consumes the already aligned Experiment; it does not create a second execution specification or call the `grill-with-docs` skill before running. It prepares the environment named by the Experiment using the target project's existing convention, executes the declared phases, and checks the declared outputs. It does not define a generic environment record, Result schema, or default output directory. A normative change to phases, resources, commands, environment configuration, outputs, verification, or failure handling returns to the `define-experiment` skill.
 
 After confirmation, the relevant skill writes its Markdown specification before implementation: `REVISION.md` and `DERIVATION.md` for a Dataset, `MODEL.md`, `BENCHMARK.md`, or `EXPERIMENT.md`. Experiment-specific environment configuration, other configuration, or custom phase code lives beside `EXPERIMENT.md` when required. These specifications have no `draft` or `confirmed` status. If implementation reveals a normative change to behavior, interfaces, input semantics, metrics, phases, resources, verification requirements, environment configuration, or failure conditions, the skill pauses and repeats the `grill-with-docs` skill; formatting, typo fixes, and mechanical edits that preserve the specification do not reopen the interview.
+
+After implementation, each Python-producing component skill resolves quality commands from project instructions, task entries, CI, and tool configuration; limits automatic formatting to the selected scope; and directly runs the applicable formatting, linting, typing, and related tests. Failures introduced by the work are fixed; unrelated existing failures and unavailable checks are reported. When the project defines no quality convention, the skill runs safe syntax checks and related tests and identifies the unavailable checks without configuring new tooling.
 
 Each component skill defines a short, component-specific section template in its own `SKILL.md`. A user-created Component commit fixes a reusable component's Markdown specification and implementation. An Experiment control commit fixes `EXPERIMENT.md`, its environment configuration, and its configuration or custom phase code; its commit message binds the reusable component commits. Later normative changes create a new aligned revision; Git history preserves the prior contract.
 
@@ -207,7 +227,7 @@ Result = f_eval(
 
 `Data_train` and `Data_test` are named Benchmark inputs and may be composed from multiple Dataset derivations.
 
-Every formal reusable component is Git-addressed. A component revision records a repository, a complete 40-character commit SHA, and the paths containing its aligned specification, implementation, applicable configuration, and checks. A Benchmark directory is self-contained, including its metric implementations and optional visualizations; Model directories are likewise self-contained and do not use a shared Model directory. An Experiment control commit fixes its Experiment directory and any same-repository environment configuration paths it references. Environment facts that are not declared Experiment outputs are not required run records.
+Every formal reusable component is Git-addressed. A component revision records a repository, a complete 40-character commit SHA, and the paths containing its aligned specification, implementation, applicable configuration, and checks. A Benchmark directory is self-contained, including its metric implementations and optional visualizations; Model directories are likewise self-contained and do not use a shared Model directory. A Model defines a framework-neutral weight identity, naming, and load contract; a framework-native checkpoint records or implements the mapping to that contract. An Experiment control commit fixes its Experiment directory and any same-repository environment configuration paths it references. Environment facts that are not declared Experiment outputs are not required run records.
 
 ### Phases and partial work
 
@@ -227,6 +247,22 @@ Formal version contract:
 Formal execution requires a fixed Experiment control commit and matching component revisions. The assistant may prepare code, validate records, and run low-cost smoke tests before a component commit. It may not silently change a component, environment configuration, resource request, Dataset derivation, Benchmark scope, Experiment phase, or output.
 
 Uncommitted or dirty work may support exploratory runs and smoke tests, but it is not eligible for a formal benchmark or report claim. Automatic Experiment commits are allowed only after the user explicitly confirms the exact displayed submission set.
+
+## Python utilities
+
+`initialize-python-project` is a user-invoked initializer for an absent or completely empty target directory. It requires a target path, a Python version request, and `uv` on `PATH`; runs `uv init --python <python> <target>` with the installed uv version's ordinary defaults; adds Ruff with `uv add --dev ruff`; writes the fixed Ruff configuration and complete `.gitignore`; then requires `uv run ruff format --check .` and `uv run ruff check .` to pass. It does not select a uv project template, add testing or typing tools, migrate existing projects, or create research directories. A partial failure preserves the created project and reports the unfinished steps.
+
+`fix-python-quality` is model-invocable and requires an explicit Python file or directory scope plus `uv run ruff --version` to succeed. It runs Ruff's safe lint fixes and formatter, follows with lint and format checks, and may manually repair remaining Ruff findings inside the scope when behavior and public interfaces remain unchanged. It stops when Ruff is unavailable or a repair would change semantics, widen the scope, or require an uncertain suppression. It does not infer scope from Git status, configure quality tooling, provide a check-only mode, or run tests.
+
+`improve-python-documentation` is model-invocable and requires an explicit Python file or directory scope. It improves docstrings and comments using the project's conventions or a simplified Google-style fallback, preserves behavior and contracts, and reports changes or items it cannot safely explain. It does not infer scope from Git status, resolve component design questions, or run tests.
+
+These utilities are independent. Python-producing skills invoke both only after implementation is consistent with its component contract, passing the same explicit Python scope first to documentation review and then to Ruff repair.
+
+## Framework integration
+
+Framework integration skills are optional implementation capabilities, not component owners or execution entries. They may be invoked directly or delegated to after the framework choice is already aligned. Each invocation works in one Model or Experiment scope without changing its contract; missing or changing contracts return to the corresponding `define-*` skill. Generic definition skills may continue using clear project conventions when a specialized integration skill is not installed.
+
+`integrate-pytorch-lightning` defaults to Experiment scope. It uses Model scope only when `MODEL.md` explicitly requires a framework-native Lightning model.
 
 ## Local execution
 
@@ -251,8 +287,8 @@ Numbers, comparisons, data-processing descriptions, and Reference-derived facts 
 3. let the user revise or approve the proposal;
 4. write only agreed files and preserve existing content.
 
-Install the nested leaf skills with `npx skills`, which preserves their frontmatter names as installed identities. The repository does not provide an installer or flattened export and does not promise that copying the grouped source tree directly into an agent's skill directory will work. Component planning requires the separately installed `grill-with-docs`; it stops if that skill is unavailable. The collection may also invoke `research`, `prototype`, `tdd`, and `code-review`, but does not copy or fork those skills. The root `CONTEXT.md` and this design spec are development documents, not runtime dependencies of the delivered skills.
+Install the nested leaf skills with `npx skills`, which preserves their frontmatter names as installed identities. The repository does not provide an installer or flattened export and does not promise that copying the grouped source tree directly into an agent's skill directory will work. Component planning requires the separately installed `grill-with-docs`; it stops if that skill is unavailable. The collection may also invoke `research`, `prototype`, `tdd`, and `code-review`, but does not copy or fork those skills. Python-producing skills run project-native checks without invoking the independent Python utilities, and generic definition skills follow an established framework convention when a framework integration skill is absent. The root `CONTEXT.md` and this design spec are development documents, not runtime dependencies of the delivered skills.
 
 ## Implementation order
 
-The initial implementation keeps every leaf skill as a self-contained Markdown workflow before reviewing each Capability module and the collection as a whole. Review covers Reference investigation, experiment initialization, Dataset derivation, Model registration or implementation, separately defined Benchmark and Experiment specifications, local execution guidance, phase-level evaluation, structured record templates, and reader-facing writing. No Python package, custom installer, CLI, or repository-specific runtime is part of v1.
+The initial implementation keeps every leaf skill as a self-contained Markdown workflow before reviewing each Capability module and the collection as a whole. Review covers Reference investigation, experiment initialization, Dataset derivation, Model registration or implementation, separately defined Benchmark and Experiment specifications, uv project initialization, scoped Ruff repair, optional framework integration, local execution guidance, phase-level evaluation, structured record templates, and reader-facing writing. No Python package, custom installer, CLI, framework registry, or repository-specific runtime is part of v1.

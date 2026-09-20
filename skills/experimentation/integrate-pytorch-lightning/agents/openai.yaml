@@ -1,0 +1,4 @@
+interface:
+  display_name: "integrate-pytorch-lightning"
+  short_description: "Implement Lightning in an aligned component scope"
+  default_prompt: "Use the `integrate-pytorch-lightning` skill to implement PyTorch Lightning within one already aligned Model or Experiment scope."

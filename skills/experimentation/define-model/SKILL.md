@@ -9,12 +9,13 @@ Treat each model as an independent, reproducible component of a deep-learning ex
 
 ## Workflow
 
-1. Inspect the target project's instructions, architecture, data interfaces, training entry points, and dependency conventions.
+1. Inspect the target project's instructions, architecture, data interfaces, training entry points, framework conventions, and dependency conventions.
 2. Before designing or changing the model, invoke the `grill-with-docs` skill. Continue until the architecture, module contracts, interfaces, training and inference behavior, and implementation constraints are explicit and confirmed. If it is unavailable, stop.
 3. Write `MODEL.md` as the model contract.
-4. Implement the model in a self-contained `models/<model-id>/` directory.
-5. Keep `MODEL.md`, implementation files, and configuration consistent. If implementation reveals a change to the architecture, module interfaces, input/output behavior, training or inference behavior, or checkpoint contract, pause and repeat the `grill-with-docs` skill before continuing.
-6. List the changed files and show the diff. Do not create a commit.
+4. Implement the model in a self-contained `models/<model-id>/` directory. When the confirmed design uses a supported framework, use its optional integration skill if available or follow the project's established convention directly.
+5. Implement the selected Model, then record the explicit Python file or directory scope containing the code created or modified by this invocation. Keep `MODEL.md`, implementation files, and configuration consistent. If implementation reveals a change to the architecture, module interfaces, input/output behavior, training or inference behavior, or checkpoint contract, pause and repeat the `grill-with-docs` skill before continuing.
+6. After the implementation and Model contract agree, invoke `improve-python-documentation` with that explicit Python scope. Then invoke `fix-python-quality` with the same explicit scope.
+7. List the changed files, documentation changes, quality commands and results, and unverified checks, then show the diff. Do not create a commit.
 
 ## Model Directory
 
@@ -51,6 +52,6 @@ Give each meaningful module its own subsection. For every module, describe its r
 
 ### Implementation
 
-Record implementation files, configuration, dependencies, initialization, checkpoint and state-dict details, and implementation choices that affect reproducibility. Keep the code itself in the implementation files.
+Record implementation files, configuration, dependencies, initialization, and implementation choices that affect reproducibility. Define the framework-neutral identity, naming, and load semantics of learned parameters. When a framework-native checkpoint applies, record how its weights map to that contract and distinguish loading model weights from restoring training state. Keep the code itself in the implementation files.
 
 The specification must remain consistent with the actual implementation. If the implementation changes the model contract, stop and realign the design before continuing.
