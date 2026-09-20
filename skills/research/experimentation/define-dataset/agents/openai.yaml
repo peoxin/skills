@@ -1,4 +1,4 @@
 interface:
   display_name: "define-dataset"
-  short_description: "Define a self-contained, reproducible Dataset component"
+  short_description: "Define a self-contained, reusable Dataset component"
   default_prompt: "Use the `define-dataset` skill to align a Dataset revision and derivation, write the component contracts, and implement the required processing."
