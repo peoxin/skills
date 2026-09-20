@@ -15,7 +15,7 @@ Treat each Experiment as one concrete training, evaluation, or train-then-evalua
 4. Implement the declared phases using the target project's existing configuration or code conventions. Create or update project-native configuration, custom phase code, or both as required. When the confirmed design uses a supported framework, use its optional integration skill if available or follow the project's established convention directly. Run a bounded lifecycle smoke test only when the Experiment contract requires it.
 5. Implement the declared phases, then record the explicit Python file or directory scope containing the code created or modified by this invocation. Keep `EXPERIMENT.md`, configuration or phase code, and commands consistent. If the question, components, phases, configuration, implementation, resources, checkpoint flow, outputs, or failure boundaries change, pause and repeat the `grill-with-docs` skill before continuing.
 6. After the implementation and Experiment contract agree, invoke `improve-python-documentation` with that explicit Python scope. Then invoke `fix-python-quality` with the same explicit scope. Do not let either utility infer scope from Git status or the diff.
-7. List the changed files, documentation changes, quality commands and results, and unverified checks, show the diff, and propose an Experiment control commit message. Do not create a commit or execute the Experiment.
+7. List the changed files, documentation changes, quality commands and results, and unverified checks, then show the diff. Do not create a commit or execute the Experiment.
 
 If a selected Model, Dataset derivation, or Benchmark must change, hand the work to the `define-model`, `define-dataset`, or `define-benchmark` skill.
 
@@ -46,7 +46,7 @@ Describe the research question, comparison, purpose, and explicit boundaries of 
 
 ### Components
 
-Identify the Model, Dataset derivations, Benchmark, and other inputs used by the declared phases. Record their logical identities, roles, repositories when external, and paths. Record component versions in the Experiment control commit message, not in this document.
+Identify the Model, Dataset derivations, Benchmark, and other inputs used by the declared phases. Record their logical identities, roles, repositories when external, and paths. Record external locators or digests when they are part of the Experiment's input contract. Version fixation and submission membership belong to `run-experiment`, not this specification.
 
 A Train phase requires a Model and its training Dataset derivations. A Benchmark is optional unless training consumes its protocol. An Evaluate phase requires a Model, Benchmark, and checkpoint; the Benchmark identifies its Dataset derivations and evaluation inputs.
 
@@ -74,19 +74,6 @@ Record the phase commands, configuration files, custom phase code, environment f
 
 The specification must remain consistent with the configuration and commands. If implementation changes the Experiment contract, stop and realign the design before continuing.
 
-## Versioning
+## Run Handoff
 
-An Experiment is a concrete definition, not a reusable component. Before formal execution, every selected Model, Dataset derivation, and Benchmark must be fixed by an existing component commit or by a new commit containing only that component. Components that already have the required fixed revision do not need another commit.
-
-The Experiment control commit fixes `EXPERIMENT.md` and its configuration. Its commit message records every selected component's repository, complete commit SHA, and paths using this body format:
-
-```text
-Components:
-- model: repository=<repository>; commit=<40-character SHA>; paths=<paths>
-- dataset-derivation: repository=<repository>; commit=<40-character SHA>; paths=<paths>
-- benchmark: repository=<repository>; commit=<40-character SHA>; paths=<paths>
-```
-
-Repeat entries when multiple Dataset derivations apply. Formal execution rejects missing entries, branches, tags, short SHAs, dirty selected paths, or paths that do not match the recorded commit. Environment configuration paths are fixed by the Experiment control commit when they are in the same repository and are not repeated in the commit message.
-
-The user may create these commits manually. A pre-run workflow may create them automatically only when the user selects that option: show each component diff, commit each changed reusable component separately, then commit the Experiment definition with the component bindings in its message. Do not include unrelated or parallel work.
+`define-experiment` finishes with a validated Experiment contract and reports its changed files and checks. It does not create commits, determine the submission set, or execute the Experiment. `run-experiment` owns version fixation immediately before execution, including the declared dependency closure, user-confirmed control commit, external immutable identities, and pre-run `HEAD` and worktree checks.

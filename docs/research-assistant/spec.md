@@ -151,13 +151,13 @@ Each entry is independently callable. They exchange explicit files or user-selec
 3. `define-model`
    Handle either `reproduce` or `new-method` intent. Align `MODEL.md`, including evidence or hypothesis separation, interfaces, required behavior, integration, and verification, before implementation.
 4. `define-benchmark`
-   Create or revise one self-contained data-and-metric Benchmark from Dataset derivation paths. Own `BENCHMARK.md`, input composition, metric implementations, aggregation, optional visualizations, and proposed Benchmark commit without selecting a Model or run.
+   Create or revise one self-contained data-and-metric Benchmark from Dataset derivation paths. Own `BENCHMARK.md`, input composition, metric implementations, aggregation, optional visualizations, and validation; do not create a commit or select a Model or run.
 5. `define-experiment`
-   Create `EXPERIMENT.md` and any configuration or custom phase code for one concrete Experiment from selected Model, Dataset derivation, and Benchmark paths. Bind component versions, environment configuration paths, optional training settings, phases, seed, resources, checkpoint, and outputs without modifying the referenced components.
+   Create `EXPERIMENT.md` and any configuration or custom phase code for one concrete Experiment from selected Model, Dataset derivation, and Benchmark paths. Declare the selected component identities and paths, environment configuration paths, optional training settings, phases, seed, resources, checkpoint, and outputs without modifying the referenced components.
 6. `integrate-pytorch-lightning`
    Implement PyTorch Lightning within one already aligned Model or Experiment contract without changing that contract.
 7. `run-experiment`
-   Run the phases declared by a fixed Experiment using its declared environment configuration, resources, commands, and outputs. It checks the minimum commit preconditions and does not define generic execution records or output formats.
+   Fix the Experiment and its declared same-repository dependency closure in one user-confirmed control commit immediately before running, then run the declared phases using that clean snapshot. It checks explicit paths, prepares the declared environment, and checks declared outputs without defining generic execution records or output formats.
 8. `propose-improvements`
    Combine Reference analyses and experiment reports into evidence-linked improvement proposals with hypotheses, mechanisms, risks, and ablations.
 
@@ -179,13 +179,13 @@ Each entry is independently callable. They exchange explicit files or user-selec
 
 Creating or normatively changing a Dataset derivation, Model, Benchmark, or Experiment starts by invoking Matt's `grill-with-docs` skill. This is a hard dependency for those planning stages: if it is unavailable, the skill stops before specification or implementation work. The interview follows the design tree until its frontier is empty, then the assistant presents the complete shared understanding and waits for explicit user confirmation.
 
-`run-experiment` consumes the already aligned Experiment; it does not create a second execution specification or call the `grill-with-docs` skill before running. It prepares the environment named by the Experiment using the target project's existing convention, executes the declared phases, and checks the declared outputs. It does not define a generic environment record, Result schema, or default output directory. A normative change to phases, resources, commands, environment configuration, outputs, verification, or failure handling returns to the `define-experiment` skill.
+`run-experiment` consumes the already aligned Experiment; it does not create a second execution specification or call the `grill-with-docs` skill before running. Immediately before execution, it determines the declared same-repository dependency closure, shows the exact submission diff, paths, and commit message, and creates one Experiment control commit after explicit user confirmation. If there are no changes, it may reuse the current `HEAD` only when that tree contains the complete Experiment and closure. It checks explicit local paths and entry points for obvious undeclared references, stops when clarification is needed, verifies that `HEAD` is still the selected commit and that the worktree is clean, then prepares the declared environment and executes the declared phases. It does not define a generic environment record, Result schema, or default output directory. A normative change to phases, resources, commands, environment configuration, outputs, verification, or failure handling returns to the `define-experiment` skill.
 
 After confirmation, the relevant skill writes its Markdown specification before implementation: `REVISION.md` and `DERIVATION.md` for a Dataset, `MODEL.md`, `BENCHMARK.md`, or `EXPERIMENT.md`. Experiment-specific environment configuration, other configuration, or custom phase code lives beside `EXPERIMENT.md` when required. These specifications have no `draft` or `confirmed` status. If implementation reveals a normative change to behavior, interfaces, input semantics, metrics, phases, resources, verification requirements, environment configuration, or failure conditions, the skill pauses and repeats the `grill-with-docs` skill; formatting, typo fixes, and mechanical edits that preserve the specification do not reopen the interview.
 
 After implementation, each Python-producing component skill resolves quality commands from project instructions, task entries, CI, and tool configuration; limits automatic formatting to the selected scope; and directly runs the applicable formatting, linting, typing, and related tests. Failures introduced by the work are fixed; unrelated existing failures and unavailable checks are reported. When the project defines no quality convention, the skill runs safe syntax checks and related tests and identifies the unavailable checks without configuring new tooling.
 
-Each component skill defines a short, component-specific section template in its own `SKILL.md`. A user-created Component commit fixes a reusable component's Markdown specification and implementation. An Experiment control commit fixes `EXPERIMENT.md`, its environment configuration, and its configuration or custom phase code; its commit message binds the reusable component commits. Later normative changes create a new aligned revision; Git history preserves the prior contract.
+Each component skill defines a short, component-specific section template in its own `SKILL.md`. Component skills write and validate their specifications and implementations but do not create commits. `run-experiment` fixes the Experiment, its declared same-repository dependency closure, and its same-repository environment files in one user-confirmed control commit immediately before execution. A same-repository component is identified by that repository, the Experiment control commit SHA, and its path; external components retain immutable repository commits or locators. Later normative changes create a new aligned revision; Git history preserves prior experiment snapshots.
 
 ## Shared records
 
@@ -213,7 +213,7 @@ Benchmark spec (one or more Dataset derivations, inputs, metrics, aggregation)
 
 Benchmark does not own baselines or model comparisons. An Experiment may compare models by referencing the same Benchmark from multiple Experiment specs.
 
-`define-benchmark` is the only entry that creates or revises a Benchmark. It consumes Dataset derivation paths, keeps `BENCHMARK.md`, metric implementations, and visualizations inside the Benchmark directory, verifies their consistency, and proposes a user-created Benchmark commit. `define-experiment` consumes selected component paths and writes only the selected Experiment directory. If the Benchmark needs to change, Experiment definition stops until the `define-benchmark` skill produces the aligned change.
+`define-benchmark` is the only entry that creates or revises a Benchmark. It consumes Dataset derivation paths, keeps `BENCHMARK.md`, metric implementations, and visualizations inside the Benchmark directory, verifies their consistency, and reports the changed files without creating a commit. `define-experiment` consumes selected component paths and writes only the selected Experiment directory. If the Benchmark needs to change, Experiment definition stops until the `define-benchmark` skill produces the aligned change.
 
 The functional model of a complete experiment is:
 
@@ -227,7 +227,7 @@ Result = f_eval(
 
 `Data_train` and `Data_test` are named Benchmark inputs and may be composed from multiple Dataset derivations.
 
-Every formal reusable component is Git-addressed. A component revision records a repository, a complete 40-character commit SHA, and the paths containing its aligned specification, implementation, applicable configuration, and checks. A Benchmark directory is self-contained, including its metric implementations and optional visualizations; Model directories are likewise self-contained and do not use a shared Model directory. A Model defines a framework-neutral weight identity, naming, and load contract; a framework-native checkpoint records or implements the mapping to that contract. An Experiment control commit fixes its Experiment directory and any same-repository environment configuration paths it references. Environment facts that are not declared Experiment outputs are not required run records.
+Every formal Experiment is Git-addressed by its repository, complete control commit SHA, and Experiment path. Its control commit includes the Experiment directory and the declared same-repository dependency closure: selected Model, Dataset derivations, Benchmark, their declared specifications, implementations, configurations, checks, and same-repository environment paths. A same-repository component is identified by the Experiment control commit SHA and its path. External repositories use complete immutable commit SHAs and paths; non-Git resources use immutable locators and digests. Large data, checkpoints, and execution artifacts need not be committed when their provenance and digest are recorded.
 
 ### Phases and partial work
 
@@ -239,14 +239,12 @@ An external checkpoint is registered with an External checkpoint record and eval
 
 Formal version contract:
 
-- Model, every Dataset derivation selected by the Experiment or Benchmark, Benchmark when used, and the Experiment directory must be identified by Git repository, complete commit SHA, and paths. Each reusable component's Markdown specification and implementation must agree at that revision. The Experiment control commit fixes `EXPERIMENT.md`, its configuration or custom phase code, and same-repository environment configuration paths referenced by `EXPERIMENT.md`. Its commit message binds the selected Model, Dataset derivations, and Benchmark commits. For an external repository or environment, record its URL or immutable locator and how it is used; verify it independently before execution.
-- Before a formal run, the Experiment control commit must exist, the Experiment path must be clean, and every Model, Dataset derivation, and Benchmark commit named by its message must exist.
+- The Experiment control commit fixes the Experiment directory and its declared same-repository dependency closure, including selected Model, Dataset derivations, Benchmark, declared implementations and configurations, and same-repository environment paths. A same-repository component is identified by the Experiment repository, complete control commit SHA, and path. External repositories use immutable commit SHAs and paths; external environments and resources use immutable locators and digests.
+- Before a formal run, `run-experiment` shows the exact submission diff, paths, and commit message. The user may add paths but may not remove declared dependencies. After confirmation, it creates one control commit, or reuses the current `HEAD` when the submission set is empty and the tree already contains the complete closure. It then requires `HEAD` to remain that commit and the worktree to be clean before execution.
 - The run uses the target project's environment convention and the configuration paths named by `EXPERIMENT.md`. It does not infer a missing environment, perform a generic compatibility audit, or create an unrequested environment record.
 - After a run, commit only the outputs declared by the Experiment and any files the user chooses to retain as a user-created Result commit. The execution entry proposes the files and message but does not create the Result commit automatically.
 
-Formal execution requires a fixed Experiment control commit and matching component revisions. The assistant may prepare code, validate records, and run low-cost smoke tests before a component commit. It may not silently change a component, environment configuration, resource request, Dataset derivation, Benchmark scope, Experiment phase, or output.
-
-Uncommitted or dirty work may support exploratory runs and smoke tests, but it is not eligible for a formal benchmark or report claim. Automatic Experiment commits are allowed only after the user explicitly confirms the exact displayed submission set.
+`define-*` skills may prepare and validate dirty work, but they do not create component commits. A user may create ordinary component commits for local history or reuse; they are not formal execution prerequisites. Run outputs remain outside the control commit.
 
 ## Python utilities
 
@@ -268,7 +266,7 @@ Framework integration skills are optional implementation capabilities, not compo
 
 The first execution target is one researcher-controlled multi-GPU machine. `run-experiment` reads the Experiment's resource declaration, uses the target project's environment convention, executes the declared phases, checks the declared outputs, and releases resources after success or failure. It does not ship a scheduler, generic environment manager, execution schema, or cloud implementation.
 
-Large checkpoints, datasets, logs, and image collections need not be committed to Git. Their manifests record path or external reference, size, SHA256, generation/download time, and the component commits that produced or consumed them. Dataset processing code, Dataset derivation records, checkpoint registration records, specs, code, configs, reports, and small provenance records are Git-tracked.
+Large checkpoints, datasets, logs, and image collections need not be committed to Git. Their manifests record path or external reference, size, SHA256, generation/download time, and the Experiment control commit or other provenance that produced or consumed them. Dataset processing code, Dataset derivation records, checkpoint registration records, specs, code, configs, reports, and small provenance records are Git-tracked.
 
 ## References and investigation
 

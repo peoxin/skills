@@ -2,10 +2,8 @@
 
 `run-experiment` is the only user-facing execution entry. It reads the environment configuration, phases, commands, resources, checkpoint flow, outputs, and failure boundaries already fixed by `define-experiment`; it does not accept temporary execution overrides or define a generic environment, output, Result, or report format.
 
+Immediately before execution, it determines the declared same-repository dependency closure, checks explicit local paths and entry points for obvious undeclared references, presents the exact submission diff, paths, and commit message, and creates one Experiment control commit after explicit user confirmation. A changed submission set requires new confirmation. If the submission set is empty, it may reuse the current `HEAD` only when the tree contains the complete Experiment and closure. After selecting the control commit, it verifies that `HEAD` is unchanged and the worktree is clean before running. A failed commit or check stops execution. Result commits remain user-created and contain only files the Experiment declares or the user chooses to retain.
+
 The Experiment must declare its environment configuration. The target project's existing convention determines how that configuration is prepared. `run-experiment` executes the declared phases and checks the declared outputs; Experiment code produces any environment report or other output that the Experiment declares. The skill does not add an environment-probing command or record runtime facts by default.
 
-Automatic Experiment commits are permitted only after the user explicitly confirms the exact diffs, paths, and commit message shown immediately before commit creation. A later or changed submission set requires new confirmation. Result commits remain user-created and contain only files the Experiment declares or the user chooses to retain.
-
-## Consequences
-
-Users have one execution entry without a generic execution schema. Environment requirements and outputs belong to the Experiment contract; project-native configuration expresses package and Python versions, and no generic CUDA or hardware requirement is imposed. Formal execution still requires a fixed Experiment control commit and the named Model, Dataset derivation, and Benchmark commits. Explicitly authorized exploratory runs may use incomplete provenance but cannot be presented as formal evidence.
+Component skills do not create commits. A user may create ordinary component commits for local history or reuse, but the formal execution identity is the Experiment control commit plus component paths. Run outputs are not added to the control commit.

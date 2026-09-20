@@ -37,7 +37,7 @@ One `data/<dataset-id>/` directory represents one selected raw Dataset revision.
 
 Do not create or require shared data-processing directories such as `common/`, `lib/`, `_shared/`, or top-level processing directories. If derivations need similar code, keep each derivation self-contained and maintain copies independently.
 
-Do not create `dataset.yaml` or `derivation.yaml`. Git fixes the complete component version; later Experiments record the relevant commit and paths.
+Do not create `dataset.yaml` or `derivation.yaml`. A formal Experiment control commit fixes the selected Dataset derivation's specification, implementation, and configuration in its declared dependency closure. A user may create an ordinary Dataset commit for local history or reuse.
 
 ## REVISION.md
 
