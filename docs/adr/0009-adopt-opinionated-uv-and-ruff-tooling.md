@@ -1,0 +1,5 @@
+# Adopt Opinionated uv And Ruff Tooling
+
+The Tooling group provides three independent, preference-specific Python capabilities. `initialize-python-project` is user-invoked and initializes only an absent or empty target with the installed uv version's defaults, a fixed Ruff development dependency and configuration, and a fixed `.gitignore`. `fix-python-quality` is model-invocable and runs Ruff through uv to repair and verify formatting and linting in an explicit Python file or directory scope. `improve-python-documentation` is model-invocable and improves docstrings and comments in an explicit Python file or directory scope.
+
+These tools optimize for one user's workflow rather than compatibility. The initializer does not migrate existing projects or establish a contract consumed by other skills. The repair skill requires `uv run ruff --version` to succeed but does not inspect the resolved executable path, configure tooling, provide a check-only mode, or run tests. Python-producing research skills continue to run the target project's established quality commands directly and may invoke these independent tools explicitly when appropriate.

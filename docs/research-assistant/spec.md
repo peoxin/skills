@@ -15,31 +15,29 @@ Capability modules organize source directories; they are not skills or routers. 
 
 ```text
 skills/
-  investigation/
-    search-references/
-    add-references/
-    analyze-references/
-  experimentation/
-    initialize-experiment-workspace/
-    define-dataset/
-    define-model/
-    define-benchmark/
-    define-experiment/
-    integrate-pytorch-lightning/
-    run-experiment/
-      SKILL.md
-      agents/
-        openai.yaml
-    propose-improvements/
-  writing/
-    write-report/
-  utilities/
+  research/
+    investigation/
+      search-references/
+      add-references/
+      analyze-references/
+    experimentation/
+      initialize-experiment-workspace/
+      define-dataset/
+      define-model/
+      define-benchmark/
+      define-experiment/
+      integrate-pytorch-lightning/
+      run-experiment/
+      propose-improvements/
+    writing/
+      write-report/
+  tooling/
     initialize-python-project/
     fix-python-quality/
     improve-python-documentation/
 ```
 
-`utilities` is the fourth module for small independent tools. `initialize-python-project` creates a new uv project with the preferred Ruff and Git ignore baseline; `fix-python-quality` repairs Ruff formatting and lint failures in an explicit Python scope; `improve-python-documentation` improves docstrings and comments in an explicit Python scope. Module directories do not contain `SKILL.md` or module README files.
+`research` groups the Investigation, Experimentation, and Writing capability areas. `tooling` is a peer group for independent development tools. `initialize-python-project` creates a new uv project with the preferred Ruff and Git ignore baseline; `fix-python-quality` repairs Ruff formatting and lint failures in an explicit Python scope; `improve-python-documentation` improves docstrings and comments in an explicit Python scope. Group directories do not contain `SKILL.md` or module README files.
 
 ## Target project layout
 
@@ -166,7 +164,7 @@ Each entry is independently callable. They exchange explicit files or user-selec
 1. `write-report`
    Produce an editable reader-facing report or paper from Reference records and analyses, experiment results, and user-confirmed claims. It does not rewrite canonical evidence, submit, or review the document.
 
-### Utilities
+### Tooling
 
 1. `initialize-python-project`
    Create a new Python project in an absent or empty target using the installed uv defaults, then add the fixed Ruff configuration and Git ignore baseline. It is user-invoked and does not migrate existing projects or establish requirements for other skills.
@@ -246,7 +244,7 @@ Formal version contract:
 
 `define-*` skills may prepare and validate dirty work, but they do not create component commits. A user may create ordinary component commits for local history or reuse; they are not formal execution prerequisites. Run outputs remain outside the control commit.
 
-## Python utilities
+## Python tooling
 
 `initialize-python-project` is a user-invoked initializer for an absent or completely empty target directory. It requires a target path, a Python version request, and `uv` on `PATH`; runs `uv init --python <python> <target>` with the installed uv version's ordinary defaults; adds Ruff with `uv add --dev ruff`; writes the fixed Ruff configuration and complete `.gitignore`; then requires `uv run ruff format --check .` and `uv run ruff check .` to pass. It does not select a uv project template, add testing or typing tools, migrate existing projects, or create research directories. A partial failure preserves the created project and reports the unfinished steps.
 
@@ -254,7 +252,7 @@ Formal version contract:
 
 `improve-python-documentation` is model-invocable and requires an explicit Python file or directory scope. It improves docstrings and comments using the project's conventions or a simplified Google-style fallback, preserves behavior and contracts, and reports changes or items it cannot safely explain. It does not infer scope from Git status, resolve component design questions, or run tests.
 
-These utilities are independent. Python-producing skills invoke both only after implementation is consistent with its component contract, passing the same explicit Python scope first to documentation review and then to Ruff repair.
+These tooling capabilities are independent. Python-producing research skills invoke both only after implementation is consistent with its component contract, passing the same explicit Python scope first to documentation review and then to Ruff repair.
 
 ## Framework integration
 
@@ -285,7 +283,7 @@ Numbers, comparisons, data-processing descriptions, and Reference-derived facts 
 3. let the user revise or approve the proposal;
 4. write only agreed files and preserve existing content.
 
-Install the nested leaf skills with `npx skills`, which preserves their frontmatter names as installed identities. The repository does not provide an installer or flattened export and does not promise that copying the grouped source tree directly into an agent's skill directory will work. Component planning requires the separately installed `grill-with-docs`; it stops if that skill is unavailable. The collection may also invoke `research`, `prototype`, `tdd`, and `code-review`, but does not copy or fork those skills. Python-producing skills run project-native checks without invoking the independent Python utilities, and generic definition skills follow an established framework convention when a framework integration skill is absent. The root `CONTEXT.md` and this design spec are development documents, not runtime dependencies of the delivered skills.
+Install the nested leaf skills with `npx skills`, which preserves their frontmatter names as installed identities. The repository does not provide an installer or flattened export and does not promise that copying the grouped source tree directly into an agent's skill directory will work. Component planning requires the separately installed `grill-with-docs`; it stops if that skill is unavailable. The collection may also invoke `research`, `prototype`, `tdd`, and `code-review`, but does not copy or fork those skills. Python-producing skills run project-native checks without invoking the independent Tooling capabilities, and generic definition skills follow an established framework convention when a framework integration skill is absent. The root `CONTEXT.md` and this design spec are development documents, not runtime dependencies of the delivered skills.
 
 ## Implementation order
 

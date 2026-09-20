@@ -13,7 +13,7 @@ A directly invocable capability organized around a research task, with explicit 
 _Avoid_: Pipeline stage, internal utility
 
 **Capability module**:
-A non-invocable source-layout category that groups independently callable skills by responsibility. The modules are Investigation, Experimentation, Writing, and Utilities; a module does not route calls or own hidden workflow state.
+A non-invocable source-layout category that groups independently callable skills by responsibility. The top-level groups are Research and Tooling; Research contains Investigation, Experimentation, and Writing areas, while Tooling contains independent development tools. A group does not route calls or own hidden workflow state.
 _Avoid_: Router skill, pipeline stage, installed skill identity
 
 **Reference collection**:
@@ -86,13 +86,9 @@ _Avoid_: Benchmark definition, experiment execution
 The functional view of one experiment as `Result = f_eval(f_train(Model, Data_train, Hyperparameter_config), Data_test, Eval_metric)`, where Train may select Dataset derivation inputs directly and Evaluate uses the Benchmark's declared inputs and metrics; every input, transformation, and function implementation has a fixed revision.
 _Avoid_: Training job, benchmark number
 
-**Reusable component revision**:
-The Git identity of an intentional, reusable input or implementation. It records a repository, a complete commit SHA, and the paths whose contents belong to the component, such as a Model, Dataset derivation, or Benchmark implementation. An Experiment is not a reusable component; its concrete training, environment references, and evaluation settings belong to its Experiment control commit.
+**Component snapshot**:
+The contents of a reusable Model, Dataset derivation, or Benchmark as fixed by an Experiment control commit and component path. A component may also have ordinary user-created Git history, but it does not require an independent formal component commit.
 _Avoid_: Latest code, branch-only reference, file version without a commit
-
-**Component commit**:
-The user-created commit that fixes one reusable component's specification document, implementation, and applicable configuration as a consistent revision of its declared paths. Different components in one repository may use different commits; a formal run verifies that the current checkout still matches each component commit at its paths.
-_Avoid_: Unverified version label, execution snapshot
 
 **Experiment phase**:
 An independently executable part of an experiment composition, such as training or evaluation, with its own inputs, status, outputs, and continuation conditions while retaining the parent experiment identity.
@@ -107,15 +103,15 @@ An experiment whose declared phases or outputs are incomplete, failed, cancelled
 _Avoid_: Successful experiment, missing run
 
 **Runnable revision**:
-A formal runnable revision is identified by a Git repository, a complete 40-character commit SHA, and paths for every code, configuration, Dataset derivation, and environment input required by a deliverable run. An external repository is acceptable when its URL or identifier and use are recorded and its commit can be independently verified. Draft or dirty-worktree material may support exploration but is not eligible for a formal run.
+A formal runnable revision is identified by a repository, a complete Experiment control commit SHA, and paths for the Experiment and every same-repository code, configuration, Dataset derivation, Model, Benchmark, and environment input required by the run. External repositories are identified by immutable commit SHA and paths; external resources use immutable locators and digests. Draft or dirty-worktree material may support exploration but is not eligible for a formal run.
 _Avoid_: Latest version, working copy
 
 **Git-tracked experiment**:
-An experiment whose reusable Model, Dataset derivation(s), Benchmark, environment configuration, and Experiment definition are identified by Git commits. Large outputs may remain external only when their source, digest, and producing commits are recorded.
+An experiment whose Experiment definition and declared same-repository dependency closure are fixed by one Experiment control commit. Large outputs may remain external only when their source, digest, and producing or consuming Experiment control commit are recorded.
 _Avoid_: One undifferentiated commit, tracker run
 
 **Experiment control commit**:
-The immutable revision containing `EXPERIMENT.md`, its configuration, and its custom phase code for one concrete run. It fixes the environment configuration paths used by the Experiment when those files are in the same repository. Its commit message binds the selected Model, Dataset derivations, and Benchmark by repository, complete commit SHA, and paths; it does not repeat environment paths.
+The immutable revision containing `EXPERIMENT.md`, its configuration, custom phase code, and declared same-repository dependency closure for one concrete run. It fixes the environment configuration paths used by the Experiment when those files are in the same repository. Its commit message summarizes the Experiment and component paths; the commit tree and declared records provide the authoritative snapshot.
 _Avoid_: Component commit, result commit
 
 **Result commit**:
@@ -123,7 +119,7 @@ A user-created Git commit containing the outputs declared by an Experiment and a
 _Avoid_: Checkpoint file alone, mutable dashboard
 
 **Component verification**:
-The check before execution that the Experiment control commit exists, the Experiment path is clean, and the Model, Dataset derivation, and Benchmark commits named by the control commit message exist. It does not define a generic environment or phase-boundary audit.
+The pre-run check that `run-experiment` has shown the exact submission set, received user confirmation, selected an Experiment control commit, and verified that `HEAD` still identifies that commit and the worktree is clean. It also checks the declared local paths and external immutable identities needed by the run.
 _Avoid_: Trusting a branch name, checking only the commit message
 
 **Local multi-GPU execution**:
