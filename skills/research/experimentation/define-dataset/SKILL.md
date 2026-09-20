@@ -9,8 +9,16 @@ Treat each **Dataset** as an independent, reusable component. A **Dataset revisi
 
 ## Workflow
 
-1. Inspect the project, then invoke `grill-with-docs`. Stop if unavailable. Align the Dataset revision, named inputs, derivation rules, boundaries, and implementation constraints.
-2. Reuse a matching `REVISION.md`; create one only for a new Dataset directory. If the required revision record is absent, incomplete, or incompatible, stop and identify what the user must resolve. Create or update the selected `DERIVATION.md`.
+### Dataset revision
+
+1. Skip this stage if `REVISION.md` already exists.
+2. Thoroughly inspect the user-provided raw dataset, including all data and annotations, and summarize your findings without omissions.
+3. Record the findings in `REVISION.md`.
+
+### Dataset derivation
+
+1. Inspect the project, then invoke `grill-with-docs`. Align the Dataset revision, named inputs, derivation rules, boundaries, and implementation constraints.
+2. Create or update the selected `DERIVATION.md`.
 3. Implement the derivation under `data/<dataset-id>/derivations/<derivation-id>/`. Keep its contract, code, and configuration consistent and self-contained. If implementation requires changing the aligned revision, inputs, rules, or boundaries, rerun `grill-with-docs`.
 4. Record the explicit Python file or directory scope changed. Run `improve-python-documentation`, then `fix-python-quality`, with that same scope.
 5. Report what you've done. Do not commit.
@@ -44,7 +52,7 @@ Document the raw revision shared by all derivations with these sections:
 
 Document one derivation without copying complete configuration or source code:
 
-- **Description**: boundaries and the identity of the derivation.
-- **Dataset Derivation**: referenced `REVISION.md`, raw data used, and how it is transformed into named inputs.
-- **Derived Data**: selection boundary, format, fields, and label semantics for each named input. Prefer to use `train`, `validation`, and `test` for standard splits, but allow other names when appropriate.
-- **Implementation**: files, configurations, dependencies, generation commands, materialized or cached artifacts.
+- **Description**: identity and boundaries.
+- **Dataset Derivation**: referenced `REVISION.md`, raw data used, and its transformation into named inputs.
+- **Derived Data**: selection boundary, format, fields, and label semantics for each named input. Prefer `train`, `validation`, and `test`; allow other split names when needed.
+- **Implementation**: files, configurations, dependencies, generation commands, and materialized or cached artifacts.
