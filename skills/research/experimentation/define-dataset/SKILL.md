@@ -5,7 +5,7 @@ description: Define a self-contained, reusable Dataset component, including its 
 
 # Define Dataset
 
-Treat each **Dataset** as an independent, reusable component. A **Dataset revision** identifies the source content; a **Dataset derivation** defines the rules that turn that revision into named inputs for training, validation, testing, or other declared uses.
+Treat each **Dataset** as an independent, reusable component. A **Dataset revision** identifies the source content; a **Dataset derivation** defines the rules that turn that revision into named inputs.
 
 ## Workflow
 
@@ -36,7 +36,7 @@ Do not create `dataset.yaml` or `derivation.yaml`.
 
 Document the raw revision shared by all derivations with these sections:
 
-- **Description**: identity, purpose, boundaries, source, version, acquisition, content identity, license, and access conditions.
+- **Description**: identity, boundaries, source, version, acquisition, content identity, license, and access conditions.
 - **Raw Data**: files, fields, sample structure, labels, and availability.
 - **Known Constraints**: missing content, data quality, source limitations, and access or licensing restrictions.
 
@@ -44,7 +44,7 @@ Document the raw revision shared by all derivations with these sections:
 
 Document one derivation without copying complete configuration or source code:
 
-- **Description**: purpose and boundaries.
+- **Description**: boundaries and the identity of the derivation.
 - **Dataset Derivation**: referenced `REVISION.md`, raw data used, and how it is transformed into named inputs.
-- **Derived Data**: purpose, selection boundary, format, fields, and label semantics for each named input. Prefer to use `train`, `validation`, and `test` for standard splits, but allow other names when appropriate.
+- **Derived Data**: selection boundary, format, fields, and label semantics for each named input. Prefer to use `train`, `validation`, and `test` for standard splits, but allow other names when appropriate.
 - **Implementation**: files, configurations, dependencies, generation commands, materialized or cached artifacts.
