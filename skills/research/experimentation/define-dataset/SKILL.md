@@ -46,5 +46,5 @@ Document one derivation without copying complete configuration or source code:
 
 - **Description**: purpose and boundaries.
 - **Dataset Derivation**: referenced `REVISION.md`, raw data used, and how it is transformed into named inputs.
-- **Derived Data**: each named input's purpose, selection boundary, format, fields, label meaning.
+- **Derived Data**: purpose, selection boundary, format, fields, and label semantics for each named input. Prefer to use `train`, `validation`, and `test` for standard splits, but allow other names when appropriate.
 - **Implementation**: files, configurations, dependencies, generation commands, materialized or cached artifacts.
