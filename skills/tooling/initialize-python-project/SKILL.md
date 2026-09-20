@@ -31,10 +31,6 @@ After `uv add` succeeds, inspect the generated `pyproject.toml` and add the Ruff
 
 Replace `.gitignore` with the exact template below, whether or not a `.gitignore` already exists.
 
-## Completion
-
-Initialization is complete when `uv init`, `uv add --dev ruff`, the Ruff configuration update, and the `.gitignore` replacement have all succeeded. Do not run formatting, lint, tests, or other project setup as part of this skill.
-
 If any step fails, report the completed steps, the failing command or file operation, and the remaining work. Preserve the partially initialized directory.
 
 ## Templates
