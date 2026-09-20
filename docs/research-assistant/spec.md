@@ -167,7 +167,7 @@ Each entry is independently callable. They exchange explicit files or user-selec
 ### Tooling
 
 1. `initialize-python-project`
-   Create a new Python project in an absent or empty target using the installed uv defaults, then add the fixed Ruff configuration and Git ignore baseline. It is user-invoked and does not migrate existing projects or establish requirements for other skills.
+   Initialize the current directory as a new Python project using the installed uv defaults, then add Ruff and the fixed Ruff configuration and Git ignore baseline. It is user-invoked, requires no existing `pyproject.toml`, and does not migrate existing projects or establish requirements for other skills.
 2. `fix-python-quality`
    Run Ruff through uv to fix and verify formatting and lint failures in an explicitly provided Python file or directory scope. It does not configure tools, expose a check-only mode, infer scope from Git changes, or run tests.
 3. `improve-python-documentation`
@@ -246,7 +246,7 @@ Formal version contract:
 
 ## Python tooling
 
-`initialize-python-project` is a user-invoked initializer for an absent or completely empty target directory. It requires a target path, a Python version request, and `uv` on `PATH`; runs `uv init --python <python> <target>` with the installed uv version's ordinary defaults; adds Ruff with `uv add --dev ruff`; writes the fixed Ruff configuration and complete `.gitignore`; then requires `uv run ruff format --check .` and `uv run ruff check .` to pass. It does not select a uv project template, add testing or typing tools, migrate existing projects, or create research directories. A partial failure preserves the created project and reports the unfinished steps.
+`initialize-python-project` is a user-invoked initializer for the current directory. It requires a Python version request, `uv` on `PATH`, and no existing `pyproject.toml`; unrelated existing files do not by themselves block initialization. It runs `uv init --python <python>` with the installed uv version's ordinary defaults, adds Ruff with `uv add --dev ruff`, and writes the fixed Ruff configuration and complete `.gitignore`. It does not select a uv project template, add testing or typing tools, run quality checks, migrate an existing project, or create research directories. A partial failure preserves the created project and reports the unfinished steps.
 
 `fix-python-quality` is model-invocable and requires an explicit Python file or directory scope plus `uv run ruff --version` to succeed. It runs Ruff's safe lint fixes and formatter, follows with lint and format checks, and may manually repair remaining Ruff findings inside the scope when behavior and public interfaces remain unchanged. It stops when Ruff is unavailable or a repair would change semantics, widen the scope, or require an uncertain suppression. It does not infer scope from Git status, configure quality tooling, provide a check-only mode, or run tests.
 
