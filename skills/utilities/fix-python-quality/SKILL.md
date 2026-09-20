@@ -1,6 +1,6 @@
 ---
 name: fix-python-quality
-description: Fix Ruff formatting and lint errors in an explicit scope or the changed Python files. Use when a user asks to format, lint-fix, or repair Ruff quality failures in a uv project.
+description: Fix Ruff formatting and lint errors in an explicit Python file or directory scope. Use when a user asks to format, lint-fix, or repair Ruff quality failures in a uv project.
 ---
 
 # Fix Python Quality
@@ -9,10 +9,7 @@ Repair Ruff formatting and lint failures inside one selected scope. Assume the p
 
 ## Select The Scope
 
-1. Use an explicit user-selected file or directory scope when provided. Git is not required for an explicit scope.
-2. Otherwise, require a Git worktree and select every staged, unstaged, and untracked `.py` or `.pyi` file that still exists. Use NUL-delimited, machine-readable Git output so spaces, renames, and combined statuses remain intact; exclude deleted files.
-3. If Git cannot provide a scope or the resulting Python file set is empty, ask the user for a scope.
-4. Keep every automatic and manual write inside the selected scope.
+Require the caller to provide an explicit Python file or directory scope. If no scope is provided, stop and ask the user or calling skill to identify the files or directory.
 
 ## Require Ruff
 

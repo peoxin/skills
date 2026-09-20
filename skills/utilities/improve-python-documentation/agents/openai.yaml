@@ -1,0 +1,4 @@
+interface:
+  display_name: "improve-python-documentation"
+  short_description: "Improve docstrings and comments in an explicit Python scope"
+  default_prompt: "Use the `improve-python-documentation` skill to improve docstrings and comments in an explicitly provided Python file or directory scope without changing behavior."

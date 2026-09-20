@@ -1,4 +1,4 @@
 interface:
   display_name: "fix-python-quality"
   short_description: "Fix Ruff formatting and lint failures"
-  default_prompt: "Use the `fix-python-quality` skill to repair Ruff formatting and lint failures in an explicit scope or the changed Python files."
+  default_prompt: "Use the `fix-python-quality` skill to repair Ruff formatting and lint failures in an explicitly provided Python file or directory scope."
