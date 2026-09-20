@@ -1,0 +1,4 @@
+interface:
+  display_name: "initialize-python-project"
+  short_description: "Initialize a preferred uv and Ruff Python project"
+  default_prompt: "Use the `initialize-python-project` skill to create a new uv-managed Python project with the preferred Ruff and Git ignore defaults."
